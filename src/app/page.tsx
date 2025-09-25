@@ -111,20 +111,19 @@ export default function AuthPage() {
         }
       }
     } catch (err: unknown) {
-  let errorCode = "";
-  let errorMsg = "Error desconocido.";
+        let errorCode = "";
+        let errorMsg = "Error desconocido.";
 
-  if (err instanceof Error) {
-    errorMsg = err.message;
-    errorCode = (err as { code?: string }).code ?? "";
-  } else if (typeof err === "object" && err !== null) {
-    errorCode = (err as { code?: string }).code ?? "";
-    errorMsg = (err as { message?: string }).message ?? "Error desconocido.";
-  }
+        if (err instanceof Error) {
+          errorMsg = err.message;
+        }
+        if (typeof err === "object" && err !== null && "code" in err) {
+          errorCode = (err as { code?: string }).code ?? "";
+        }
 
-  setMessage(traducirError(errorCode, errorMsg));
-  setMessageType("error");
-}
+        setMessage(traducirError(errorCode, errorMsg));
+        setMessageType("error");
+      }
   };
 
   // 🔹 Si hay usuario logueado, redirige a /home
