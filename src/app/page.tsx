@@ -21,19 +21,19 @@ export default function AuthPage() {
   const [redirecting, setRedirecting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-
   const router = useRouter();
 
-  // 🔹 Si supabase no está inicializado (ej. prerender)
-  if (!supabase) return <p>Cargando...</p>;
-
-  // 🔹 Escuchar cambios de sesión
+  // 🔹 Escuchar cambios de sesión (hook siempre incondicional)
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data?.session?.user ?? null);
+    const initSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setUser(data?.session?.user ?? null);
+      } catch (err) {
+        console.error("Error obteniendo sesión:", err);
+      }
     };
-    getSession();
+    initSession();
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -44,10 +44,25 @@ export default function AuthPage() {
     };
   }, []);
 
-  // 🔹 Redirigir si ya está logueado
-  useEffect(() => {
-    if (user) router.push("/home");
-  }, [user, router]);
+  // 🔹 Redirigir si hay usuario logueado
+ useEffect(() => {
+  if (!supabase) return; // Early return seguro dentro del hook
+
+  const getSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    setUser(data?.session?.user ?? null);
+  };
+
+  getSession();
+
+  const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+  });
+
+  return () => {
+    subscription.subscription.unsubscribe();
+  };
+}, []);
 
   const traducirError = (code: string, msg: string) => {
     switch (code) {
@@ -84,8 +99,6 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      if (!supabase) return;
-
       if (isLogin) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -192,7 +205,7 @@ export default function AuthPage() {
 
               <div className="button-row">
                 <button type="submit" className="btn btn-secondary" disabled={loading}>
-                  {loading ? "Cargando..." : isLogin ? "Inicia Sesión" : "Regístrate"}
+                  {loading ? "Cargando..." : isLogin ? "Inicia Sesión" : "Registráte"}
                 </button>
                 <button type="button" className="btn btn-primary" onClick={() => setIsLogin(!isLogin)} disabled={loading}>
                   {isLogin ? "Crear cuenta" : "Ya tengo cuenta"}
