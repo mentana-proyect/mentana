@@ -1,0 +1,339 @@
+:root {
+  --accent-primary: #56dbc4;
+  --accent-secondary: #00bcd4;
+  --text-light: #e0e0e0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html, #__next {
+  height: 100%;
+  margin: 0;
+  background-color: #112244;
+}
+
+.pageinicio {
+  margin: 0 0 ;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 100px 10px; /* 🔹 padding adaptable */
+  min-height: 100vh;
+  color: white;
+  }
+
+.container {
+  padding: 30px 20px; /* 🔹 menos padding en mobile */
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow-y: auto;
+  max-height: 90vh; /* 🔹 un poco menos para evitar cortes */
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px; /* Espacio inferior */
+}
+
+.form-group {
+  flex: 1 1 100%;
+  
+}
+
+.full-width {
+  flex: 1 1 100%;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: 14px;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+input:focus {
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background .3s ease, color .3s ease, border .3s ease;
+}
+
+
+
+
+
+a {
+  color: #f999b7;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.message {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #fff;
+  white-space: pre-line;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid var(--accent-primary);
+  border-radius: 50%;
+  margin: 20px auto;
+}
+
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* ahora los elementos van arriba */
+  align-items: center;         /* horizontalmente siguen centrados */
+  height: 100vh;
+  width: 100%;
+  padding-top: 50px; /* opcional, para dar espacio desde arriba */
+  color: white;
+  text-align: center;
+}
+
+
+.options-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  color: white;
+}
+
+.option-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.option-btn.selected {
+  background: var(--accent-primary);
+  color: #112244;
+  font-weight: 600;
+  border: 1px solid var(--accent-secondary);
+}
+
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+
+  form {
+    gap: 15px;
+  }
+
+
+  .btn-primary {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .options-row {
+    display: flex;
+    flex-wrap: nowrap;       /* ❌ no permite salto de línea */
+    overflow-x: auto;        /* ✅ agrega scroll horizontal */
+    gap: 10px;
+    -webkit-overflow-scrolling: touch; /* suave en iOS */
+  }
+
+  .option-btn {
+    white-space: nowrap;     /* ✅ evita que se parta el texto */
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .btn-primary {
+    width: 100%; /* botón ocupa toda la fila */
+  }
+}
+
+
+.form-group p {
+  text-align: left;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.modal-header {
+  display: none !important;
+}
+.button-row {
+  display: flex;
+  justify-content: center; /* centra dentro del contenedor */
+  align-items: center;
+  gap: 10px;               /* espacio entre botones */
+  margin-top: 10px;
+  width: 100%;
+}
+.button-row .btn {
+  flex: 1;                 /* cada botón crece igual */
+  max-width: 50%;          /* que no pase de la mitad */
+  text-align: center;
+  padding: 10px 20px; /* 🔹 18px alto, 20px ancho */
+  font-size: 14px;    /* tamaño del texto */
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #56dbc4;
+  color: white;
+  border: none;
+}
+
+
+.btn-primary:hover {
+  background: #56dbc4;
+  color: #112244;
+}
+.btn-secondary {
+  background: #f999b7;
+  color: white;
+  border: none;
+}
+.btn-secondary:hover {
+  background: #f999b7;
+  color: #112244;
+}
+p {
+  font-size: 14px;
+}
+.terms {
+  margin: 0 0 10px;
+   font-size: 13px;
+  color: var(--text-light, #e0e0e0);
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+.terms2 {
+  margin: 1px 0 10px;
+  font-size: 13px;
+  color: var(--text-light, #e0e0e0);
+  display: flex;
+  justify-content: flex-end; /* 👈 mueve el contenido a la derecha */
+  align-items: center;
+  text-align: right;
+  width: 100%; /* 👈 asegura que ocupe todo el ancho del form */
+}
+
+.terms input[type="checkbox"] {
+  width: 18px;
+  height: 10px;
+  accent-color: var(--accent-primary, #56dbc4);
+  cursor: pointer;
+}
+
+.terms a {
+  color: var(--accent-secondary, #00bcd4);
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}
+.terms2 a {
+  color: var(--accent-secondary, #00bcd4);
+  text-decoration: none;
+}
+
+.terms2 a:hover {
+  text-decoration: underline;
+}
+/* Wrapper para password + botón */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 2.5rem; /* espacio para el botón */
+}
+
+.toggle-password {
+  margin-top: 8px;
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+/* Mensajes diferenciados */
+.message {
+  margin-top: 10px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.message.success {
+  color: #4caf50; /* verde */
+}
+
+.message.error {
+  color: #f44336; /* rojo */
+}
+
+.message.warning {
+  color: #ff9800; /* naranja */
+}
