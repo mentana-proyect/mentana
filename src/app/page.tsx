@@ -1,4 +1,5 @@
 "use client";
+
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,15 +16,16 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<
-    "success" | "error" | "warning" | ""
-  >("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "warning" | "">("");
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   const router = useRouter();
+
+  // 🔹 Si supabase no está inicializado (ej. prerender)
+  if (!supabase) return <p>Cargando...</p>;
 
   // 🔹 Escuchar cambios de sesión
   useEffect(() => {
@@ -33,16 +35,19 @@ export default function AuthPage() {
     };
     getSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => {
       subscription.subscription.unsubscribe();
     };
   }, []);
+
+  // 🔹 Redirigir si ya está logueado
+  useEffect(() => {
+    if (user) router.push("/home");
+  }, [user, router]);
 
   const traducirError = (code: string, msg: string) => {
     switch (code) {
@@ -71,9 +76,7 @@ export default function AuthPage() {
     setMessage("");
 
     if (!isLogin && !termsAccepted) {
-      setMessage(
-        "⚠️ Debes aceptar los términos y condiciones para registrarte."
-      );
+      setMessage("⚠️ Debes aceptar los términos y condiciones para registrarte.");
       setMessageType("warning");
       return;
     }
@@ -81,11 +84,10 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
+      if (!supabase) return;
+
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
         if (data.user) {
@@ -95,44 +97,33 @@ export default function AuthPage() {
           setTimeout(() => router.push("/home"), 1500);
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
         if (data.user) {
-          setMessage(
-            "✅ Registro exitoso, revisa tu correo para confirmar."
-          );
+          setMessage("✅ Registro exitoso, revisa tu correo para confirmar.");
           setMessageType("success");
           setRedirecting(true);
           setTimeout(() => router.push("/home"), 1500);
         }
       }
     } catch (err: unknown) {
-        let errorCode = "";
-        let errorMsg = "Error desconocido.";
+      let errorCode = "";
+      let errorMsg = "Error desconocido.";
 
-        if (err instanceof Error) {
-          errorMsg = err.message;
-        }
-        if (typeof err === "object" && err !== null && "code" in err) {
-          errorCode = (err as { code?: string }).code ?? "";
-        }
-
-        
-        setMessage(traducirError(errorCode, errorMsg));
-        setMessageType("error");
+      if (err instanceof Error) {
+        errorMsg = err.message;
       }
-  };
+      if (typeof err === "object" && err !== null && "code" in err) {
+        errorCode = (err as { code?: string }).code ?? "";
+      }
 
-  // 🔹 Si hay usuario logueado, redirige a /home
-  useEffect(() => {
-    if (user) {
-      router.push("/home");
+      setMessage(traducirError(errorCode, errorMsg));
+      setMessageType("error");
+    } finally {
+      setLoading(false);
     }
-  }, [user, router]);
+  };
 
   return (
     <>
@@ -143,13 +134,7 @@ export default function AuthPage() {
       <div className="pageinicio">
         {!redirecting ? (
           <div className="container">
-            <Image
-              src="/logo.jpg"
-              alt="Logo Mentana"
-              width={120}
-              height={120}
-              className="logo"
-            />
+            <Image src="/logo.jpg" alt="Logo Mentana" width={120} height={120} className="logo" />
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -174,30 +159,14 @@ export default function AuthPage() {
                     disabled={loading}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                  <button
-                    type="button"
-                    className="toggle-password"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
+                  <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="25"
-                        height="25"
-                        fill="white"
-                        viewBox="0 0 30 18"
-                      >
-                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 5 5s-2.239 5-5 5zm0-8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width={25} height={25} fill="white" viewBox="0 0 30 18">
+                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 5 5s-2.239 5-5 5zm0-8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z"/>
                       </svg>
                     ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="25"
-                        height="25"
-                        fill="white"
-                        viewBox="0 0 30 18"
-                      >
-                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 7-12 7-12-7-12-7 4.367-7 12-7zm0 12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 0-5 2.239-5 5s2.239 5 5 5z" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width={25} height={25} fill="white" viewBox="0 0 30 18">
+                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 7-12 7-12-7-12-7 4.367-7 12-7zm0 12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 0-5 2.239-5 5s2.239 5 5 5z"/>
                       </svg>
                     )}
                   </button>
@@ -208,45 +177,24 @@ export default function AuthPage() {
                 <div className="terms">
                   <label>
                     &nbsp;
-                    <input
-                      type="checkbox"
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                    />{" "}
+                    <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} />{" "}
                     Acepto los{" "}
-                    <Link href="/terminos" target="_blank">
-                      Términos y Condiciones
-                    </Link>
+                    <Link href="/terminos" target="_blank">Términos y Condiciones</Link>
                   </label>
                 </div>
               ) : (
                 <div className="terms2">
                   <label>
-                    <Link href="/reset-password" target="_blank">
-                      ¿Olvidaste tu contraseña?
-                    </Link>
+                    <Link href="/reset-password" target="_blank">¿Olvidaste tu contraseña?</Link>
                   </label>
                 </div>
               )}
 
               <div className="button-row">
-                <button
-                  type="submit"
-                  className="btn btn-secondary"
-                  disabled={loading}
-                >
-                  {loading
-                    ? "Cargando..."
-                    : isLogin
-                    ? "Inicia Sesión"
-                    : "Regístrate"}
+                <button type="submit" className="btn btn-secondary" disabled={loading}>
+                  {loading ? "Cargando..." : isLogin ? "Inicia Sesión" : "Regístrate"}
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => setIsLogin(!isLogin)}
-                  disabled={loading}
-                >
+                <button type="button" className="btn btn-primary" onClick={() => setIsLogin(!isLogin)} disabled={loading}>
                   {isLogin ? "Crear cuenta" : "Ya tengo cuenta"}
                 </button>
               </div>
@@ -254,20 +202,12 @@ export default function AuthPage() {
 
             {message && <p className={`message ${messageType}`}>{message}</p>}
 
-            <p>
-              <strong>&copy; 2025 Mentana 🧠</strong>
-            </p>
+            <p><strong>&copy; 2025 Mentana 🧠</strong></p>
           </div>
         ) : (
           <div className="loading-screen">
-            <motion.div
-              className="spinner"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-            />
-            <p className="message">
-              {isLogin ? "Iniciando Sesión..." : "Registrando usuario..."}
-            </p>
+            <motion.div className="spinner" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} />
+            <p className="message">{isLogin ? "Iniciando Sesión..." : "Registrando usuario..."}</p>
           </div>
         )}
       </div>
