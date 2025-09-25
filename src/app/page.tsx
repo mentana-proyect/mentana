@@ -121,6 +121,7 @@ export default function AuthPage() {
           errorCode = (err as { code?: string }).code ?? "";
         }
 
+        
         setMessage(traducirError(errorCode, errorMsg));
         setMessageType("error");
       }
