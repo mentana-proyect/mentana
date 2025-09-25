@@ -110,14 +110,21 @@ export default function AuthPage() {
           setTimeout(() => router.push("/home"), 1500);
         }
       }
-    } catch (err: any) {
-      const errorCode = err?.code || "";
-      const errorMsg = err?.message || "Error desconocido.";
-      setMessage(traducirError(errorCode, errorMsg));
-      setMessageType("error");
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: unknown) {
+  let errorCode = "";
+  let errorMsg = "Error desconocido.";
+
+  if (err instanceof Error) {
+    errorMsg = err.message;
+    errorCode = (err as { code?: string }).code ?? "";
+  } else if (typeof err === "object" && err !== null) {
+    errorCode = (err as { code?: string }).code ?? "";
+    errorMsg = (err as { message?: string }).message ?? "Error desconocido.";
+  }
+
+  setMessage(traducirError(errorCode, errorMsg));
+  setMessageType("error");
+}
   };
 
   // 🔹 Si hay usuario logueado, redirige a /home
