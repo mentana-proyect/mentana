@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
 import { motion } from "framer-motion";
-import { User } from "@supabase/supabase-js";
+import { User, AuthError } from "@supabase/supabase-js";
 import "./general.css";
 
 export default function AuthPage() {
@@ -110,9 +110,17 @@ export default function AuthPage() {
           setTimeout(() => router.push("/home"), 1500);
         }
       }
-    } catch (err: any) {
-      const errorCode = err?.code || "";
-      const errorMsg = err?.message || "Error desconocido.";
+    } catch (err: unknown) {
+      let errorCode = "";
+      let errorMsg = "Error desconocido.";
+
+      if (err instanceof AuthError) {
+        errorCode = err.name || "";
+        errorMsg = err.message;
+      } else if (err instanceof Error) {
+        errorMsg = err.message;
+      }
+
       setMessage(traducirError(errorCode, errorMsg));
       setMessageType("error");
     } finally {
@@ -180,7 +188,7 @@ export default function AuthPage() {
                         fill="white"
                         viewBox="0 0 30 18"
                       >
-                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 5 5s-2.239 5-5 5zm0-8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
+                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 0-5-2.239-5-5s-2.239-5-5-5c-2.761 0-5 2.239-5 5s2.239 5 5 5zm0-8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
                       </svg>
                     ) : (
                       <svg
