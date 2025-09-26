@@ -15,12 +15,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-/**
- * Decode la URL en caso de que Render haya bloqueado caracteres especiales
- */
 const decodedUrl = decodeURIComponent(supabaseUrl);
-
-/**
- * Cliente Supabase listo para usar en Client Components
- */
 export const supabase = createClient(decodedUrl, supabaseAnonKey);
