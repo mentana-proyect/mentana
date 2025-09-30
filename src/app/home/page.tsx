@@ -3,17 +3,24 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import type { User } from '@supabase/supabase-js';
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const session = supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) router.push('/auth');
-      else setUser(data.session.user);
-    });
-  }, []);
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session) {
+        router.push('/auth');
+      } else {
+        setUser(data.session.user);
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   if (!user) return <p>Loading...</p>;
 
