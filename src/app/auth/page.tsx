@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
 import { motion } from "framer-motion";
 import "../../styles/general.css";
+import type { User } from "@supabase/supabase-js";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,7 +18,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const router = useRouter();
 
@@ -29,11 +30,9 @@ export default function AuthPage() {
     };
     getSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => {
       subscription.subscription.unsubscribe();
@@ -62,7 +61,7 @@ export default function AuthPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
 
@@ -76,10 +75,7 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
         if (data?.user) {
@@ -89,10 +85,7 @@ export default function AuthPage() {
           setTimeout(() => router.push("/home"), 1500);
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
         if (data?.user) {
@@ -102,9 +95,11 @@ export default function AuthPage() {
           setTimeout(() => router.push("/home"), 1500);
         }
       }
-    } catch (err: any) {
-      const errorCode = err?.code || "";
-      const errorMsg = err?.message || "Error desconocido.";
+    } catch (err: unknown) {
+      // 🔹 Tipado seguro del error
+      const e = err as { code?: string; message?: string };
+      const errorCode = e.code || "";
+      const errorMsg = e.message || "Error desconocido.";
       setMessage(traducirError(errorCode, errorMsg));
       setMessageType("error");
     } finally {
@@ -112,11 +107,9 @@ export default function AuthPage() {
     }
   };
 
-  // 🔹 Si hay usuario logueado, redirige a /home
+  // 🔹 Redirigir si ya hay usuario
   useEffect(() => {
-    if (user) {
-      router.push("/home");
-    }
+    if (user) router.push("/home");
   }, [user, router]);
 
   return (
@@ -128,13 +121,7 @@ export default function AuthPage() {
       <div className="pageinicio">
         {!redirecting ? (
           <div className="container">
-            <img
-              src="logo.jpg"
-              alt="Logo Mentana"
-              width="120"
-              height="120"
-              className="logo"
-            />
+            <img src="logo.jpg" alt="Logo Mentana" width={120} height={120} className="logo" />
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -164,28 +151,7 @@ export default function AuthPage() {
                     className="toggle-password"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      // Icono "ocultar"
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="25" height="25" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
-                                0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 
-                                5 5s-2.239 5-5 5zm0-8c-1.657 0-3 
-                                1.343-3 3s1.343 3 3 3 3-1.343 
-                                3-3-1.343-3-3-3z"/>
-                      </svg>
-                    ) : (
-                      // Icono "mostrar"
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="25" height="25" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
-                                7-12 7-12-7-12-7 4.367-7 12-7zm0 
-                                12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
-                                0-5 2.239-5 5s2.239 5 5 5z"/>
-                      </svg>
-                    )}
+                    {showPassword ? "🙈" : "👁️"}
                   </button>
                 </div>
               </div>
@@ -193,7 +159,8 @@ export default function AuthPage() {
               {!isLogin ? (
                 <div className="terms">
                   <label>
-                    &nbsp;<input
+                    &nbsp;
+                    <input
                       type="checkbox"
                       checked={termsAccepted}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
@@ -242,9 +209,7 @@ export default function AuthPage() {
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
             />
-            <p className="message">
-              {isLogin ? "Iniciando Sesión..." : "Registrando usuario..."}
-            </p>
+            <p className="message">{isLogin ? "Iniciando Sesión..." : "Registrando usuario..."}</p>
           </div>
         )}
       </div>
