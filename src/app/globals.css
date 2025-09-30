@@ -2,7 +2,7 @@
 
 :root {
   --background: #112244;
-  --foreground: #56dbc4;
+  --foreground: #fff;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -11,8 +11,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #112244;
+  --foreground: #fff;
   }
 }
 

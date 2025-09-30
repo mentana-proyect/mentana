@@ -1,0 +1,249 @@
+/* 🎨 Variables globales */
+:root {
+  --primary: #56dbc4;
+  --secondary: #f999b7;
+  --accent: #00bcd4;
+  --background: #112244;
+  --text: #ffffff;
+  --text-light: #e0e0e0;
+  --font: 'Poppins', sans-serif;
+  --radius: 16px;
+  --transition: 0.3s ease;
+  --accent-primary: #56dbc4; /* para carousel indicators */
+}
+
+/* 🔹 Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🔹 Body y página principal */
+html, body, #__next {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.page, .pageinicio {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 30px;
+  color: var(--text);
+  background-color: var(--background);
+}
+
+/* 🔹 Contenedores */
+.container,
+.contenedor-principal-adaptado {
+  width: 100%;
+  max-width: 450px;
+  padding: 30px 20px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow-y: auto;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.contenedor-principal-adaptado {
+  width: 95%;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px 0 10px;
+}
+
+.tarjeta-contenido-principal,
+.tarjeta-contenido-secundario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 🔹 Tipografía */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--text-light);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* 🔹 Botones */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--text);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  color: var(--text);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  opacity: 0.85;
+}
+
+.botones-accion {
+  display: flex;
+  gap: 10px;
+}
+
+.botones-accion a {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: var(--radius);
+  display: inline-block;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+/* 🔹 Formularios */
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+}
+
+/* 🔹 Mensajes */
+.message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-align: center;
+}
+
+.message.success { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+.message.error { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+.message.warning { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+
+/* 🔹 Utilidades */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 20px; }
+.mb-1 { margin-bottom: 10px; }
+.mb-2 { margin-bottom: 20px; }
+
+/* 🔹 Footer */
+footer {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* 🔹 Loading */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(to right, #23bcd7, #112244);
+}
+
+/* 🔹 Carousel */
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-cards {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: 0 0 100%;
+  padding: 10px;
+  border-radius: var(--radius);
+  scroll-snap-align: center;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.indicator.active {
+  background-color: var(--accent-primary);
+}
