@@ -118,10 +118,10 @@ export default function AuthPage() {
         <title>{isLogin ? "Iniciar Sesión" : "Registrarse"}</title>
       </Head>
 
-      <div className="pageinicio">
+      <div className="page">
         {!redirecting ? (
           <div className="container">
-            <img src="logo.jpg" alt="Logo Mentana" width={120} height={120} className="logo" />
+            <img src="logo.jpg" alt="Logo Mentana" className="logo-container" />
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">

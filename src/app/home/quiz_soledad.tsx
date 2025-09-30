@@ -56,13 +56,13 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
     }
 
     // Guardar respuestas en results_ucla
-    const { error: insertError } = await supabase.from("results_ucla").insert([
+    const { error: insertError } = await supabase.from("results_soledad").insert([
       { user_id: userId, answers, total, interpretation: interp },
     ]);
 
     if (insertError) {
       console.error(insertError);
-      alert("Error al guardar el resultado en results_ucla");
+      alert("Error al guardar el resultado en results_soledad");
       setLoading(false);
       return;
     }

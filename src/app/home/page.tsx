@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
-import CuestionarioGAD7 from "./quiz_gad7";
-import CuestionarioPHQ9 from "./quiz_phq9";
-import CuestionarioPSS10 from "./quiz_pss10";
-import CuestionarioUCLA from "./quiz_ucla";
+import CuestionarioGAD7 from "./quiz_ansiedad";
+import CuestionarioPHQ9 from "./quiz_depresion";
+import CuestionarioPSS10 from "./quiz_estres";
+import CuestionarioUCLA from "./quiz_soledad";
 import Confetti from "react-confetti";
 import { supabase } from "../../lib/supabaseClient";
 

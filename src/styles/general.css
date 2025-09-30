@@ -94,7 +94,7 @@ a:hover {
 /* 🔹 Botones */
 .btn {
   display: inline-block;
-  padding: 10px 20px;
+  padding: 10px 50px;
   border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
@@ -192,6 +192,7 @@ footer {
   text-align: center;
   font-size: 14px;
   color: var(--text-light);
+  gap: 20px;
 }
 
 /* 🔹 Loading */

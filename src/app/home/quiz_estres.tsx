@@ -69,13 +69,13 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
     }
 
     // 1️⃣ Guardar respuestas en results_pss10
-    const { error: insertError } = await supabase.from("results_pss10").insert([
+    const { error: insertError } = await supabase.from("results_estres").insert([
       { user_id: userId, answers, total, interpretation: interp },
     ]);
 
     if (insertError) {
       console.error(insertError);
-      alert("Error al guardar el resultado en results_pss10");
+      alert("Error al guardar el resultado en results_estres");
       setLoading(false);
       return;
     }
