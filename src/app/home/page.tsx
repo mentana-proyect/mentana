@@ -26,29 +26,20 @@ type QuizComponentsMap = {
 };
 
 // 🔹 Logout
-const handleLogout = async (router: ReturnType<typeof useRouter>) => {
-  const { error } = await supabase.auth.signOut();
-  if (error) console.error("Error al cerrar sesión:", error.message);
-  else router.replace("/auth");
+const useLogout = () => {
+  const router = useRouter();
+  return async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error("Error al cerrar sesión:", error.message);
+    else router.replace("/auth");
+  };
 };
 
 const initialData: Category[] = [
-  {
-    name: "Ansiedad",
-    quiz: { id: "ansiedad1", title: "Ansiedad GAD-7", description: "Preocupación, nerviosismo e inquietud.", unlocked: true, completed: false },
-  },
-  {
-    name: "Depresión",
-    quiz: { id: "depresion1", title: "Depresión PHQ-9", description: "Estado de ánimo, interés y energía reciente.", unlocked: false, completed: false },
-  },
-  {
-    name: "Estrés",
-    quiz: { id: "estres1", title: "Estrés PSS-10", description: "Tensión, carga y recuperación.", unlocked: false, completed: false },
-  },
-  {
-    name: "Soledad",
-    quiz: { id: "soledad1", title: "Soledad UCLA", description: "Percepción de conexión y apoyo social.", unlocked: false, completed: false },
-  },
+  { name: "Ansiedad", quiz: { id: "ansiedad1", title: "Ansiedad GAD-7", description: "Preocupación, nerviosismo e inquietud.", unlocked: true, completed: false } },
+  { name: "Depresión", quiz: { id: "depresion1", title: "Depresión PHQ-9", description: "Estado de ánimo, interés y energía reciente.", unlocked: false, completed: false } },
+  { name: "Estrés", quiz: { id: "estres1", title: "Estrés PSS-10", description: "Tensión, carga y recuperación.", unlocked: false, completed: false } },
+  { name: "Soledad", quiz: { id: "soledad1", title: "Soledad UCLA", description: "Percepción de conexión y apoyo social.", unlocked: false, completed: false } },
 ];
 
 const quizComponents: QuizComponentsMap = {
@@ -62,6 +53,8 @@ const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 min
 
 const Home: React.FC = () => {
   const router = useRouter();
+  const logout = useLogout();
+
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>(initialData);
   const [results, setResults] = useState<Record<string, QuizResult>>({});
@@ -79,10 +72,11 @@ const Home: React.FC = () => {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
     inactivityTimer.current = setTimeout(() => {
       console.warn("Sesión cerrada por inactividad ⏳");
-      handleLogout(router);
+      logout();
     }, INACTIVITY_LIMIT);
   };
 
+  // 🔹 Reinicia el timer con clics
   useEffect(() => {
     const handleClick = () => resetInactivityTimer();
     window.addEventListener("click", handleClick);
@@ -91,8 +85,9 @@ const Home: React.FC = () => {
       if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
       window.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [logout]);
 
+  // 🔹 Revisar sesión al cargar
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -102,6 +97,7 @@ const Home: React.FC = () => {
     checkAuth();
   }, [router]);
 
+  // 🔹 Cargar progreso desde Supabase
   useEffect(() => {
     const fetchProgress = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -183,6 +179,7 @@ const Home: React.FC = () => {
         interpretation,
         user_id: user.id,
       });
+
       if (activeIndex < updated.length - 1) {
         const nextQuiz = updated[activeIndex + 1].quiz;
         await supabase.from("quiz_progress").upsert({
@@ -204,16 +201,37 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <header>{/* ... tu header ... */}</header>
+      <header>
+        <article className="card">
+          <div style={{ textAlign: "center" }}>
+            <img src="../logo.jpg" alt="Logo" style={{ width: "120px", height: "120px", objectFit: "cover" }} />
+            <h2>Perfil Emocional Preliminar</h2><br />
+          </div>
+          <p style={{ textAlign: "center" }}>
+            Al completar tu PEP estarás dando un paso importante hacia conocerte mejor. Poco a poco, irás desbloqueando aspectos clave de ti mismo: cómo manejas la ansiedad, el estrés, la soledad o la tristeza.
+            <br /><br /><strong>👉 Es tu espacio seguro, pensado para ti 🌱</strong>
+          </p>
+          <div className="topbar">
+            <div className="progress-wrap" aria-label="Progreso total">
+              <div className="progress-label">
+                <span>Progreso</span>
+                <span id="progressText">{completed} / {total} completados</span>
+              </div>
+              <div className="progress">
+                <div id="progressBar" style={{ width: `${(completed / total) * 100}%` }}></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </header>
+
       <main>
         {categories.map((cat, index) => (
           <section key={cat.name} className="grid">
             <article className={`card ${cat.quiz.unlocked ? "" : "locked"}`}>
               <div className="status"><span className="badge"><b>Quiz {index + 1}</b></span></div>
               <h3>{cat.quiz.title}</h3>
-              <span className="pill">
-                {cat.quiz.completed ? "✅ Completado" : cat.quiz.unlocked ? "🔓 Disponible" : "🔒 Bloqueado"}
-              </span>
+              <span className="pill">{cat.quiz.completed ? "✅ Completado" : cat.quiz.unlocked ? "🔓 Disponible" : "🔒 Bloqueado"}</span>
               <p className="subtitle">{cat.quiz.description}</p>
               <div className="actions">
                 <button className="action open" disabled={!cat.quiz.unlocked || cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Responder</b></button>
@@ -222,6 +240,16 @@ const Home: React.FC = () => {
             </article>
           </section>
         ))}
+
+        <footer className="dock-footer">
+          <nav className="dock">
+            <a href="./home">👤</a>
+            <a href="./setting">⚙️</a>
+          </nav>
+          <nav className="dock">
+            <button onClick={logout} style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer" }}>X</button>
+          </nav>
+        </footer>
       </main>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} showConfetti={showConfetti}>
