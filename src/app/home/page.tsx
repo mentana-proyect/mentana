@@ -35,11 +35,12 @@ const useLogout = () => {
   };
 };
 
+// 🔹 Todos los quizzes desbloqueados
 const initialData: Category[] = [
-  { name: "Ansiedad", quiz: { id: "ansiedad1", title: "Ansiedad GAD-7", description: "Preocupación, nerviosismo e inquietud.", unlocked: true, completed: false } },
-  { name: "Depresión", quiz: { id: "depresion1", title: "Depresión PHQ-9", description: "Estado de ánimo, interés y energía reciente.", unlocked: false, completed: false } },
-  { name: "Estrés", quiz: { id: "estres1", title: "Estrés PSS-10", description: "Tensión, carga y recuperación.", unlocked: false, completed: false } },
-  { name: "Soledad", quiz: { id: "soledad1", title: "Soledad UCLA", description: "Percepción de conexión y apoyo social.", unlocked: false, completed: false } },
+  { name: "Ansiedad", quiz: { id: "ansiedad1", title: "Ansiedad GAD-7", description: "Evalúa tu nivel de preocupación, nerviosismo e inquietud en las últimas dos semanas.", unlocked: true, completed: false } },
+  { name: "Depresión", quiz: { id: "depresion1", title: "Depresión PHQ-9", description: "Mide tu estado de ánimo, interés y energía reciente para identificar síntomas de depresión.", unlocked: true, completed: false } },
+  { name: "Estrés", quiz: { id: "estres1", title: "Estrés PSS-10", description: "Evalúa la percepción de tensión, carga y capacidad de recuperación ante situaciones estresantes.", unlocked: true, completed: false } },
+  { name: "Soledad", quiz: { id: "soledad1", title: "Soledad UCLA", description: "Mide tu percepción de conexión social y apoyo, identificando posibles sentimientos de soledad.", unlocked: true, completed: false } },
 ];
 
 const quizComponents: QuizComponentsMap = {
@@ -76,7 +77,6 @@ const Home: React.FC = () => {
     }, INACTIVITY_LIMIT);
   };
 
-  // 🔹 Reinicia el timer con clics
   useEffect(() => {
     const handleClick = () => resetInactivityTimer();
     window.addEventListener("click", handleClick);
@@ -87,7 +87,6 @@ const Home: React.FC = () => {
     };
   }, [logout]);
 
-  // 🔹 Revisar sesión al cargar
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -97,7 +96,6 @@ const Home: React.FC = () => {
     checkAuth();
   }, [router]);
 
-  // 🔹 Cargar progreso desde Supabase
   useEffect(() => {
     const fetchProgress = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -116,8 +114,8 @@ const Home: React.FC = () => {
           ...cat,
           quiz: {
             ...cat.quiz,
-            completed: progress?.completed ?? false,
-            unlocked: progress?.unlocked ?? cat.quiz.unlocked,
+            completed: progress?.completed ?? cat.quiz.completed,
+            unlocked: true,
           },
         };
       });
@@ -162,9 +160,6 @@ const Home: React.FC = () => {
 
     const updated = [...categories];
     updated[activeIndex] = { ...activeQuiz, quiz: { ...activeQuiz.quiz, completed: true, unlocked: true } };
-    if (activeIndex < updated.length - 1) {
-      updated[activeIndex + 1] = { ...updated[activeIndex + 1], quiz: { ...updated[activeIndex + 1].quiz, unlocked: true } };
-    }
 
     setCategories(updated);
     setResults((prev) => ({ ...prev, [activeQuiz.quiz.id]: { score, interpretation } }));
@@ -179,16 +174,6 @@ const Home: React.FC = () => {
         interpretation,
         user_id: user.id,
       });
-
-      if (activeIndex < updated.length - 1) {
-        const nextQuiz = updated[activeIndex + 1].quiz;
-        await supabase.from("quiz_progress").upsert({
-          quiz_id: nextQuiz.id,
-          completed: nextQuiz.completed,
-          unlocked: true,
-          user_id: user.id,
-        });
-      }
     }
 
     setModalMode("result");
@@ -204,8 +189,8 @@ const Home: React.FC = () => {
       <header>
         <article className="card">
           <div style={{ textAlign: "center" }}>
-            <img src="../logo.jpg" alt="Logo" style={{ width: "120px", height: "120px", objectFit: "cover" }} />
-            <h2>Perfil Emocional Preliminar</h2><br />
+             <img src="../logo.jpg" className="logo"></img>
+            <h3>Perfil Emocional Preliminar</h3>
           </div>
           <p style={{ textAlign: "center" }}>
             Al completar tu PEP estarás dando un paso importante hacia conocerte mejor. Poco a poco, irás desbloqueando aspectos clave de ti mismo: cómo manejas la ansiedad, el estrés, la soledad o la tristeza.
@@ -228,28 +213,87 @@ const Home: React.FC = () => {
       <main>
         {categories.map((cat, index) => (
           <section key={cat.name} className="grid">
-            <article className={`card ${cat.quiz.unlocked ? "" : "locked"}`}>
-              <div className="status"><span className="badge"><b>Quiz {index + 1}</b></span></div>
-              <h3>{cat.quiz.title}</h3>
-              <span className="pill">{cat.quiz.completed ? "✅ Completado" : cat.quiz.unlocked ? "🔓 Disponible" : "🔒 Bloqueado"}</span>
+            <article className="card-content">
+             
+              <h2>{cat.quiz.title}</h2>
+              <span className="pill">{cat.quiz.completed ? "✅ Completado" : "🔓 Disponible"}</span>
               <p className="subtitle">{cat.quiz.description}</p>
               <div className="actions">
-                <button className="action open" disabled={!cat.quiz.unlocked || cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Responder</b></button>
-                <button className="action view" disabled={!cat.quiz.completed} onClick={() => openResult(cat, index)}><b>Ver resultado</b></button>
+                <button className="action open" disabled={cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Responder</b></button>
+                <button className="action view" disabled={!cat.quiz.completed} onClick={() => openResult(cat, index)}><b>Resultado</b></button>
+                {/*<button className="action open" disabled={cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Recomendación</b></button>*/}
               </div>
             </article>
           </section>
         ))}
+        <footer>
+              <strong>&copy; 2025 Mentana 🧠</strong>
+            </footer>
+        
 
         <footer className="dock-footer">
-          <nav className="dock">
-            <a href="./home">👤</a>
-            <a href="./setting">⚙️</a>
-          </nav>
-          <nav className="dock">
-            <button onClick={logout} style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer" }}>X</button>
-          </nav>
-        </footer>
+        <nav className="dock">
+          <a href="./home" title="Inicio">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="feather feather-user"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+
+          <a href="./setting" title="Configuración">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="feather feather-settings"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </a>
+        
+          <a
+            onClick={logout}
+            title="Cerrar sesión"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="feather feather-x"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </a>
+        </nav>
+
+
+</footer>
+
+
       </main>
 
       <Modal isOpen={isModalOpen} onClose={closeModal} showConfetti={showConfetti}>
