@@ -32,6 +32,7 @@
 .modal-content {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  
 }
 
 /* Header con flex para título + X */
@@ -40,7 +41,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: #f9f9f9; /* 🔹 contraste con el cuerpo */
+  background: #112244; /* 🔹 contraste con el cuerpo */
   border-bottom: 1px solid #eee;
 }
 
@@ -56,7 +57,7 @@
   background: transparent;
   font-size: 22px;
   cursor: pointer;
-  color: #112244;
+  color: #fff;
   font-weight: bold;
   line-height: 1;
   transition: transform 0.2s ease-in-out;
@@ -64,51 +65,10 @@
 
 .modal-close:hover {
   transform: scale(1.1);
-  color: var(--accent-primary, #56dbc4);
+  color:  #f999b7;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
-}
-/* === PHQ-9 Question Styles === */
-.question {
-  margin-bottom: 18px;
-  color: #fff;
-  text-align: left;
-}
-
-.question p {
-  font-size: 16px;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.options {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.options button {
-  background-color: #1b3b6f;
-  color: white;
-  border: 1px solid #56dbc4;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.options button:hover {
-  background-color: #56dbc4;
-  color: #112244;
-}
-
-.options button.active {
-  background-color: #56dbc4;
-  color: #112244;
-  font-weight: bold;
 }

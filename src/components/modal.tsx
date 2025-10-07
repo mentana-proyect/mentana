@@ -55,8 +55,9 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className="modal-overlay">
       <div className="modal-content" ref={modalRef}>
-        {/* Header con título y botón cerrar */}
+        {/* Header con título centrado y botón a la derecha */}
         <div className="modal-header">
+          <div style={{ flex: 1 }} /> {/* espacio a la izquierda */}
           {title && <h2 className="modal-title">{title}</h2>}
           <button
             className="modal-close"
