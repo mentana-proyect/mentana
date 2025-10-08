@@ -107,7 +107,7 @@ const Home: React.FC = () => {
       ? quizComponents[activeQuiz.quiz.id as keyof typeof quizComponents]
       : null;
 
-  // 🌀 Mostrar spinner mientras se carga la sesión o progreso
+  // Mostrar spinner mientras se carga la sesión o progreso
   if (authLoading || loading)
     return (
       <div className="loading-container">
@@ -116,7 +116,6 @@ const Home: React.FC = () => {
       </div>
     );
 
-  // ⚠️ Mostrar error si ocurre
   if (error)
     return (
       <div className="loading-container">
@@ -154,7 +153,7 @@ const Home: React.FC = () => {
         <DockFooter logout={logout} />
       </main>
 
-      {/* 🧩 Modal dinámico */}
+      {/* Modal dinámico */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
