@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabaseClient";
 import { motion } from "framer-motion";
-import "../../styles/general.css";
+import "../../styles/auth.css";
 import type { User } from "@supabase/supabase-js";
 
 export default function AuthPage() {
@@ -182,12 +182,12 @@ export default function AuthPage() {
               )}
 
               <div className="button-row">
-                <button type="submit" className="btn btn-secondary" disabled={loading}>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
                   {loading ? "Cargando..." : isLogin ? "Inicia Sesión" : "Regístrate"}
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-secondary"
                   onClick={() => setIsLogin(!isLogin)}
                   disabled={loading}
                 >
