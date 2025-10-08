@@ -198,9 +198,9 @@ export default function AuthPage() {
 
             {message && <p className={`message ${messageType}`}>{message}</p>}
 
-            <p>
+            <footer>
               <strong>&copy; 2025 Mentana 🧠</strong>
-            </p>
+            </footer>
           </div>
         ) : (
           <div className="loading-screen">

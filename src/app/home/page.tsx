@@ -182,7 +182,7 @@ const Home: React.FC = () => {
 
   const QuizComponentToRender = activeQuiz ? quizComponents[activeQuiz.quiz.id] : null;
 
-  if (loading) return <p>Loading...</p>;
+ 
 
   return (
     <div>
