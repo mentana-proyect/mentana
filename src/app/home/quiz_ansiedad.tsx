@@ -131,7 +131,7 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
     {/* 🎯 Nuevo Contenedor para el Encabezado Fijo */}
    <div className="fixed-header-container">
       <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
-       <small><i>Donde 0 es "", 1 es "", 2 es "", 3 es "".</i></small>
+       <small><i>Donde 0 es &quot;&quot;, 1 es &quot;&quot;, 2 es &quot;&quot;, 3 es &quot;&quot;.</i></small>
      </div>
      <form>
         
