@@ -219,8 +219,8 @@ const Home: React.FC = () => {
               <span className="pill">{cat.quiz.completed ? "✅ Completado" : "🔓 Disponible"}</span>
               <p className="subtitle">{cat.quiz.description}</p>
               <div className="actions">
-                <button className="action open" disabled={cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Responder</b></button>
-                <button className="action view" disabled={!cat.quiz.completed} onClick={() => openResult(cat, index)}><b>Resultado</b></button>
+                <button className="action open" disabled={cat.quiz.completed} onClick={() => openModal(cat, index)}>Responder</button>
+                <button className="action view" disabled={!cat.quiz.completed} onClick={() => openResult(cat, index)}>Resultado</button>
                 {/*<button className="action open" disabled={cat.quiz.completed} onClick={() => openModal(cat, index)}><b>Recomendación</b></button>*/}
               </div>
             </article>

@@ -178,7 +178,10 @@ main {
     font-size:12px; 
     color:var(--muted);
 }
-
+.action {
+    /* Permite que el navegador reconozca el evento táctil rápido */
+    touch-action: manipulation; 
+}
 .actions {
     display:flex; 
     gap:8px; 
