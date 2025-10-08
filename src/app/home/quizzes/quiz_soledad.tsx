@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
-import "../../styles/general.css";
+import { supabase } from "../../../lib/supabaseClient";
+import "../../../styles/general.css";
 
 interface UclaFormProps {
   onComplete?: () => void;
