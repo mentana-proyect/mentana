@@ -42,17 +42,13 @@ const Home: React.FC = () => {
   const logout = useLogout();
   const loading = useAuthCheck();
   useInactivityTimer(logout);
-
   const { categories, setCategories, results, setResults } = useFetchProgress(initialData);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
-
   const { handleQuizCompletion } = useQuizHandlers(categories, setCategories, setResults, () => setIsModalOpen(false));
-
   const completed = categories.filter((c) => c.quiz.completed).length;
   const total = categories.length;
   const QuizComponentToRender =
@@ -65,7 +61,6 @@ const Home: React.FC = () => {
   return (
     <div>
       <ProgressHeader completed={completed} total={total} />
-
       <main>
         {categories.map((cat, index) => (
           <QuizCard
