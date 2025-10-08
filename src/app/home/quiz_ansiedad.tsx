@@ -70,7 +70,6 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       return;
     }
 
-    // 1️⃣ Guardar respuestas en results_gad7
     const { error: insertError } = await supabase.from("results_ansiedad").insert([
       {
         user_id: userId,
@@ -87,7 +86,6 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       return;
     }
 
-    // 2️⃣ Actualizar progreso en ansiedad1 (marcar completado)
     const { error: updateAnsiedadError } = await supabase
       .from("quiz_progress")
       .update({
@@ -129,9 +127,14 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
 
   return (
     <div className="page">
+   
+    {/* 🎯 Nuevo Contenedor para el Encabezado Fijo */}
+   <div className="fixed-header-container">
       <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
-
-      <form>
+       <small><i>Donde 0 es "", 1 es "", 2 es "", 3 es "".</i></small>
+     </div>
+     <form>
+        
         {gad7Questions.map((q, qIndex) => (
           <div key={qIndex} className="form-group full-width">
             <p className="font-medium mb-3 text-left">{q}</p>
@@ -154,7 +157,7 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       <button
         onClick={calculateScore}
         disabled={loading}
-        className="btn btn-primary"
+        className="calculate-row"
       >
         {loading ? "Guardando..." : "Calcular"}
       </button>

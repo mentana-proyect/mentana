@@ -23,6 +23,15 @@
   overflow: hidden;    /* 🔹 asegura que header/body respeten el border-radius */
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); /* 🔹 sombra elegante */
 }
+.modal-body {
+  background:  #112244;
+  max-width: 450px;
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease-in-out;
+  
+}
 
 /* Ocultar la barra de scroll */
 .modal-content::-webkit-scrollbar {
@@ -65,7 +74,7 @@
 
 .modal-close:hover {
   transform: scale(1.1);
-  color:  #f999b7;
+  color:  #56dbc4;
 }
 
 @keyframes fadeIn {

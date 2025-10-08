@@ -1,43 +1,5 @@
-/* 🎨 Variables globales */
-:root {
-  --primary: #56dbc4;
-  --secondary: #f999b7;
-  --accent: #00bcd4;
-  --background: #112244;
-  --text: #ffffff;
-  --text-light: #e0e0e0;
-  --font: 'Poppins', sans-serif;
-  --radius: 16px;
-  --transition: 0.3s ease;
-  --accent-primary: #56dbc4; /* para carousel indicators */
-}
+/* 🎨 Variables globales */ :root {   --primary: #56dbc4;   --secondary: #f999b7;   --accent: #00bcd4;   --background: #112244;   --text: #ffffff;   --text-light: #e0e0e0;   --font: 'Poppins', sans-serif;   --radius: 16px;   --transition: 0.3s ease;   --accent-primary: #56dbc4; /* para carousel indicators */ } /* 🔹 Reset */ * {   margin: 0;   padding: 0;   box-sizing: border-box; } /* 🔹 Body y página principal */ html, body, #__next {   height: 100%;   font-family: var(--font);   background: var(--background);   color: var(--text);   line-height: 1.5; } .page {   max-width: 600px;   margin: 0 auto;   padding: 0 10px; /* 🔥 CLAVE: Asegura 0 padding superior */   background-color: #112244;   color: #fff;   font-family: 'Arial', sans-serif; }
 
-/* 🔹 Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* 🔹 Body y página principal */
-html, body, #__next {
-  height: 100%;
-  font-family: var(--font);
-  background: var(--background);
-  color: var(--text);
-  line-height: 1.5;
-}
-
-.page, .pageinicio {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  min-height: 100vh;
-  padding-top: 30px;
-  color: var(--text);
-  background-color: var(--background);
-}
 
 /* 🔹 Contenedores */
 .container,
@@ -91,52 +53,7 @@ a:hover {
   color: var(--accent);
 }
 
-/* 🔹 Botones */
-.btn {
-  display: inline-block;
-  padding: 10px 50px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: var(--transition);
-  text-align: center;
-}
 
-.btn-primary {
-  background: var(--primary);
-  color: var(--text);
-}
-
-.btn-primary:hover {
-  background: var(--accent);
-  color: var(--text);
-}
-
-.btn-secondary {
-  background: var(--secondary);
-  color: var(--text);
-}
-
-.btn-secondary:hover {
-  opacity: 0.85;
-}
-
-.botones-accion {
-  display: flex;
-  gap: 10px;
-}
-
-.botones-accion a {
-  flex: 1;
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: var(--radius);
-  display: inline-block;
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: center;
-}
 
 /* 🔹 Formularios */
 input, select, textarea {
@@ -248,3 +165,121 @@ footer {
 .indicator.active {
   background-color: var(--accent-primary);
 }
+/* Título del cuestionario */
+.page h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Descripción pequeña */
+.page small {
+  display: block;
+  font-size: 0.875rem;
+  color: #c0c0c0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+/* Cada pregunta del cuestionario */
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* Pregunta en sí */
+.form-group p {
+  font-weight: 500;
+  margin-bottom: 10px;
+  text-align: left;
+  font-size: 1rem;
+}
+/* Contenedor de opciones */
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+/* 🔹 Botones */
+.btn {
+  display: inline-block;
+  padding: 10px 50px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  text-align: center;
+}
+.btn-primary {
+  background: var(--primary);
+  color: var(--text);
+  /* Estilos agregados para asegurar que el botón principal se centre correctamente */
+  width: 100%; /* El botón ocupa todo el ancho de su contenedor */
+  max-width: 300px; /* Limita el ancho máximo para que no se vea demasiado grande */
+  display: block; /* Ahora es un elemento de bloque */
+  margin: 0 auto; /* Centrado automático de bloque */
+}
+.btn-primary:hover {
+  background: var(--accent);
+  color: var(--text);
+}
+/* Botones de opciones */
+.option-btn {
+  flex: 1;
+  padding: 8px 8px;
+  background-color: #1a2a4a;
+  border: 2px solid #1a2a4a;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.option-btn:hover {
+  background-color: #56dbc4;
+  border-color: #56dbc4;
+  
+}
+
+.option-btn.selected {
+background-color: #56dbc4;
+ border-color: #56dbc4;
+ color: #112244;
+}
+
+/* 🔥 SOLUCIÓN AL PROBLEMA DEL BOTÓN CALCULAR */
+/* Creado un nuevo estilo para el contenedor que envuelve el botón de acción */
+.calculate-row {
+  background: var(--primary);
+  color: var(--text);
+  /* Estilos agregados para asegurar que el botón principal se centre correctamente */
+  width: 100%; /* El botón ocupa todo el ancho de su contenedor */
+  max-width: 200px; /* Limita el ancho máximo para que no se vea demasiado grande */
+  display: block; /* Ahora es un elemento de bloque */
+  margin: 0 auto; /* Centrado automático de bloque */
+  padding: 8px 8px;
+  border-radius: 16px;
+}
+.calculate-row:hover {
+  background-color: #56dbc4;
+  border-color: #56dbc4;
+  
+}
+.fixed-header-container {
+    position: sticky; /* Hace que el elemento permanezca en su posición cuando se scrollea */
+    top: 0; /* Lo fija en la parte superior de la ventana de visualización */
+    z-index: 0; /* Asegura que se muestre por encima de las preguntas */
+    background: var(--background); /* Usa el color de fondo para que las preguntas no se vean por debajo */
+    padding-top: 10px; /* Pequeño padding superior */
+    padding-bottom: 20px; /* Espacio debajo del encabezado fijo */
+    width: 100%; /* Ocupa todo el ancho */
+    text-align: center; 
+}
+/* Ajuste para el título y descripción dentro del contenedor fijo */
+.fixed-header-container h1,
+.fixed-header-container small {
+    margin-bottom: 0; /* Eliminamos el margin-bottom del h1 que choca con el padding-bottom del contenedor */
+}
+
