@@ -31,7 +31,7 @@
 /* LOGO SUPERIOR */
 /* ======================= */
 .logoContainer {
-  width: 140px;
+  width: 150px;
   height: auto;
   border-radius: 8px;
   object-fit: contain;
@@ -53,9 +53,8 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
-  margin-bottom: 10px;
 }
 
 .inputGroup label {
@@ -189,12 +188,10 @@
 }
 
 .message.error {
-  background-color: #ef4444;
   color: white;
 }
 
 .message.success {
-  background-color: #22c55e;
   color: white;
 }
 
@@ -209,16 +206,78 @@
   font-size: 18px;
   color: #56dbc4;
 }
+/* ======================= */
+/* CHECKBOX Y LINKS */
+/* ======================= */
+.extrasContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
 
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxContainer input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #56dbc4;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.checkboxContainer input[type="checkbox"]:checked {
+  background: #56dbc4;
+  border-color: #56dbc4;
+}
+
+.checkboxContainer input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: #0f172a;
+  position: absolute;
+  top: 0;
+  left: 4px;
+  font-size: 12px;
+}
+
+.extraLinks {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.extraLinks a {
+  color: #56dbc4;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.extraLinks a:hover {
+  color: #38bfa8;
+  text-decoration: underline;
+}
 /* ======================= */
 /* FOOTER */
 /* ======================= */
 .footer {
-  margin-top: 25px;
+  margin-top: 15px;
   font-size: 14px;
   color: #94a3b8;
   text-align: center;
 }
+
 /* ======================= */
 /* RESPONSIVE */
 /* ======================= */
@@ -242,15 +301,13 @@
     font-size: 13px;
   }
 
-  /* Mantiene los botones en una sola fila */
   .buttonsContainer {
-    flex-direction: row;
-    gap: 8px;
+    flex-direction: column;
   }
 
   .buttonsContainer .button {
-    flex: 1;
-    width: auto;
+    flex: unset;
+    width: 100%;
   }
 
   .button {

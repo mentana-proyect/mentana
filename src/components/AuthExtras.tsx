@@ -16,13 +16,13 @@ export const AuthExtras: React.FC<AuthExtrasProps> = ({
   return (
     <div className={styles.extrasContainer}>
       {!isLogin && (
-        <label className={styles.checkboxContainer}>&nbsp;
+        <label className={styles.checkboxContainer}>
           <input
             type="checkbox"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
           />
-          &nbsp;Acepto términos y condiciones
+          Acepto términos y condiciones
         </label>
       )}
       <div className={styles.extraLinks}>
