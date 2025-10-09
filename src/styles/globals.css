@@ -35,3 +35,9 @@
     --accent-primary: #56dbc4;
   }
 }
+body, html, #__next {
+    margin:0; 
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif;   
+    color:var(--text);
+    min-height:100dvh;
+} 

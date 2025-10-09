@@ -1,0 +1,153 @@
+/* Contenedor principal de la página */
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #112244; /* Fondo oscuro */
+  color: #e5e7eb; /* Texto claro */
+  padding: 20px;
+}
+
+/* Contenedor del formulario */
+.container {
+  background: #1f2a44;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.1); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  transition: all 0.3s ease;
+}
+
+/* Logo superior */
+.logoContainer {
+  width: 120px;
+  height: auto;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Formulario */
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Footer */
+.footer {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+/* Mensajes de error o info */
+.message {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Tipos de mensaje */
+.message.error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.message.success {
+  background-color: #22c55e;
+  color: white;
+}
+
+/* Loading */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 18px;
+  color: #56dbc4;
+}
+
+/* Adaptable a móviles */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .logoContainer {
+    width: 100px;
+  }
+}
+
+/* Contenedor de botones */
+.buttonsContainer {
+  display: flex;
+  gap: 12px; /* espacio entre los botones */
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Cada botón ocupa la mitad del contenedor */
+.buttonsContainer .button {
+  flex: 1; /* todos los botones toman igual espacio */
+}
+
+/* Botones primario y secundario mantienen estilos anteriores */
+.button {
+  padding: 8px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.primary {
+  background-color: #56dbc4;
+  color: #112244;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #3bb89f;
+}
+
+.secondary {
+  background-color: #334155;
+  color: #cbd5e1;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #475569;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .buttonsContainer {
+    flex-direction: column; /* en móviles, los apila */
+  }
+
+  .buttonsContainer .button {
+    flex: unset; /* ancho automático */
+    width: 100%;
+  }
+
+  .button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

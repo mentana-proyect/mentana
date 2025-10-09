@@ -1,0 +1,265 @@
+/* ======================= */
+/* CONTENEDOR PRINCIPAL DE LA PÁGINA */
+/* ======================= */
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #112244; /* Fondo oscuro */
+  color: #e5e7eb; /* Texto claro */
+  padding: 20px;
+}
+
+/* ======================= */
+/* CONTENEDOR DEL FORMULARIO */
+/* ======================= */
+.container {
+  background: rgba(255, 255, 255, 0.1); 
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  transition: all 0.3s ease;
+}
+
+/* ======================= */
+/* LOGO SUPERIOR */
+/* ======================= */
+.logoContainer {
+  width: 140px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* ======================= */
+/* FORMULARIO */
+/* ======================= */
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ======================= */
+/* INPUTS */
+/* ======================= */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.inputGroup label {
+  font-size: 14px;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.inputGroup input {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #1f2a44;
+  color: #e5e7eb;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #56dbc4;
+  box-shadow: 0 0 0 3px rgba(86, 219, 196, 0.2);
+}
+
+.inputGroup input:disabled {
+  background-color: #334155;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ======================= */
+/* INPUT DE CONTRASEÑA CON OJO */
+/* ======================= */
+.passwordWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding: 10px 14px;
+  padding-right: 40px; /* espacio para el ojo */
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #1f2a44;
+  color: #e5e7eb;
+  font-size: 16px;
+}
+
+.showPasswordToggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #56dbc4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.showPasswordToggle:hover {
+  color: #3bb89f;
+}
+
+.eyeIcon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ======================= */
+/* BOTONES */
+/* ======================= */
+.buttonsContainer {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.buttonsContainer .button {
+  flex: 1;
+}
+
+.button {
+  padding: 8px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.primary {
+  background-color: #f999b7;
+  color: #fff;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #f999b7;
+  color: #112244;
+}
+
+.secondary {
+  background-color: #56dbc4;
+  color: #fff;
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: #56dbc4;
+  color: #112244;
+}
+
+/* ======================= */
+/* MENSAJES DE ALERTA / ÉXITO */
+/* ======================= */
+.message {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.message.error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.message.success {
+  background-color: #22c55e;
+  color: white;
+}
+
+/* ======================= */
+/* LOADING */
+/* ======================= */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 18px;
+  color: #56dbc4;
+}
+
+/* ======================= */
+/* FOOTER */
+/* ======================= */
+.footer {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #94a3b8;
+  text-align: center;
+}
+/* ======================= */
+/* RESPONSIVE */
+/* ======================= */
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px;
+  }
+
+  .logoContainer {
+    width: 100px;
+  }
+
+  .inputGroup input,
+  .passwordWrapper input {
+    font-size: 14px;
+    padding: 8px 12px;
+    padding-right: 36px;
+  }
+
+  .showPasswordToggle {
+    font-size: 13px;
+  }
+
+  /* Mantiene los botones en una sola fila */
+  .buttonsContainer {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .buttonsContainer .button {
+    flex: 1;
+    width: auto;
+  }
+
+  .button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .eyeIcon {
+    width: 20px;
+    height: 20px;
+  }
+}

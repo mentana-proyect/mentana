@@ -1,0 +1,17 @@
+.message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
