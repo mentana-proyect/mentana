@@ -80,7 +80,7 @@ header .logo {
 
 /* --- BOTONES --- */
 .btn, .action {
-    padding: 8px 10px;          /* tamaño general */
+    padding: 6px 10px;          /* tamaño general */
 
     border-radius: 16px;         /* bordes redondeados */
     cursor: pointer;
