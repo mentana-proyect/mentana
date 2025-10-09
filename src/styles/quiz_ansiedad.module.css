@@ -1,0 +1,18 @@
+.questionCard {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.questionCard legend {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.questionCard label {
+  display: block;
+  margin: 6px 0;
+  font-size: 0.9rem;
+}

@@ -95,7 +95,11 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
 
   return (
     <div className="page">
-      <h1 className="text-2xl font-bold mb-6">Cuestionario de Soledad UCLA</h1>
+      <div className="fixed-header-container">
+      <h1 className="text-2xl font-bold mb-6">Cuestionario UCLA</h1>
+       <small><i>Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.</i></small>
+     </div>
+      
       <form>
         {uclaQuestions.map((q, qIndex) => (
           <div key={qIndex} className="form-group full-width">

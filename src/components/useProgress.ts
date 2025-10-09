@@ -6,6 +6,7 @@ export type Quiz = {
   description: string;
   unlocked: boolean;
   completed: boolean;
+  completedAt?: string; 
 };
 
 export type Category = {

@@ -124,7 +124,11 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
 
   return (
     <div className="page">
+      <div className="fixed-header-container">
       <h1 className="text-2xl font-bold mb-6">Cuestionario PSS-10</h1>
+       <small><i>Donde 0 es &quot;Nunca&quot;, 1 es &quot;Casi nunca&quot;, 2 es &quot;A veces&quot;, 3 es &quot;Bastante seguido&quot; y 4 es &quot;Muy a menudo&quot;.</i></small>
+     </div>
+      
       <form>
         {pss10Questions.map((q, qIndex) => (
           <div key={qIndex} className="form-group full-width">

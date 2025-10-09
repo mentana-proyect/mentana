@@ -131,7 +131,7 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
     {/* 🎯 Nuevo Contenedor para el Encabezado Fijo */}
    <div className="fixed-header-container">
       <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
-       <small><i>Donde 0 es &quot;&quot;, 1 es &quot;&quot;, 2 es &quot;&quot;, 3 es &quot;&quot;.</i></small>
+       <small><i>Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot;y 3 es &quot;Casi todos los días&quot;.</i></small>
      </div>
      <form>
         

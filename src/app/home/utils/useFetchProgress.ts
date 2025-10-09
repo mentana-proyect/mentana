@@ -4,6 +4,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import type { Category } from "../../../components/useProgress";
 import type { QuizResult } from "./useQuizHandlers";
 
+
 interface QuizProgress {
   quiz_id: string;
   completed: boolean;
@@ -17,6 +18,9 @@ export const useFetchProgress = (initialData: Category[]) => {
   const [results, setResults] = useState<Record<string, QuizResult>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 🕒 Timers persistentes por quiz
+  const [timers, setTimers] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -52,7 +56,7 @@ export const useFetchProgress = (initialData: Category[]) => {
             quiz: {
               ...cat.quiz,
               completed: progress?.completed ?? cat.quiz.completed,
-              unlocked: true, // desbloquear quiz al cargar
+              unlocked: true,
             },
           };
         });
@@ -64,9 +68,17 @@ export const useFetchProgress = (initialData: Category[]) => {
             savedResults[p.quiz_id] = { score: p.score, interpretation: p.interpretation };
         });
 
+        // 🔹 Carga timers desde localStorage
+        const loadedTimers: Record<string, number> = {};
+        initialData.forEach((cat) => {
+          const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
+          loadedTimers[cat.quiz.id] = stored ? parseInt(stored, 10) : 0;
+        });
+
         if (isMounted) {
           setCategories(updatedCategories);
           setResults(savedResults);
+          setTimers(loadedTimers);
         }
       } catch (err) {
         console.error("Error al obtener progreso:", err);
@@ -78,11 +90,36 @@ export const useFetchProgress = (initialData: Category[]) => {
 
     fetchProgress();
 
-    // Cleanup para evitar memory leaks si el componente se desmonta
     return () => {
       isMounted = false;
     };
   }, [initialData]);
 
-  return { categories, setCategories, results, setResults, loading, error };
+  // 🕒 Hook para actualizar timers cada segundo
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimers((prev) => {
+        const next: Record<string, number> = {};
+        Object.keys(prev).forEach((quizId) => {
+          const newTime = prev[quizId] + 1;
+          next[quizId] = newTime;
+          localStorage.setItem(`quiz_timer_${quizId}`, newTime.toString());
+        });
+        return next;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Función para resetear timer de un quiz
+  const resetTimer = (quizId: string) => {
+    setTimers((prev) => {
+      const newTimers = { ...prev, [quizId]: 0 };
+      localStorage.removeItem(`quiz_timer_${quizId}`);
+      return newTimers;
+    });
+  };
+
+  return { categories, setCategories, results, setResults, loading, error, timers, resetTimer };
 };

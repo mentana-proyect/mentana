@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/home.css";
-import { Category } from "../../components/useProgress";
+import { Category, Quiz } from "../../components/useProgress";
 import Modal from "../../components/modal";
 import Confetti from "react-confetti";
 
@@ -20,8 +20,9 @@ import ProgressHeader from "../../components/ProgressHeader";
 import QuizCard from "../../components/QuizCard";
 import DockFooter from "../../components/DockFooter";
 import ResultView from "../../components/ResultView";
+import { initialData } from "../data/initialData";
 
-// 📋 Mapeo de quizzes disponibles
+// Mapeo de componentes de quiz
 const quizComponents: Record<
   "ansiedad1" | "depresion1" | "estres1" | "soledad1",
   React.FC<{ onComplete?: () => void; onResult?: (score: number, interpretation: string) => void }>
@@ -32,74 +33,80 @@ const quizComponents: Record<
   soledad1: CuestionarioUCLA,
 };
 
-// 📂 Datos iniciales
-const initialData: Category[] = [
-  {
-    name: "Ansiedad",
-    quiz: {
-      id: "ansiedad1",
-      title: "Ansiedad GAD-7",
-      description: "Evalúa tu nivel de preocupación, nerviosismo e inquietud.",
-      unlocked: true,
-      completed: false,
-    },
-  },
-  {
-    name: "Depresión",
-    quiz: {
-      id: "depresion1",
-      title: "Depresión PHQ-9",
-      description: "Mide tu estado de ánimo y energía reciente.",
-      unlocked: true,
-      completed: false,
-    },
-  },
-  {
-    name: "Estrés",
-    quiz: {
-      id: "estres1",
-      title: "Estrés PSS-10",
-      description: "Evalúa tu percepción de carga y tensión.",
-      unlocked: true,
-      completed: false,
-    },
-  },
-  {
-    name: "Soledad",
-    quiz: {
-      id: "soledad1",
-      title: "Soledad UCLA",
-      description: "Mide tu nivel de conexión social.",
-      unlocked: true,
-      completed: false,
-    },
-  },
-];
-
 const Home: React.FC = () => {
   const logout = useLogout();
-  const authLoading = useAuthCheck(); // Verifica sesión
+  const authLoading = useAuthCheck();
   useInactivityTimer(logout);
 
-  // 🧠 Carga de progreso de quizzes
   const { categories, setCategories, results, setResults, loading, error } =
     useFetchProgress(initialData);
 
-  // ⚙️ Estados locales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
 
-  const { handleQuizCompletion } = useQuizHandlers(
+  const { handleQuizCompletion: originalHandleQuizCompletion } = useQuizHandlers(
     categories,
     setCategories,
     setResults,
     () => setIsModalOpen(false)
   );
 
-  const completed = categories.filter((c) => c.quiz.completed).length;
+  // Estado para actualizar días restantes
+  const [daysRemaining, setDaysRemaining] = useState<Record<string, number>>({});
+
+  // Calcular días restantes
+  const getDaysRemaining = (quiz: Quiz) => {
+  if (!quiz.completedAt) return 0; // nunca completado, no mostrar contador
+  const unlockDate = new Date(new Date(quiz.completedAt).getTime() + 30 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const diff = unlockDate.getTime() - now.getTime();
+  return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
+};
+
+  const isQuizUnlocked = (quiz: Quiz) => getDaysRemaining(quiz) === 0;
+
+  const handleQuizCompletion = (
+    index: number | null,
+    quiz: Category | null,
+    score: number,
+    interpretation: string
+  ) => {
+    if (index === null || quiz === null) return;
+
+    const updatedCategories = [...categories];
+    updatedCategories[index].quiz.completed = true;
+    updatedCategories[index].quiz.completedAt = new Date().toISOString();
+    setCategories(updatedCategories);
+
+    setResults(prev => ({
+      ...prev,
+      [quiz.quiz.id]: { score, interpretation },
+    }));
+
+    setShowConfetti(true);
+    setModalMode("result");
+
+    originalHandleQuizCompletion(index, quiz, score, interpretation, setShowConfetti, setModalMode);
+  };
+
+  // Actualizar días restantes cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newDays: Record<string, number> = {};
+      categories.forEach(cat => {
+        if (cat.quiz.completed && !isQuizUnlocked(cat.quiz)) {
+          newDays[cat.quiz.id] = getDaysRemaining(cat.quiz);
+        }
+      });
+      setDaysRemaining(newDays);
+    }, 60000); // actualiza cada minuto
+    return () => clearInterval(interval);
+  }, [categories]);
+
+  const completed = categories.filter(c => c.quiz.completed).length;
   const total = categories.length;
 
   const QuizComponentToRender =
@@ -107,7 +114,6 @@ const Home: React.FC = () => {
       ? quizComponents[activeQuiz.quiz.id as keyof typeof quizComponents]
       : null;
 
-  // Mostrar spinner mientras se carga la sesión o progreso
   if (authLoading || loading)
     return (
       <div className="loading-container">
@@ -128,23 +134,49 @@ const Home: React.FC = () => {
       <ProgressHeader completed={completed} total={total} />
       <main>
         {categories.map((cat, index) => (
-          <QuizCard
-            key={cat.name}
-            cat={cat}
-            index={index}
-            openModal={(q, i) => {
-              setActiveQuiz(q);
-              setActiveIndex(i);
-              setModalMode("quiz");
-              setIsModalOpen(true);
-            }}
-            openResult={(q, i) => {
-              setActiveQuiz(q);
-              setActiveIndex(i);
-              setModalMode("result");
-              setIsModalOpen(true);
-            }}
-          />
+          <div key={cat.name} style={{ position: "relative" }}>
+            <QuizCard
+              cat={cat}
+              index={index}
+              openModal={(q, i) => {
+                if (!isQuizUnlocked(q.quiz)) {
+                  alert(`⏰ Este quiz se desbloquea en ${daysRemaining[q.quiz.id] || 0} días`);
+                  return;
+                }
+                setActiveQuiz(q);
+                setActiveIndex(i);
+                setModalMode("quiz");
+                setIsModalOpen(true);
+              }}
+              openResult={(q, i) => {
+                setActiveQuiz(q);
+                setActiveIndex(i);
+                setModalMode("result");
+                setIsModalOpen(true);
+              }}
+            />
+            {/* ⏰ Contador de días */}
+            {cat.quiz.completed && !isQuizUnlocked(cat.quiz) && (
+  <div
+    style={{
+      position: "absolute",
+      top: 8,
+      right: 16,
+      background: "rgba(0,0,0,0.6)",
+      color: "#fff",
+      padding: "4px 8px",
+      borderRadius: "12px",
+      fontSize: "0.8rem",
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",
+    }}
+  >
+    <span>⏰</span>
+    <span>{getDaysRemaining(cat.quiz)} días</span>
+  </div>
+)}
+          </div>
         ))}
 
         <footer>
@@ -153,7 +185,6 @@ const Home: React.FC = () => {
         <DockFooter logout={logout} />
       </main>
 
-      {/* Modal dinámico */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -162,14 +193,7 @@ const Home: React.FC = () => {
         {modalMode === "quiz" && QuizComponentToRender && (
           <QuizComponentToRender
             onResult={(s, i) =>
-              handleQuizCompletion(
-                activeIndex,
-                activeQuiz,
-                s,
-                i,
-                setShowConfetti,
-                setModalMode
-              )
+              handleQuizCompletion(activeIndex, activeQuiz, s, i)
             }
           />
         )}
@@ -178,14 +202,11 @@ const Home: React.FC = () => {
           results[activeQuiz.quiz.id] && (
             <ResultView
               score={results[activeQuiz.quiz.id].score}
-              interpretation={
-                results[activeQuiz.quiz.id].interpretation
-              }
+              interpretation={results[activeQuiz.quiz.id].interpretation}
             />
           )}
       </Modal>
 
-      {/* 🎉 Confeti */}
       {showConfetti && typeof window !== "undefined" && (
         <Confetti
           width={window.innerWidth}
