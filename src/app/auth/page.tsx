@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import Head from "next/head";
 import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";
@@ -24,6 +25,11 @@ export default function AuthPage() {
     setTermsAccepted,
     handleSubmit,
   } = useAuthForm();
+
+  // 🔹 Scroll hacia abajo al cargar la página
+  useEffect(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }, []);
 
   return (
     <>
@@ -112,12 +118,8 @@ export default function AuthPage() {
               />
             </form>
 
-            {/* ======================= */}
-            {/* MENSAJE */}
             <AuthMessage message={message} type={messageType} />
 
-            {/* ======================= */}
-            {/* FOOTER */}
             <footer className={styles.footer}>
               <strong>&copy; 2025 Mentana 🧠</strong>
             </footer>

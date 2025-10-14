@@ -9,9 +9,6 @@ html, body {
   color: #e5e7eb;
 }
 .page {
-  color: #e5e7eb; /* Texto claro */
-  padding: 20px;
-
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -329,7 +326,7 @@ html, body {
 /* ======================= */
 @media (max-width: 480px) {
   .container {
-    padding: 20px;
+    padding: 10px;
   }
 
   .logoContainer {
