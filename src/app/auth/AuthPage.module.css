@@ -288,16 +288,7 @@ html, body {
   color: #38bfa8;
   text-decoration: underline;
 }
-/* ======================= */
-/* FOOTER */
-/* ======================= */
-.footer {
-  margin-top: 20px; /* Establece el margen superior */
-  
-  font-size: 14px;
-  color: #fff;
-  text-align: center;
-}
+
 
 /* ======================= */
 /* Toast */

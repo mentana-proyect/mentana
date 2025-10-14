@@ -88,13 +88,6 @@ textarea:focus {
   outline: none;
 }
 
-/* 🔹 Footer */
-footer {
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-light);
-  margin-top: 20px;
-}
 
 /* 🔹 Utilidades */
 .text-center {

@@ -2,122 +2,137 @@
 /* 🏠 HomePage.module.css */
 /* ========================= */
 
-/* Página principal */
 .page {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 10px;
-  background-color: var(--background);
-  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #112244;
+  padding: env(safe-area-inset);
+  box-sizing: border-box;
 }
 
-/* Contenedores */
-.contenedor-principal-adaptado {
+.contenedorPrincipal {
   width: 95%;
   max-width: 450px;
-  padding: 30px 20px;
-  border-radius: var(--radius);
+  padding: 25px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   gap: 20px;
   align-items: center;
-  margin: 20px auto;
   text-align: center;
 }
 
-/* Tarjeta principal */
-.tarjeta-contenido-principal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.header {
+  margin-bottom: 12px;
 }
 
-/* Logo */
 .logo {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
+  width: 160px;
+  height: auto;
+  border-radius: 12px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.logo:hover {
+  transform: scale(1.05);
 }
 
-/* Botones */
-.botones-accion {
+.carruselSection {
+  width: 100%;
+  margin-top: -40px;
+}
+
+.textoMotivacional p {
+  font-size: 15px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.botonesAccion {
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
+  justify-content: space-between; /* Separa los botones */
+  gap: 12px; /* Espacio entre botones */
+  width: 100%; /* Ocupa todo el ancho del contenedor */
 }
 
 .btn {
-  display: inline-block;
-  padding: 10px 30px;
+  flex: 1; /* Cada botón ocupa el mismo espacio */
+  padding: 10px 0;
   border-radius: 50px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
   text-align: center;
+  font-weight: bold
 }
 
-.btn-primary {
-  background: var(--secondary);
-  color: var(--text);
+
+
+/* Botones primarios y secundarios */
+.btnPrimary {
+  background-color: #f999b7;
+  color: #fff;
+}
+.btnPrimary:hover {
+  background-color: #f999b7;
+  color: #112244;
 }
 
-.btn-primary:hover {
-  background: var(--secondary);
-  color: var(--background);
+.btnSecondary {
+  background-color: #56dbc4;
+  color: #fff;
+}
+.btnSecondary:hover {
+  background-color: #56dbc4;
+  color: #112244;
 }
 
-.btn-secondary {
-  background: var(--primary);
-  color: var(--text);
-}
-
-.btn-secondary:hover {
-  background: var(--primary);
-  color: var(--background);
+.footer {
+  font-size: 14px;
+  color: var(--text-light);
 }
 
 /* Carrusel */
-.carousel-container {
-  position: relative;
-  width: 100%;
-}
-
 .carousel-cards {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  gap: 12px;
 }
-
 .card {
   flex: 0 0 100%;
   scroll-snap-align: center;
-  padding: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
 }
-
-/* Indicadores del carrusel */
 .carousel-indicators {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 10px;
 }
-
 .indicator {
   width: 8px;
   height: 8px;
-  border-radius: 16px;
+  border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
 }
-
 .indicator.active {
   background-color: var(--accent-primary);
+}
+
+/* Responsive: móviles muy pequeños */
+@media (max-width: 360px) {
+  .botonesAccion {
+    flex-direction: column;
+  }
+  .btn {
+    max-width: 100%;
+  }
 }

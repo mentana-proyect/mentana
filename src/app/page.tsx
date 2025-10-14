@@ -2,8 +2,9 @@
 
 import Head from "next/head";
 import Link from "next/link";
-import styles from "./HomePage.module.css";
+import "./globals.css"; // Estilos globales
 import Carrusel from "./script_index";
+import styles from "./HomePage.module.css";
 
 export default function HomePage() {
   const cards = [
@@ -13,7 +14,7 @@ export default function HomePage() {
     },
     {
       title: "Descubre tu Perfil Emocional Preliminar",
-      text: "El 47% de las personas que necesitó ver a un profesional del área no lo hizo por falta de financiamiento.",
+      text: "El 47% de quienes necesitaron ver a un profesional no lo hicieron por falta de financiamiento.",
     },
     {
       title: "Descubre tu Perfil Emocional Preliminar",
@@ -31,32 +32,46 @@ export default function HomePage() {
         />
       </Head>
 
-      <div className={styles["contenedor-principal-adaptado"]}>
-        <div className={styles["tarjeta-contenido-principal"]}>
-          <img src="logo.jpg" alt="Logo Mentana" className={styles.logo} />
+      <main className={styles.contenedorPrincipal}>
+        {/* Header / Logo */}
+        <header className={styles.header}>
+          <img
+            src="/logo.jpg"
+            alt="Logo Mentana"
+            className={styles.logo}
+          />
+        </header>
+
+        {/* Carrusel */}
+        <section className={styles.carruselSection}>
           <Carrusel cards={cards} />
-        </div>
+        </section>
 
-        <p>
-          Estamos construyendo el futuro del bienestar emocional.
-          <br />
-          <br />
-          <strong>Únete al viaje.</strong>
-        </p>
+        {/* Texto motivacional */}
+        <section className={styles.textoMotivacional}>
+          <p>
+            Estamos construyendo el futuro del <strong>bienestar emocional</strong>.
+          </p>
+          <p>
+            <strong>Únete al viaje.</strong>
+          </p>
+        </section>
 
-        <div className={styles["botones-accion"]}>
-          <Link href="/registro" className={`${styles.btn} ${styles["btn-primary"]}`}>
-            <b>Regístrate</b>
+        {/* Botones de acción */}
+        <section className={styles.botonesAccion}>
+          <Link href="/auth" className={`${styles.btn} ${styles.btnPrimary}`}>
+            Regístrate
           </Link>
-          <Link href="/auth" className={`${styles.btn} ${styles["btn-secondary"]}`}>
-            <b>Inicia Sesión</b>
+          <Link href="/auth" className={`${styles.btn} ${styles.btnSecondary}`}>
+            Inicia Sesión
           </Link>
-        </div>
+        </section>
 
-        <footer>
+        {/* Footer */}
+        <footer className={styles.footer}>
           <strong>&copy; 2025 Mentana 🧠</strong>
         </footer>
-      </div>
+      </main>
     </div>
   );
 }
