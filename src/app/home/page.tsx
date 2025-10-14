@@ -22,10 +22,10 @@ import DockFooter from "../../components/DockFooter";
 import ResultView from "../../components/ResultView";
 import { initialData } from "../data/initialData";
 
-// Mapeo de componentes de quiz
+// 🔹 Mapeo de cuestionarios
 const quizComponents: Record<
   "ansiedad1" | "depresion1" | "estres1" | "soledad1",
-  React.FC<{ onComplete?: () => void; onResult?: (score: number, interpretation: string) => void }>
+  React.FC<{ onResult?: (score: number, interpretation: string) => void }>
 > = {
   ansiedad1: CuestionarioGAD7,
   depresion1: CuestionarioPHQ9,
@@ -46,6 +46,8 @@ const Home: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
+  const [daysRemaining, setDaysRemaining] = useState<Record<string, number>>({});
+  const [lockMessage, setLockMessage] = useState<string | null>(null);
 
   const { handleQuizCompletion: originalHandleQuizCompletion } = useQuizHandlers(
     categories,
@@ -54,20 +56,20 @@ const Home: React.FC = () => {
     () => setIsModalOpen(false)
   );
 
-  // Estado para actualizar días restantes
-  const [daysRemaining, setDaysRemaining] = useState<Record<string, number>>({});
-
-  // Calcular días restantes
+  // 🔹 Calcular días restantes
   const getDaysRemaining = (quiz: Quiz) => {
-  if (!quiz.completedAt) return 0; // nunca completado, no mostrar contador
-  const unlockDate = new Date(new Date(quiz.completedAt).getTime() + 30 * 24 * 60 * 60 * 1000);
-  const now = new Date();
-  const diff = unlockDate.getTime() - now.getTime();
-  return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
-};
+    if (!quiz.completedAt) return 0;
+    const unlockDate = new Date(
+      new Date(quiz.completedAt).getTime() + 30 * 24 * 60 * 60 * 1000
+    );
+    const diff = unlockDate.getTime() - new Date().getTime();
+    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
+  };
 
+  // 🔹 Comprobar si un quiz está desbloqueado
   const isQuizUnlocked = (quiz: Quiz) => getDaysRemaining(quiz) === 0;
 
+  // 🔹 Manejar finalización de quiz
   const handleQuizCompletion = (
     index: number | null,
     quiz: Category | null,
@@ -92,17 +94,20 @@ const Home: React.FC = () => {
     originalHandleQuizCompletion(index, quiz, score, interpretation, setShowConfetti, setModalMode);
   };
 
-  // Actualizar días restantes cada minuto
+  // 🔹 Actualizar días restantes cada minuto
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateDays = () => {
       const newDays: Record<string, number> = {};
       categories.forEach(cat => {
-        if (cat.quiz.completed && !isQuizUnlocked(cat.quiz)) {
+        if (cat.quiz.completed) {
           newDays[cat.quiz.id] = getDaysRemaining(cat.quiz);
         }
       });
       setDaysRemaining(newDays);
-    }, 60000); // actualiza cada minuto
+    };
+
+    updateDays(); // Inicial
+    const interval = setInterval(updateDays, 60000); // cada minuto
     return () => clearInterval(interval);
   }, [categories]);
 
@@ -132,52 +137,60 @@ const Home: React.FC = () => {
   return (
     <div>
       <ProgressHeader completed={completed} total={total} />
+
       <main>
-        {categories.map((cat, index) => (
-          <div key={cat.name} style={{ position: "relative" }}>
-            <QuizCard
-              cat={cat}
-              index={index}
-              openModal={(q, i) => {
-                if (!isQuizUnlocked(q.quiz)) {
-                  alert(`⏰ Este quiz se desbloquea en ${daysRemaining[q.quiz.id] || 0} días`);
-                  return;
-                }
-                setActiveQuiz(q);
-                setActiveIndex(i);
-                setModalMode("quiz");
-                setIsModalOpen(true);
-              }}
-              openResult={(q, i) => {
-                setActiveQuiz(q);
-                setActiveIndex(i);
-                setModalMode("result");
-                setIsModalOpen(true);
-              }}
-            />
-            {/* ⏰ Contador de días */}
-            {cat.quiz.completed && !isQuizUnlocked(cat.quiz) && (
-  <div
-    style={{
-      position: "absolute",
-      top: 8,
-      right: 16,
-      background: "rgba(0,0,0,0.6)",
-      color: "#fff",
-      padding: "4px 8px",
-      borderRadius: "12px",
-      fontSize: "0.8rem",
-      display: "flex",
-      alignItems: "center",
-      gap: "4px",
-    }}
-  >
-    <span>⏰</span>
-    <span>{getDaysRemaining(cat.quiz)} días</span>
-  </div>
-)}
-          </div>
-        ))}
+        {categories.map((cat, index) => {
+          const remaining = getDaysRemaining(cat.quiz);
+          const locked = cat.quiz.completed && remaining > 0;
+
+          return (
+            <div key={cat.name} style={{ position: "relative" }}>
+              <QuizCard
+                cat={cat}
+                index={index}
+                openModal={(q, i) => {
+                  if (locked) {
+                    setLockMessage(`⏰ Este quiz se desbloquea en ${remaining} días`);
+                    setTimeout(() => setLockMessage(null), 3000);
+                    return;
+                  }
+                  setActiveQuiz(q);
+                  setActiveIndex(i);
+                  setModalMode("quiz");
+                  setIsModalOpen(true);
+                }}
+                openResult={(q, i) => {
+                  setActiveQuiz(q);
+                  setActiveIndex(i);
+                  setModalMode("result");
+                  setIsModalOpen(true);
+                }}
+              />
+
+              {/* 🔹 Etiqueta de días restantes */}
+              {locked && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 16,
+                    background: "rgba(0,0,0,0.6)",
+                    color: "#fff",
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  <span>⏰</span>
+                  <span>{remaining} días</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         <footer>
           <strong>&copy; 2025 Mentana 🧠</strong>
@@ -185,6 +198,7 @@ const Home: React.FC = () => {
         <DockFooter logout={logout} />
       </main>
 
+      {/* 🔹 Modal con cuestionarios y resultados */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -207,6 +221,7 @@ const Home: React.FC = () => {
           )}
       </Modal>
 
+      {/* 🔹 Confetti 🎉 */}
       {showConfetti && typeof window !== "undefined" && (
         <Confetti
           width={window.innerWidth}
@@ -215,6 +230,13 @@ const Home: React.FC = () => {
           numberOfPieces={200}
           gravity={0.1}
         />
+      )}
+
+      {/* 🔹 Mensaje de bloqueo elegante */}
+      {lockMessage && (
+        <div className="lock-toast">
+          {lockMessage}
+        </div>
       )}
     </div>
   );

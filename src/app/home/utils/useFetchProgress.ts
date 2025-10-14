@@ -4,7 +4,6 @@ import { supabase } from "../../../lib/supabaseClient";
 import type { Category } from "../../../components/useProgress";
 import type { QuizResult } from "./useQuizHandlers";
 
-
 interface QuizProgress {
   quiz_id: string;
   completed: boolean;
@@ -16,10 +15,8 @@ interface QuizProgress {
 export const useFetchProgress = (initialData: Category[]) => {
   const [categories, setCategories] = useState<Category[]>(initialData);
   const [results, setResults] = useState<Record<string, QuizResult>>({});
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // 🕒 Timers persistentes por quiz
   const [timers, setTimers] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -30,25 +27,36 @@ export const useFetchProgress = (initialData: Category[]) => {
         setLoading(true);
         setError(null);
 
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) throw new Error(userError.message);
+        // ✅ Espera a que Supabase restaure la sesión
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
 
-        const user = userData?.user;
+        const session = sessionData?.session;
+        if (!session) {
+          if (isMounted) {
+            setError("No hay sesión activa. Por favor inicia sesión nuevamente.");
+            setLoading(false);
+          }
+          return;
+        }
+
+        const user = session.user;
         if (!user) {
           if (isMounted) setLoading(false);
           return;
         }
 
+        // ✅ Ahora sí, consulta los progresos del usuario
         const { data, error: fetchError } = await supabase
           .from("quiz_progress")
           .select("quiz_id, completed, unlocked, score, interpretation")
           .eq("user_id", user.id);
 
-        if (fetchError) throw new Error(fetchError.message);
+        if (fetchError) throw fetchError;
 
         const progressData = (data ?? []) as QuizProgress[];
 
-        // 🔄 Actualiza categorías según el progreso obtenido
+        // 🔄 Actualiza categorías
         const updatedCategories = initialData.map((cat) => {
           const progress = progressData.find((p) => p.quiz_id === cat.quiz.id);
           return {
@@ -61,14 +69,14 @@ export const useFetchProgress = (initialData: Category[]) => {
           };
         });
 
-        // 🧮 Crea resultados guardados
+        // 🧮 Resultados guardados
         const savedResults: Record<string, QuizResult> = {};
         progressData.forEach((p) => {
           if (p.score !== null && p.interpretation)
             savedResults[p.quiz_id] = { score: p.score, interpretation: p.interpretation };
         });
 
-        // 🔹 Carga timers desde localStorage
+        // ⏱ Cargar timers desde localStorage
         const loadedTimers: Record<string, number> = {};
         initialData.forEach((cat) => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
@@ -95,7 +103,7 @@ export const useFetchProgress = (initialData: Category[]) => {
     };
   }, [initialData]);
 
-  // 🕒 Hook para actualizar timers cada segundo
+  // 🔁 Temporizador por quiz
   useEffect(() => {
     const interval = setInterval(() => {
       setTimers((prev) => {
@@ -112,7 +120,6 @@ export const useFetchProgress = (initialData: Category[]) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Función para resetear timer de un quiz
   const resetTimer = (quizId: string) => {
     setTimers((prev) => {
       const newTimers = { ...prev, [quizId]: 0 };
