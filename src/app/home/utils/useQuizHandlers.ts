@@ -24,22 +24,21 @@ export const useQuizHandlers = (
     setShowConfetti(true);
     if (activeIndex === null || !activeQuiz) return;
 
-    // ✅ Actualizar lista local de categorías
+    // Actualizar categorías localmente
     const updated = [...categories];
     updated[activeIndex] = {
       ...activeQuiz,
       quiz: { ...activeQuiz.quiz, completed: true, unlocked: true },
     };
-
     setCategories(updated);
 
-    // ✅ Guardar resultado localmente
-    setResults((prev) => ({
+    // Guardar resultado localmente
+    setResults(prev => ({
       ...prev,
       [activeQuiz.quiz.id]: { score, interpretation },
     }));
 
-    // ✅ Guardar progreso en Supabase
+    // Guardar progreso en Supabase
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -53,11 +52,10 @@ export const useQuizHandlers = (
         interpretation,
         user_id: user.id,
       });
-
       if (error) console.error("Error al guardar progreso:", error.message);
     }
 
-    // ✅ Mostrar resultado y cerrar modal
+    // Mostrar resultado y cerrar modal
     setModalMode("result");
     setTimeout(() => closeModal(), 2000);
   };

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import type { Category } from "../../../components/useProgress";
 import type { QuizResult } from "./useQuizHandlers";
@@ -25,40 +25,24 @@ export const useFetchProgress = (initialData: Category[]) => {
     const fetchProgress = async () => {
       try {
         setLoading(true);
-        setError(null);
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) throw new Error(userError.message);
 
-        // ✅ Espera a que Supabase restaure la sesión
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
+        const user = userData?.user;
+        if (!user) return;
 
-        const session = sessionData?.session;
-        if (!session) {
-          if (isMounted) {
-            setError("No hay sesión activa. Por favor inicia sesión nuevamente.");
-            setLoading(false);
-          }
-          return;
-        }
-
-        const user = session.user;
-        if (!user) {
-          if (isMounted) setLoading(false);
-          return;
-        }
-
-        // ✅ Ahora sí, consulta los progresos del usuario
         const { data, error: fetchError } = await supabase
           .from("quiz_progress")
           .select("quiz_id, completed, unlocked, score, interpretation")
           .eq("user_id", user.id);
 
-        if (fetchError) throw fetchError;
+        if (fetchError) throw new Error(fetchError.message);
 
         const progressData = (data ?? []) as QuizProgress[];
 
-        // 🔄 Actualiza categorías
-        const updatedCategories = initialData.map((cat) => {
-          const progress = progressData.find((p) => p.quiz_id === cat.quiz.id);
+        // Actualizar categorías según progreso
+        const updatedCategories = initialData.map(cat => {
+          const progress = progressData.find(p => p.quiz_id === cat.quiz.id);
           return {
             ...cat,
             quiz: {
@@ -69,16 +53,16 @@ export const useFetchProgress = (initialData: Category[]) => {
           };
         });
 
-        // 🧮 Resultados guardados
+        // Guardar resultados
         const savedResults: Record<string, QuizResult> = {};
-        progressData.forEach((p) => {
+        progressData.forEach(p => {
           if (p.score !== null && p.interpretation)
             savedResults[p.quiz_id] = { score: p.score, interpretation: p.interpretation };
         });
 
-        // ⏱ Cargar timers desde localStorage
+        // Cargar timers
         const loadedTimers: Record<string, number> = {};
-        initialData.forEach((cat) => {
+        initialData.forEach(cat => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
           loadedTimers[cat.quiz.id] = stored ? parseInt(stored, 10) : 0;
         });
@@ -98,17 +82,15 @@ export const useFetchProgress = (initialData: Category[]) => {
 
     fetchProgress();
 
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [initialData]);
 
-  // 🔁 Temporizador por quiz
+  // Timers
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimers((prev) => {
+      setTimers(prev => {
         const next: Record<string, number> = {};
-        Object.keys(prev).forEach((quizId) => {
+        Object.keys(prev).forEach(quizId => {
           const newTime = prev[quizId] + 1;
           next[quizId] = newTime;
           localStorage.setItem(`quiz_timer_${quizId}`, newTime.toString());
@@ -121,7 +103,7 @@ export const useFetchProgress = (initialData: Category[]) => {
   }, []);
 
   const resetTimer = (quizId: string) => {
-    setTimers((prev) => {
+    setTimers(prev => {
       const newTimers = { ...prev, [quizId]: 0 };
       localStorage.removeItem(`quiz_timer_${quizId}`);
       return newTimers;

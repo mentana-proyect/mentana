@@ -4,6 +4,11 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 
+interface AuthError {
+  code?: string;
+  message?: string;
+}
+
 export const useAuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -18,6 +23,9 @@ export const useAuthForm = () => {
 
   const router = useRouter();
 
+  // ==========================
+  // Obtener sesión y cambios de auth
+  // ==========================
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -32,6 +40,9 @@ export const useAuthForm = () => {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
+  // ==========================
+  // Traducción de errores
+  // ==========================
   const traducirError = (code: string, msg: string) => {
     switch (code) {
       case "invalid_credentials":
@@ -49,19 +60,39 @@ export const useAuthForm = () => {
       case "weak_password":
       case "password_length_invalid":
         return "⚠️ La contraseña es demasiado débil. Usa al menos 6 caracteres.";
+      case "no_email_provided":
+        return "⚠️ Debes ingresar un correo electrónico.";
+      case "no_phone_provided":
+        return "⚠️ Debes ingresar un número de teléfono.";
+      case "anonymous_sign_in_disabled":
+        return "⚠️ El inicio de sesión anónimo está deshabilitado.";
       default:
         return "⚠️ " + msg;
     }
   };
 
+  // ==========================
+  // Manejo de submit (login / registro)
+  // ==========================
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setMessageType(null);
 
+    // Validaciones previas
+    if (!email.trim()) {
+      setMessage("⚠️ Debes ingresar un correo electrónico.");
+      setMessageType("error");
+      return;
+    }
+    if (!password) {
+      setMessage("⚠️ Debes ingresar una contraseña.");
+      setMessageType("error");
+      return;
+    }
     if (!isLogin && !termsAccepted) {
       setMessage("⚠️ Debes aceptar los términos y condiciones para registrarte.");
-      setMessageType("error"); // Cambiado de "warning" a "error"
+      setMessageType("error");
       return;
     }
 
@@ -73,7 +104,7 @@ export const useAuthForm = () => {
         if (error) throw error;
 
         if (data?.user) {
-          setMessage("✅ Inicio de sesión correcto");
+          setMessage("✅ Inicio de sesión correcto.");
           setMessageType("success");
           setRedirecting(true);
           setTimeout(() => router.push("/home"), 1500);
@@ -90,16 +121,17 @@ export const useAuthForm = () => {
         }
       }
     } catch (err: unknown) {
-      const e = err as { code?: string; message?: string };
-      const errorCode = e.code || "";
-      const errorMsg = e.message || "Error desconocido.";
-      setMessage(traducirError(errorCode, errorMsg));
-      setMessageType("error"); // Siempre compatible con AuthMessage
+      const e = err as AuthError;
+      setMessage(traducirError(e.code || "", e.message || "Error desconocido."));
+      setMessageType("error");
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================
+  // Redirigir si ya está logueado
+  // ==========================
   useEffect(() => {
     if (user) router.push("/home");
   }, [user, router]);

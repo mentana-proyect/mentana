@@ -23,7 +23,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   transition: all 0.3s ease;
 }
 
@@ -31,10 +31,11 @@
 /* LOGO SUPERIOR */
 /* ======================= */
 .logoContainer {
-  width: 150px;
+  width: 160px;
   height: auto;
   border-radius: 8px;
   object-fit: contain;
+  margin-bottom: 10px; /* Establece el margen inferior */
 }
 
 /* ======================= */
@@ -51,20 +52,29 @@
 /* INPUTS */
 /* ======================= */
 .inputGroup {
+  position: relative; /* necesario para floating label */
   display: flex;
   flex-direction: column;
-  gap: 12px;
   width: 100%;
 }
 
 .inputGroup label {
-  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
   color: #cbd5e1;
+  font-size: 16px;
   font-weight: 500;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  padding: 0 4px;
+  border-radius: 5px;
 }
 
 .inputGroup input {
-  padding: 10px 14px;
+  padding: 10px 10px; /* un poco más de padding para el label flotante */
   border-radius: 10px;
   border: 1px solid #334155;
   background: #1f2a44;
@@ -84,24 +94,26 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+/* Label flotante al hacer focus o tener valor */
+.inputGroup input:focus + label,
+.inputGroup input:not(:placeholder-shown) + label {
+  top: 0px;
+  left: 10px;
+  font-size: 12px;
+  color: #fff;
+  background-color: #112244;
+  padding: 0 4px;
+}
 
 /* ======================= */
 /* INPUT DE CONTRASEÑA CON OJO */
 /* ======================= */
 .passwordWrapper {
   position: relative;
-  width: 100%;
 }
 
 .passwordWrapper input {
-  width: 100%;
-  padding: 10px 14px;
-  padding-right: 40px; /* espacio para el ojo */
-  border-radius: 10px;
-  border: 1px solid #334155;
-  background: #1f2a44;
-  color: #e5e7eb;
-  font-size: 16px;
+  padding-right: 40px; /* espacio para el botón de ojo */
 }
 
 .showPasswordToggle {
@@ -121,7 +133,7 @@
 }
 
 .showPasswordToggle:hover {
-  color: #3bb89f;
+   color: #3bb89f;
 }
 
 .eyeIcon {
@@ -144,13 +156,13 @@
 }
 
 .button {
-  padding: 8px;
+  padding: 10px;
   border-radius: 50px;
   border: none;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-weight: 500;
+   font-weight: bold;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -274,52 +286,13 @@
 .footer {
   margin-top: 15px;
   font-size: 14px;
-  color: #94a3b8;
+  color: #fff;
   text-align: center;
 }
 
 /* ======================= */
-/* RESPONSIVE */
+/* Toast */
 /* ======================= */
-@media (max-width: 480px) {
-  .container {
-    padding: 30px 20px;
-  }
-
-  .logoContainer {
-    width: 100px;
-  }
-
-  .inputGroup input,
-  .passwordWrapper input {
-    font-size: 14px;
-    padding: 8px 12px;
-    padding-right: 36px;
-  }
-
-  .showPasswordToggle {
-    font-size: 13px;
-  }
-
-  .buttonsContainer {
-    flex-direction: column;
-  }
-
-  .buttonsContainer .button {
-    flex: unset;
-    width: 100%;
-  }
-
-  .button {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .eyeIcon {
-    width: 20px;
-    height: 20px;
-  }
-}
 .lock-toast {
   position: fixed;
   bottom: 80px;
@@ -340,4 +313,48 @@
   10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
 }
+/* ======================= */
+/* RESPONSIVE */
+/* ======================= */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
 
+  .logoContainer {
+    width: 120px;
+  }
+
+  .inputGroup input,
+  .passwordWrapper input {
+    font-size: 14px;
+    padding: 10px 12px;
+    padding-right: 36px;
+  }
+
+  .showPasswordToggle {
+    font-size: 14px;
+  }
+
+  /* 🔹 Mantener los botones en una sola fila */
+  .buttonsContainer {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px; /* Espaciado entre botones */
+  }
+
+  .buttonsContainer .button {
+    flex: 1;
+    width: auto;
+  }
+
+  .button {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .eyeIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
