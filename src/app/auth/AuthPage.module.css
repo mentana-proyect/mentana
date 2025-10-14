@@ -1,14 +1,25 @@
 /* ======================= */
 /* CONTENEDOR PRINCIPAL DE LA PÁGINA */
 /* ======================= */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #112244; /* tu color */
+  color: #e5e7eb;
+}
 .page {
+  color: #e5e7eb; /* Texto claro */
+  padding: 20px;
+
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #112244; /* Fondo oscuro */
-  color: #e5e7eb; /* Texto claro */
-  padding: 20px;
+  background-color: #112244;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
 }
 
 /* ======================= */
