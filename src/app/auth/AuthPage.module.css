@@ -292,9 +292,9 @@ html, body {
 /* FOOTER */
 /* ======================= */
 .footer {
-  margin-top: 25px; /* Establece el margen superior */
+  margin-top: 20px; /* Establece el margen superior */
   
-  font-size: 12px;
+  font-size: 14px;
   color: #fff;
   text-align: center;
 }

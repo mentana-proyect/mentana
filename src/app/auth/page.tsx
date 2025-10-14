@@ -5,7 +5,7 @@ import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";
 import { AuthMessage } from "../../components/AuthMessage";
 import { useAuthForm } from "../../hooks/useAuthForm";
-import styles from "./AuthPage.module.css"; // CSS Module
+import styles from "./AuthPage.module.css";
 
 export default function AuthPage() {
   const {

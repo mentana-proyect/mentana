@@ -1,0 +1,123 @@
+/* ========================= */
+/* 🏠 HomePage.module.css */
+/* ========================= */
+
+/* Página principal */
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 10px;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+/* Contenedores */
+.contenedor-principal-adaptado {
+  width: 95%;
+  max-width: 450px;
+  padding: 30px 20px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin: 20px auto;
+  text-align: center;
+}
+
+/* Tarjeta principal */
+.tarjeta-contenido-principal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo */
+.logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+/* Botones */
+.botones-accion {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 30px;
+  border-radius: 50px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.btn-primary:hover {
+  background: var(--secondary);
+  color: var(--background);
+}
+
+.btn-secondary {
+  background: var(--primary);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: var(--primary);
+  color: var(--background);
+}
+
+/* Carrusel */
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-cards {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.card {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  padding: 10px;
+}
+
+/* Indicadores del carrusel */
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.indicator.active {
+  background-color: var(--accent-primary);
+}
