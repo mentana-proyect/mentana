@@ -1,87 +1,32 @@
 "use client";
 
 import Head from "next/head";
-import Link from "next/link";
-import "./globals.css"; // Estilos globales
-import Carrusel from "./script_index";
+import "./globals.css";
 import styles from "./HomePage.module.css";
 
-export default function HomePage() {
-  const cards = [
-    {
-      title: "Descubre tu Perfil Emocional Preliminar",
-      text: "7 de cada 10 personas en Chile declaran haber tenido alguna enfermedad o problema psicológico.",
-    },
-    {
-      title: "Descubre tu Perfil Emocional Preliminar",
-      text: "El 47% de quienes necesitaron ver a un profesional no lo hicieron por falta de financiamiento.",
-    },
-    {
-      title: "Descubre tu Perfil Emocional Preliminar",
-      text: "El 17.5% de las mujeres ha sufrido algún trastorno de ansiedad en su vida, frente al 9.5% de los hombres.",
-    },
-  ];
+// Componentes
+import Header from "../components/PageHeader";
+import CarruselTexto from "../components/PageCarruselTexto";
+import TextoMotivacional from "../components/PageTextoMotivacional";
+import BotonesAccion from "../components/PageBotonesAccion";
+import Footer from "../components/PageFooter";
 
+// Datos
+import { carruselTextos } from "../app/data/carruselTextos";
+
+export default function HomePage() {
   return (
     <div className={styles.page}>
       <Head>
         <title>Mentana</title>
-        
       </Head>
 
       <main className={styles.contenedorPrincipal}>
-        {/* Header / Logo */}
-        <header className={styles.header}>
-          <img
-            src="/logo.jpg"
-            alt="Logo Mentana"
-            className={styles.logo}
-          />
-        </header>
-
-        {/* Carrusel */}
-        <section className={styles.carruselSection}>
-          <Carrusel cards={cards} />
-        </section>
-
-        {/* Texto motivacional */}
-        <section className={styles.textoMotivacional}>
-          <p>
-            Estamos construyendo el futuro del <strong>bienestar emocional</strong>.
-          </p>
-          <p>
-            <strong>Únete al viaje.</strong>
-          </p>
-          
-         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="8 12 16 20 24 12" />
-        </svg>
-
-        </section>
-
-        {/* Botones de acción */}
-        <section className={styles.botonesAccion}>
-          <Link href="/auth" className={`${styles.btn} ${styles.btnPrimary}`}>
-            Regístrate
-          </Link>
-          <Link href="/auth" className={`${styles.btn} ${styles.btnSecondary}`}>
-            Inicia Sesión
-          </Link>
-        </section>
-
-        {/* Footer */}
-        <footer className={styles.footer}>
-          <strong>&copy; 2025 Mentana 🧠</strong>
-        </footer>
+        <Header />
+        <CarruselTexto textos={carruselTextos} />
+        <TextoMotivacional />
+        <BotonesAccion />
+        <Footer />
       </main>
     </div>
   );

@@ -8,7 +8,8 @@
   justify-content: center;
   align-items: center;
   background-color: #112244;
-  padding: env(safe-area-inset);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
 }
 
@@ -27,8 +28,15 @@
   text-align: center;
 }
 
+/* ========================= */
+/* 🔹 Header y Título */
+/* ========================= */
 .header {
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo {
@@ -38,40 +46,97 @@
   object-fit: contain;
   transition: transform 0.3s ease;
 }
+
 .logo:hover {
   transform: scale(1.05);
 }
 
-.carruselSection {
-  width: 100%;
-  margin-top: -40px;
+.tituloPrincipal {
+  color: #e2e8f0;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
 }
 
+/* ========================= */
+/* 🎠 Carrusel de texto */
+/* ========================= */
+.carruselSection {
+  width: 100%;
+  margin-top: -20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carruselTexto {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 10px;
+  line-height: 1.5;
+  min-height: 60px;
+  padding: 0 10px;
+  transition: opacity 0.3s ease;
+}
+
+/* Indicadores */
+.carruselIndicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator:hover {
+  transform: scale(1.2);
+}
+
+.active {
+  background-color: #56dbc4;
+  width: 10px;
+  height: 10px;
+}
+
+/* ========================= */
+/* 💬 Texto motivacional */
+/* ========================= */
 .textoMotivacional p {
   font-size: 15px;
-  color: var(--text-light);
+  color: #e2e8f0;
   margin-bottom: 12px;
   line-height: 1.6;
 }
 
+/* ========================= */
+/* 🔘 Botones */
+/* ========================= */
 .botonesAccion {
   display: flex;
-  justify-content: space-between; /* Separa los botones */
-  gap: 12px; /* Espacio entre botones */
-  width: 100%; /* Ocupa todo el ancho del contenedor */
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
 }
 
 .btn {
-  flex: 1; /* Cada botón ocupa el mismo espacio */
+  flex: 1;
   padding: 10px 0;
   border-radius: 50px;
   text-align: center;
-  font-weight: bold
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-
-
-/* Botones primarios y secundarios */
+/* Botón principal */
 .btnPrimary {
   background-color: #f999b7;
   color: #112244;
@@ -81,6 +146,7 @@
   color: #fff;
 }
 
+/* Botón secundario */
 .btnSecondary {
   background-color: #56dbc4;
   color: #112244;
@@ -90,67 +156,36 @@
   color: #fff;
 }
 
+/* ========================= */
+/* ⚙️ Footer */
+/* ========================= */
 .footer {
   font-size: 14px;
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10px;
 }
 
-
-
-/* Responsive: móviles muy pequeños */
+/* ========================= */
+/* 📱 Responsive */
+/* ========================= */
 @media (max-width: 360px) {
+  .logo {
+    width: 140px;
+  }
+
   .botonesAccion {
     flex-direction: column;
   }
+
   .btn {
     max-width: 100%;
   }
-}
 
-/* Carrusel */
-.carousel-cards {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  gap: 12px;
-}
-.card {
-  flex: 0 0 100%;
-  scroll-snap-align: center;
-  padding: 12px;
-  border-radius: 16px;
-}
-.carousel-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-.indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-}
-.indicator.active {
-  background-color: var(--accent-primary);
-}
-.carouselContainer {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
+  .tituloPrincipal {
+    font-size: 16px;
+  }
 
-.card h3 {
-  color: #fff;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.card p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  line-height: 1.4;
+  .carruselTexto {
+    font-size: 14px;
+  }
 }
