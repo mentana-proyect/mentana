@@ -82,7 +82,7 @@ html, body {
 }
 
 .inputGroup input {
-  padding: 10px 10px; /* un poco más de padding para el label flotante */
+  padding: 12px 10px; /* un poco más de padding para el label flotante */
   border-radius: 10px;
   border: 1px solid #334155;
   background: #1f2a44;
@@ -220,6 +220,7 @@ html, body {
 .footer {
   font-size: 14px;
   color: var(--text-light);
+  margin-top: 20px;
 }
 
 /* ======================= */
@@ -252,18 +253,20 @@ html, body {
   gap: 8px;
   cursor: pointer;
   user-select: none;
+  margin-top: 0px;
 }
 
 .checkboxContainer input[type="checkbox"] {
   appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border: 2px solid #56dbc4;
   border-radius: 5px;
   background: transparent;
   cursor: pointer;
   transition: all 0.25s ease;
   position: relative;
+  
 }
 
 .checkboxContainer input[type="checkbox"]:checked {
@@ -286,6 +289,7 @@ html, body {
 }
 
 .extraLinks a {
+  
   color: #56dbc4;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -343,8 +347,8 @@ html, body {
 
   .inputGroup input,
   .passwordWrapper input {
-    font-size: 16px;
-    padding: 20px 12px;
+    font-size: 14px;
+    padding: 14px;
     padding-right: 36px;
   }
 
