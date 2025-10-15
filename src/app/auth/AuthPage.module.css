@@ -170,7 +170,7 @@ html, body {
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-   font-weight: bold;
+  font-weight: bold;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -180,22 +180,22 @@ html, body {
 
 .primary {
   background-color: #f999b7;
-  color: #fff;
+  color: #112244;
 }
 
 .primary:hover:not(:disabled) {
   background-color: #f999b7;
-  color: #112244;
+  color: #fff;
 }
 
 .secondary {
   background-color: #56dbc4;
-  color: #fff;
+  color: #112244;
 }
 
 .secondary:hover:not(:disabled) {
   background-color: #56dbc4;
-  color: #112244;
+  color: #fff;
 }
 
 /* ======================= */
@@ -343,8 +343,8 @@ html, body {
 
   .inputGroup input,
   .passwordWrapper input {
-    font-size: 14px;
-    padding: 10px 12px;
+    font-size: 16px;
+    padding: 20px 12px;
     padding-right: 36px;
   }
 
@@ -366,7 +366,7 @@ html, body {
 
   .button {
     font-size: 14px;
-    padding: 10px 16px;
+    padding: 14px 16px;
   }
 
   .eyeIcon {
