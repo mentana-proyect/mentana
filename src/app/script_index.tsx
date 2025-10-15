@@ -1,5 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import styles from "./HomePage.module.css";
 
 interface Card {
   title: string;
@@ -8,43 +10,110 @@ interface Card {
 
 interface CarruselProps {
   cards: Card[];
-  interval?: number; // opcional: autoplay en ms
+  interval?: number; // tiempo de auto-rotación (ms)
 }
 
 const Carrusel: React.FC<CarruselProps> = ({ cards, interval = 5000 }) => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = derecha, -1 = izquierda
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ⏳ autoplay opcional
+  // 🔁 autoplay
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev === cards.length - 1 ? 0 : prev + 1));
-    }, interval);
-    return () => clearInterval(timer);
-  }, [cards.length, interval]);
+    if (interval > 0) {
+      timeoutRef.current = setTimeout(() => {
+        nextSlide();
+      }, interval);
+    }
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [current, interval]);
+
+  const nextSlide = () => {
+    setDirection(1);
+    setCurrent((prev) => (prev === cards.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setDirection(-1);
+    setCurrent((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
+  };
+
+  // 👉 Swipe táctil
+  const startX = useRef(0);
+  const endX = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    endX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const delta = startX.current - endX.current;
+    if (delta > 50) nextSlide();
+    else if (delta < -50) prevSlide();
+  };
+
+  // 🎬 Variantes para animación slide
+  const variants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 100 : -100,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -100 : 100,
+      opacity: 0,
+    }),
+  };
 
   return (
-    <div className="carousel-container">
-      {/* Tarjetas */}
-      <div className="carousel-cards">
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className={`card ${index === current ? "active" : ""}`}
-            style={{ display: index === current ? "block" : "none" }}
+    <div
+      className={styles.carouselContainer}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className={styles.carouselWrapper}>
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={current}
+            className={styles.card}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "tween", duration: 0.5, ease: "easeInOut" },
+              opacity: { duration: 0.4 },
+            }}
           >
-            <h3>{card.title}</h3>
-            <p>{card.text}</p>
-          </div>
-        ))}
+            <h3>{cards[current].title}</h3>
+            <p>{cards[current].text}</p>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Indicadores (circulitos) */}
-      <div className="carousel-indicators">
+      {/* Indicadores */}
+      <div className={styles["carousel-indicators"]}>
         {cards.map((_, index) => (
           <span
             key={index}
-            className={`indicator ${index === current ? "active" : ""}`}
-            onClick={() => setCurrent(index)}
+            className={`${styles.indicator} ${
+              index === current ? styles.active : ""
+            }`}
+            onClick={() => {
+              setDirection(index > current ? 1 : -1);
+              setCurrent(index);
+            }}
           />
         ))}
       </div>

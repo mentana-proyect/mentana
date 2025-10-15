@@ -74,25 +74,37 @@
 /* Botones primarios y secundarios */
 .btnPrimary {
   background-color: #f999b7;
-  color: #fff;
+  color: #112244;
 }
 .btnPrimary:hover {
   background-color: #f999b7;
-  color: #112244;
+  color: #fff;
 }
 
 .btnSecondary {
   background-color: #56dbc4;
-  color: #fff;
+  color: #112244;
 }
 .btnSecondary:hover {
   background-color: #56dbc4;
-  color: #112244;
+  color: #fff;
 }
 
 .footer {
   font-size: 14px;
   color: var(--text-light);
+}
+
+
+
+/* Responsive: móviles muy pequeños */
+@media (max-width: 360px) {
+  .botonesAccion {
+    flex-direction: column;
+  }
+  .btn {
+    max-width: 100%;
+  }
 }
 
 /* Carrusel */
@@ -108,7 +120,6 @@
   scroll-snap-align: center;
   padding: 12px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.12);
 }
 .carousel-indicators {
   display: flex;
@@ -126,13 +137,20 @@
 .indicator.active {
   background-color: var(--accent-primary);
 }
+.carouselContainer {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
 
-/* Responsive: móviles muy pequeños */
-@media (max-width: 360px) {
-  .botonesAccion {
-    flex-direction: column;
-  }
-  .btn {
-    max-width: 100%;
-  }
+.card h3 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.4;
 }

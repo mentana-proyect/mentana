@@ -26,10 +26,7 @@ export default function HomePage() {
     <div className={styles.page}>
       <Head>
         <title>Mentana</title>
-        <meta
-          name="description"
-          content="Mentana - Evaluaciones emocionales y bienestar psicológico."
-        />
+        
       </Head>
 
       <main className={styles.contenedorPrincipal}>
