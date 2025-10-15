@@ -14,20 +14,27 @@ export const AuthExtras: React.FC<AuthExtrasProps> = ({
   setTermsAccepted,
 }) => {
   return (
-    <div className={styles.extrasContainer}>
-      {!isLogin && (
-        <label className={styles.checkboxContainer}>
-          <input
-            type="checkbox"
-            checked={termsAccepted}
-            onChange={(e) => setTermsAccepted(e.target.checked)}
-          />
-          Acepto términos y condiciones
-        </label>
-      )}
-      <div className={styles.extraLinks}>
-        {isLogin ? <a href="#">¿Olvidaste tu contraseña?</a> : null}
-      </div>
-    </div>
+    <div className={styles.extrasRow}>
+  {!isLogin && (
+    <label className={styles.switch}>
+      <input
+        type="checkbox"
+        checked={termsAccepted}
+        onChange={(e) => setTermsAccepted(e.target.checked)}
+      />
+      <span className={styles.slider}></span>
+      <span className={styles.switchText}>
+        Acepto los <a href="/terminos">términos y condiciones</a>
+      </span>
+    </label>
+  )}
+
+  {isLogin && (
+    <a href="#" className={styles.extraLinkRow}>
+      ¿Olvidaste tu contraseña?
+    </a>
+  )}
+</div>
+
   );
 };
