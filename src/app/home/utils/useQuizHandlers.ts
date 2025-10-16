@@ -20,8 +20,8 @@ export const useQuizHandlers = (
     activeQuiz: Category | null,
     score: number,
     interpretation: string,
-    setShowConfetti: (v: boolean) => void,
-    setModalMode: (v: "quiz" | "result") => void
+    setShowConfetti: (value: boolean) => void,
+    setModalMode: (mode: "quiz" | "result") => void
   ): Promise<void> => {
     setShowConfetti(true);
     if (activeIndex === null || !activeQuiz) return;
@@ -31,17 +31,17 @@ export const useQuizHandlers = (
     const unlockDate = new Date(completedAt.getTime() + QUIZ_LOCK_DAYS * 86400000);
 
     // ✅ Actualizar categorías localmente
-    const updated = [...categories];
-    updated[activeIndex] = {
+    const updatedCategories = [...categories];
+    updatedCategories[activeIndex] = {
       ...activeQuiz,
       quiz: {
         ...activeQuiz.quiz,
         completed: true,
         completedAt: completedAt.toISOString(),
-        unlocked: false, // Bloqueado hasta que pasen los 30 días
+        unlocked: false, // Bloqueado hasta que pase unlockDate
       },
     };
-    setCategories(updated);
+    setCategories(updatedCategories);
 
     // ✅ Guardar resultado localmente
     setResults(prev => ({
@@ -51,12 +51,9 @@ export const useQuizHandlers = (
 
     // ✅ Guardar progreso en Supabase
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
+      const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
+      const user = userData?.user;
       if (!user) throw new Error("Usuario no autenticado");
 
       const { error } = await supabase.from("quiz_progress").upsert(
@@ -66,6 +63,7 @@ export const useQuizHandlers = (
           completed: true,
           completed_at: completedAt.toISOString(),
           unlock_date: unlockDate.toISOString(),
+          unlocked: false,
           score,
           interpretation,
         },
@@ -73,8 +71,12 @@ export const useQuizHandlers = (
       );
 
       if (error) throw error;
-    } catch (err: any) {
-      console.error("❌ Error al guardar progreso:", err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("❌ Error al guardar progreso:", err.message);
+      } else {
+        console.error("❌ Error inesperado:", err);
+      }
     }
 
     // ✅ Mostrar resultado y cerrar modal
