@@ -7,6 +7,8 @@ export interface QuizResult {
   interpretation: string;
 }
 
+const QUIZ_LOCK_DAYS = 30;
+
 export const useQuizHandlers = (
   categories: Category[],
   setCategories: React.Dispatch<React.SetStateAction<Category[]>>,
@@ -24,38 +26,58 @@ export const useQuizHandlers = (
     setShowConfetti(true);
     if (activeIndex === null || !activeQuiz) return;
 
-    // Actualizar categorías localmente
+    // 🕐 Calcular fechas
+    const completedAt = new Date();
+    const unlockDate = new Date(completedAt.getTime() + QUIZ_LOCK_DAYS * 86400000);
+
+    // ✅ Actualizar categorías localmente
     const updated = [...categories];
     updated[activeIndex] = {
       ...activeQuiz,
-      quiz: { ...activeQuiz.quiz, completed: true, unlocked: true },
+      quiz: {
+        ...activeQuiz.quiz,
+        completed: true,
+        completedAt: completedAt.toISOString(),
+        unlocked: false, // Bloqueado hasta que pasen los 30 días
+      },
     };
     setCategories(updated);
 
-    // Guardar resultado localmente
+    // ✅ Guardar resultado localmente
     setResults(prev => ({
       ...prev,
       [activeQuiz.quiz.id]: { score, interpretation },
     }));
 
-    // Guardar progreso en Supabase
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // ✅ Guardar progreso en Supabase
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (user) {
-      const { error } = await supabase.from("quiz_progress").upsert({
-        quiz_id: activeQuiz.quiz.id,
-        completed: true,
-        unlocked: true,
-        score,
-        interpretation,
-        user_id: user.id,
-      });
-      if (error) console.error("Error al guardar progreso:", error.message);
+      if (userError) throw userError;
+      if (!user) throw new Error("Usuario no autenticado");
+
+      const { error } = await supabase.from("quiz_progress").upsert(
+        {
+          user_id: user.id,
+          quiz_id: activeQuiz.quiz.id,
+          completed: true,
+          completed_at: completedAt.toISOString(),
+          unlock_date: unlockDate.toISOString(),
+          score,
+          interpretation,
+        },
+        { onConflict: "user_id,quiz_id" }
+      );
+
+      if (error) throw error;
+    } catch (err: any) {
+      console.error("❌ Error al guardar progreso:", err.message);
     }
 
-    // Mostrar resultado y cerrar modal
+    // ✅ Mostrar resultado y cerrar modal
     setModalMode("result");
     setTimeout(() => closeModal(), 2000);
   };

@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-// 🧩 Tipos seguros
-type ClarityArgs = unknown[]; // reemplaza `any[]` por `unknown[]`
+
+type ClarityArgs = unknown[]; 
 
 interface ClarityFunction {
   (...args: ClarityArgs): void;
@@ -43,7 +43,7 @@ export default function ClarityScript() {
       } else {
         l.head.appendChild(script);
       }
-    })(window, document, "tqtz5ko60k"); // 👈 tu ID de Clarity
+    })(window, document, "tqtz5ko60k");
   }, []);
 
   return null;
