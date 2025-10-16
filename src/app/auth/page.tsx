@@ -7,6 +7,7 @@ import { AuthMessage } from "../../components/AuthMessage";
 import { useAuthForm } from "../../hooks/useAuthForm";
 import "../globals.css"; // ✅ Importa los estilos globales
 import styles from "./AuthPage.module.css";
+import Footer from "../../components/Footer";
 
 export default function AuthPage() {
   const {
@@ -42,7 +43,7 @@ export default function AuthPage() {
         {!redirecting && (
           <div className={styles.container}>
             <img
-              src="logo.jpg"
+              src="logo.png"
               alt="Logo Mentana"
               className={styles.logoContainer}
             />
@@ -120,10 +121,8 @@ export default function AuthPage() {
             </form>
 
             <AuthMessage message={message} type={messageType} />
-
-            <footer className={styles.footer}>
-              <strong>&copy; 2025 Mentana 🧠</strong>
-            </footer>
+            <Footer />
+            
           </div>
         )}
       </div>

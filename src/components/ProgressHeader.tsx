@@ -11,7 +11,7 @@ const ProgressHeader: React.FC<Props> = ({ completed, total }) => {
     <header>
       <article className="card">
         <div style={{ textAlign: "center" }}>
-          <img src="../logo.jpg" className="logo" alt="Logo" />
+          <img src="../logo.png" className="logo" alt="Logo" />
           <h3>Perfil Emocional Preliminar</h3>
         </div>
         <p style={{ textAlign: "center" }}>

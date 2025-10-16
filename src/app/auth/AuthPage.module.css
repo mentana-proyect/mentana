@@ -215,15 +215,6 @@ html, body {
 }
 
 /* ======================= */
-/* 🦶 FOOTER */
-/* ======================= */
-.footer {
-  font-size: 14px;
-  color: var(--text-light);
-  margin-top: 20px;
-}
-
-/* ======================= */
 /* ⏳ LOADING */
 /* ======================= */
 .loadingContainer {
@@ -318,8 +309,8 @@ html, body {
   align-items: center;           /* Alinea verticalmente checkbox y link */
   justify-content: space-between; /* Checkbox izquierda, link derecha */
   width: 100%;
-  gap: 12px;
   margin-top: 8px;
+  margin-bottom: 20px;
 }
 
 /* 🔹 Enlace alineado a la derecha */
@@ -471,4 +462,5 @@ html, body {
     width: 20px;
     height: 20px;
   }
+ 
 }

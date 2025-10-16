@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import "./globals.css"; // ✅ Importa los estilos globales
+import "./globals.css"; // ✅ Estilos globales
+import ClarityScript from "@/components/ClarityScript"; // 👈 Agregamos el script de Clarity
 
 export const metadata: Metadata = {
   title: "Mentana",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        {children}
+        <ClarityScript /> {/* 👈 Se carga en todas las páginas */}
+      </body>
     </html>
   );
 }

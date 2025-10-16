@@ -47,83 +47,87 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
   };
 
   const calculateScore = async () => {
-    if (answers.includes(-1)) {
-      alert("Por favor responde todas las preguntas antes de continuar.");
-      return;
-    }
+  if (answers.includes(-1)) {
+    alert("Por favor responde todas las preguntas antes de continuar.");
+    return;
+  }
 
-    const total = answers.reduce((acc, val) => acc + val, 0);
-    const interp = getInterpretation(total);
+  const total = answers.reduce((acc, val) => acc + val, 0);
+  const interp = getInterpretation(total);
 
-    setScore(total);
-    setInterpretation(interp);
-    setLoading(true);
+  setScore(total);
+  setInterpretation(interp);
+  setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userId = user?.id;
 
-    if (!userId) {
-      alert("⚠️ Usuario no autenticado.");
-      setLoading(false);
-      return;
-    }
-
-    const { error: insertError } = await supabase.from("results_ansiedad").insert([
-      {
-        user_id: userId,
-        answers,
-        total,
-        interpretation: interp,
-      },
-    ]);
-
-    if (insertError) {
-      console.error(insertError);
-      alert("Error al guardar el resultado en results_ansiedad");
-      setLoading(false);
-      return;
-    }
-
-    const { error: updateAnsiedadError } = await supabase
-      .from("quiz_progress")
-      .update({
-        unlocked: false,
-        completed: true,
-        score: total,
-        interpretation: interp,
-      })
-      .eq("user_id", userId)
-      .eq("quiz_id", "ansiedad1");
-
-    if (updateAnsiedadError) {
-      console.error(updateAnsiedadError);
-      alert("Error al actualizar progreso de ansiedad1");
-      setLoading(false);
-      return;
-    }
-
-    // 3️⃣ Desbloquear depresión1
-    const { error: unlockDepresionError } = await supabase
-      .from("quiz_progress")
-      .update({
-        unlocked: true,
-      })
-      .eq("user_id", userId)
-      .eq("quiz_id", "depresion1");
-
-    if (unlockDepresionError) {
-      console.error(unlockDepresionError);
-      alert("Error al desbloquear depresión1");
-    }
-
+  if (!userId) {
+    alert("⚠️ Usuario no autenticado.");
     setLoading(false);
+    return;
+  }
 
-    // Callbacks opcionales
-    if (onResult) onResult(total, interp);
-    if (onComplete) onComplete();
-  };
+  // 1️⃣ Guardar el resultado en results_ansiedad
+  const { error: insertError } = await supabase.from("results_ansiedad").insert([
+    {
+      user_id: userId,
+      answers,
+      total,
+      interpretation: interp,
+    },
+  ]);
+
+  if (insertError) {
+    console.error(insertError);
+    alert("Error al guardar el resultado en results_ansiedad");
+    setLoading(false);
+    return;
+  }
+
+  // 2️⃣ Actualizar progreso de ansiedad1 (ahora con completed_at)
+  const { error: updateAnsiedadError } = await supabase
+    .from("quiz_progress")
+    .update({
+      unlocked: false,
+      completed: true,
+      completed_at: new Date().toISOString(), // ✅ guardamos la fecha
+      score: total,
+      interpretation: interp,
+    })
+    .eq("user_id", userId)
+    .eq("quiz_id", "ansiedad1");
+
+  if (updateAnsiedadError) {
+    console.error(updateAnsiedadError);
+    alert("Error al actualizar progreso de ansiedad1");
+    setLoading(false);
+    return;
+  }
+
+  // 3️⃣ Desbloquear depresión1
+  const { error: unlockDepresionError } = await supabase
+    .from("quiz_progress")
+    .update({
+      unlocked: true,
+    })
+    .eq("user_id", userId)
+    .eq("quiz_id", "depresion1");
+
+  if (unlockDepresionError) {
+    console.error(unlockDepresionError);
+    alert("Error al desbloquear depresión1");
+  }
+
+  setLoading(false);
+
+  // ✅ Callbacks
+  if (onResult) onResult(total, interp);
+  if (onComplete) onComplete();
+};
+
 
   return (
     <div className="page">

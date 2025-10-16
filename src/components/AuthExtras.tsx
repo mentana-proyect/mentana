@@ -30,9 +30,9 @@ export const AuthExtras: React.FC<AuthExtrasProps> = ({
   )}
 
   {isLogin && (
-    <a href="#" className={styles.extraLinkRow}>
-      ¿Olvidaste tu contraseña?
-    </a>
+    <span className={styles.switchText}>
+      <a href="/recovery">¿Olvidaste tu contraseña?</a>
+    </span>
   )}
 </div>
 

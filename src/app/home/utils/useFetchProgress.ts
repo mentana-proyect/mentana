@@ -10,6 +10,7 @@ interface QuizProgress {
   unlocked: boolean;
   score: number | null;
   interpretation: string | null;
+  completed_at: string | null; // ✅ Agregado
 }
 
 export const useFetchProgress = (initialData: Category[]) => {
@@ -33,14 +34,14 @@ export const useFetchProgress = (initialData: Category[]) => {
 
         const { data, error: fetchError } = await supabase
           .from("quiz_progress")
-          .select("quiz_id, completed, unlocked, score, interpretation")
+          .select("quiz_id, completed, completed_at, score, interpretation, unlocked")
           .eq("user_id", user.id);
 
         if (fetchError) throw new Error(fetchError.message);
 
         const progressData = (data ?? []) as QuizProgress[];
 
-        // Actualizar categorías según progreso
+        // ✅ Actualizar categorías incluyendo completed_at
         const updatedCategories = initialData.map(cat => {
           const progress = progressData.find(p => p.quiz_id === cat.quiz.id);
           return {
@@ -49,18 +50,19 @@ export const useFetchProgress = (initialData: Category[]) => {
               ...cat.quiz,
               completed: progress?.completed ?? cat.quiz.completed,
               unlocked: true,
+              completedAt: progress?.completed_at ?? null, // 👈 clave para temporizador
             },
           };
         });
 
-        // Guardar resultados
+        // ✅ Guardar resultados
         const savedResults: Record<string, QuizResult> = {};
         progressData.forEach(p => {
           if (p.score !== null && p.interpretation)
             savedResults[p.quiz_id] = { score: p.score, interpretation: p.interpretation };
         });
 
-        // Cargar timers
+        // ✅ Cargar timers (desde localStorage)
         const loadedTimers: Record<string, number> = {};
         initialData.forEach(cat => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
@@ -82,10 +84,12 @@ export const useFetchProgress = (initialData: Category[]) => {
 
     fetchProgress();
 
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [initialData]);
 
-  // Timers
+  // ✅ Actualización de temporizadores (cada 1 segundo)
   useEffect(() => {
     const interval = setInterval(() => {
       setTimers(prev => {
