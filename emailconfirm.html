@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Confirma tu cuenta</title>
+  <style>
+    /* =======================
+       RESET Y BASE
+    ======================= */
+    body, table, td, a {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      margin-bottom: -30px;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100% !important;
+      background-color: #112244;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: #e5e7eb;
+    }
+
+    /* =======================
+       CONTENEDOR PRINCIPAL
+    ======================= */
+    .email-wrapper {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      background: #1f2a44;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+    }
+
+    /* =======================
+       HEADER
+    ======================= */
+    .header {
+      padding: 28px 28px 0 28px;
+      text-align: center;
+    }
+    .logo {
+      width: 140px;
+      height: auto;
+      display: inline-block;
+    }
+
+    /* =======================
+       CUERPO DEL MENSAJE
+    ======================= */
+    .body {
+      padding: 32px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      letter-spacing: -0.2px;
+      color: #56dbc4;
+      text-align: center;
+    }
+    p {
+      margin: 12px 0 18px 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #ffffff;
+    }
+
+    /* =======================
+       BOTÓN PRINCIPAL
+    ======================= */
+    .btn {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      background: #0ea5a4;
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+    .btn:hover {
+      background: #14b8a6;
+    }
+
+    /* =======================
+       FOOTER
+    ======================= */
+    .footer {
+        margin-top: -30px;
+      padding: 24px 32px;
+      background: #1f2a44;
+      font-size: 13px;
+      color: #9ca3af;
+      text-align: center;
+    }
+    .small {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+
+    /* =======================
+       RESPONSIVE
+    ======================= */
+    @media (max-width: 480px) {
+      .body { padding: 20px; }
+      .header { padding: 18px; }
+      .footer { padding: 18px 20px; }
+      .logo { width: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:28px;">
+    <tr>
+      <td align="center">
+        <div class="email-wrapper" role="article" aria-roledescription="email">
+          
+          <!-- HEADER -->
+          <div class="header">
+            <img src="" alt="Mentana" class="logo" />
+          </div>
+
+          <!-- CUERPO -->
+          <div class="body">
+            <h1>Confirma tu correo electrónico</h1>
+            <p>Gracias por registrarte. Haz clic en el botón de abajo para confirmar tu correo y activar tu cuenta.</p>
+
+            <!-- BOTÓN DE CONFIRMACIÓN -->
+            <p style="text-align:center; margin: 28px 0;">
+              <a href="{{ .ConfirmationURL }}" class="btn">Confirmar mi cuenta</a>
+            </p>
+
+            <p style="font-size:13px; color:#9ca3af;">
+              Si el botón no funciona, copia y pega este enlace en tu navegador:
+            </p>
+
+            <!-- ENLACE DE RESPALDO -->
+            <div style="margin-top:12px; padding:14px; border-radius:8px; background:#223055; word-break:break-all; font-size:13px; color:#e5e7eb;">
+              <a href="{{ .ConfirmationURL }}" style="color:#0ea5a4; text-decoration:none;">{{ .ConfirmationURL }}</a>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer">
+            <div class="small">Si no te registraste en Mentana, ignora este mensaje.</div>
+            <div class="small">&copy; 2025 Mentana 🧠</div>
+          </div>
+
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

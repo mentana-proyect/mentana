@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import Image from "next/image";
 import Head from "next/head";
 import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";
@@ -42,11 +43,13 @@ export default function AuthPage() {
       <div className={styles.page}>
         {!redirecting && (
           <div className={styles.container}>
-            <img
-              src="logo.png"
-              alt="Logo Mentana"
-              className={styles.logoContainer}
-            />
+            <Image
+  src="/logo.png"
+  alt="Logo Mentana"
+  width={150}      // ajusta según tu diseño
+  height={150}
+  className={styles.logoContainer}
+/>
 
             <form className={styles.form} onSubmit={handleSubmit}>
 

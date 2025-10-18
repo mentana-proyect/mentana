@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import "../../styles/home.css";
 import { Category, Quiz } from "../../components/useProgress";
 import Modal from "../../components/modal";

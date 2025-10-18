@@ -109,17 +109,31 @@ export const useAuthForm = () => {
           setRedirecting(true);
           setTimeout(() => router.push("/home"), 1500);
         }
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
+      
+ } else {
+  // 🔹 Registro con confirmación de correo
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`, // ⬅️ Redirige tras confirmar
+    },
+  });
 
-        if (data?.user) {
-          setMessage("✅ Registro exitoso, revisa tu correo para confirmar.");
-          setMessageType("success");
-          setRedirecting(true);
-          setTimeout(() => router.push("/home"), 1500);
-        }
-      }
+  if (error) throw error;
+
+  // 🔹 Si el proyecto requiere confirmación, Supabase no inicia sesión inmediatamente
+  if (!data.user) {
+    setMessage("⚠️ Ocurrió un error al crear la cuenta.");
+    setMessageType("error");
+    return;
+  }
+
+  setMessage("✅ Registro exitoso. Revisa tu correo para confirmar tu cuenta.");
+  setMessageType("success");
+}
+
+
     } catch (err: unknown) {
       const e = err as AuthError;
       setMessage(traducirError(e.code || "", e.message || "Error desconocido."));
