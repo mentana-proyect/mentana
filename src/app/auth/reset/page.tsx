@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import type { AuthError } from "@supabase/supabase-js"; // ✅ Importamos el tipo
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -28,8 +29,9 @@ export default function ResetPasswordPage() {
 
       setMessage("✅ Contraseña restablecida correctamente.");
       setTimeout(() => router.push("/auth"), 1500);
-    } catch (err: any) {
-      setMessage(err.message || "Ocurrió un error.");
+    } catch (err) {
+      const e = err as AuthError; // ✅ Tipamos correctamente el error
+      setMessage(e.message || "Ocurrió un error.");
     } finally {
       setLoading(false);
     }

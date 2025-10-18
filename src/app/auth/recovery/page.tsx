@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
+import type { AuthError } from "@supabase/supabase-js"; // ✅ Importamos el tipo
 
 export default function RecoveryPage() {
   const [email, setEmail] = useState("");
@@ -23,15 +24,16 @@ export default function RecoveryPage() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset`, // Página donde el usuario redefinirá su contraseña
+        redirectTo: `${window.location.origin}/auth/reset`,
       });
 
       if (error) throw error;
 
       setMessage("✅ Revisa tu correo para restablecer la contraseña.");
       setMessageType("success");
-    } catch (err: any) {
-      setMessage(err.message || "Ocurrió un error.");
+    } catch (err) {
+      const e = err as AuthError; // ✅ Tipamos correctamente el error
+      setMessage(e.message || "Ocurrió un error.");
       setMessageType("error");
     } finally {
       setLoading(false);
