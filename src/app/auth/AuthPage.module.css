@@ -20,6 +20,7 @@ html, body {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
+  width: 100%;
 }
 
 /* ======================= */
@@ -38,6 +39,7 @@ html, body {
   gap: 20px;
   align-items: center;
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* ======================= */
@@ -45,6 +47,7 @@ html, body {
 /* ======================= */
 .logoContainer {
   width: 150px;
+  max-width: 80%;
   height: auto;
   border-radius: 12px;
   object-fit: contain;
@@ -64,6 +67,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 /* ======================= */
@@ -162,17 +166,18 @@ html, body {
 .buttonsContainer {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
   width: 100%;
 }
 
 .button {
-  flex: 1;
-  padding: 14px 16px;
+  flex: 1 1 100%;
+  padding: 12px;
   border-radius: 50px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: bold;
@@ -228,11 +233,13 @@ html, body {
 /* ======================= */
 .extrasRow {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
   margin-top: 8px;
   margin-bottom: 20px;
+  gap: 8px;
 }
 
 .switch {
@@ -289,41 +296,75 @@ html, body {
   color: #38bfa8;
   text-decoration: underline;
 }
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  
+  border-radius: 16px;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 95%;
+  padding: 25px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: center; /* centra los botones */
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%; /* ocupa todo el ancho del modal */
+}
+.acceptBtn,
+.declineBtn {
+  flex: 1; /* hace que ambos botones tengan el mismo ancho */
+  max-width: 150px; /* opcional, para que no sean demasiado grandes */
+  text-align: center;
+  padding: 10px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+.acceptBtn {
+  background-color: #56dbc4;
+  color: #112244;
+  
+}
+
+.declineBtn {
+  background-color: #f999b7;
+  color: #112244;
+
+}
 
 /* ======================= */
-/* 💻 MEDIA QUERIES (mayores pantallas) */
+/* MEDIA QUERY PARA TABLET/ESCRITORIO */
 /* ======================= */
-@media (min-width: 480px) {
-  .container {
-    padding: 25px;
-  }
-
-  .logoContainer {
-    width: 160px;
-  }
-
-  .inputGroup input,
-  .passwordWrapper input {
-    font-size: 14px;
-    padding: 12px 10px;
-    padding-right: 60px;
-  }
-
-  .showPasswordToggle {
-    font-size: 16px;
-  }
-
-  .buttonsContainer {
-    gap: 12px;
-  }
-
+@media (min-width: 300px) {
   .button {
-    font-size: 16px;
-    padding: 12px;
+    flex: 1;
   }
-
-  .eyeIcon {
-    width: 20px;
-    height: 20px;
+  .extrasRow {
+    flex-direction: row;
+    align-items: center;
   }
 }

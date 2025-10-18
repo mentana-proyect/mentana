@@ -30,17 +30,8 @@ export default function AuthPage() {
 
   // 🔹 Scroll hacia abajo al cargar la página
   useEffect(() => {
-  const isMobile = window.innerWidth <= 768;
-  if (isMobile) {
-    const timeout = setTimeout(() => {
-      const middle = document.body.scrollHeight / 2;
-      window.scrollTo({ top: middle, behavior: "smooth" });
-    }, 400); // espera 0.4s para asegurar que todo se haya cargado
-
-    return () => clearTimeout(timeout);
-  }
-}, []);
-
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }, []);
 
   return (
     <>
@@ -58,8 +49,7 @@ export default function AuthPage() {
             />
 
             <form className={styles.form} onSubmit={handleSubmit}>
-              {/* ======================= */}
-              {/* EMAIL CON LABEL FLOTANTE */}
+
               <div className={styles.inputGroup}>
                 <input
                   type="email"
@@ -71,8 +61,6 @@ export default function AuthPage() {
                 <label>Correo</label>
               </div>
 
-              {/* ======================= */}
-              {/* PASSWORD CON LABEL FLOTANTE */}
               <div className={`${styles.inputGroup} ${styles.passwordWrapper}`}>
                 <input
                   type={showPassword ? "text" : "password"}
