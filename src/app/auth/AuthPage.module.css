@@ -28,8 +28,8 @@ html, body {
 /* ======================= */
 .container {
   width: 95%;
-  max-width: 450px;
-  padding: 20px;
+  max-width: 500px;
+  padding: 25px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
@@ -269,13 +269,14 @@ html, body {
   height: 16px;
   top: 2px;
   left: 2px;
-  background-color: #56dbc4;
+  background-color: #f999b7;
   border-radius: 50%;
   transition: transform 0.3s;
 }
 
 .switch input:checked + .slider::before {
   transform: translateX(16px);
+  background-color: #56dbc4;
 }
 
 .switch input:checked + .slider {
