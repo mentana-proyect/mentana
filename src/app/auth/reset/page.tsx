@@ -1,14 +1,34 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import type { AuthError } from "@supabase/supabase-js"; // ✅ Importamos el tipo
+import type { AuthError } from "@supabase/supabase-js";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false); // ✅ Espera hasta tener token
+
+  useEffect(() => {
+    // 🔹 Captura el hash de la URL
+    const hash = window.location.hash.substring(1); // quitar '#'
+    const params = new URLSearchParams(hash);
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+
+    if (access_token && refresh_token) {
+      // 🔹 Establece la sesión temporal
+      supabase.auth.setSession({ access_token, refresh_token })
+        .then(() => setReady(true))
+        .catch((err: AuthError) => {
+          setMessage(err.message || "Ocurrió un error al iniciar sesión temporal.");
+        });
+    } else {
+      setMessage("⚠️ Enlace inválido o expirado.");
+    }
+  }, []);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,20 +42,20 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      // ✅ Aquí solo usamos updateUser({ password })
       const { error } = await supabase.auth.updateUser({ password });
-
       if (error) throw error;
 
       setMessage("✅ Contraseña restablecida correctamente.");
       setTimeout(() => router.push("/auth"), 1500);
     } catch (err) {
-      const e = err as AuthError; // ✅ Tipamos correctamente el error
+      const e = err as AuthError;
       setMessage(e.message || "Ocurrió un error.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (!ready) return <p style={{ color: "#f87171", textAlign: "center", marginTop: "40px" }}>{message || "Cargando..."}</p>;
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#112244", color: "#e5e7eb", padding: "20px" }}>
