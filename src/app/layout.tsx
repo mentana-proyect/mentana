@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css"; // ✅ Estilos globales
 import ClarityScript from "@/components/ClarityScript"; // 👈 Agregamos el script de Clarity
