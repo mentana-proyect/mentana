@@ -28,10 +28,13 @@ export default function AuthPage() {
     handleSubmit,
   } = useAuthForm();
 
-  // 🔹 Scroll hacia abajo al cargar la página
-  useEffect(() => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  }, []);
+ useEffect(() => {
+  const isMobile = window.innerWidth <= 768; // Solo en móviles
+  if (isMobile) {
+    const middle = document.body.scrollHeight / 2;
+    window.scrollTo({ top: middle, behavior: "smooth" });
+  }
+}, []);
 
   return (
     <>
@@ -79,7 +82,15 @@ export default function AuthPage() {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                      // Icono "ocultar"
+                      <svg xmlns="http://www.w3.org/2000/svg" 
+                          width="28" height="28" fill="white" 
+                          viewBox="0 0 30 18">
+                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
+                                7-12 7-12-7-12-7 4.367-7 12-7zm0 
+                                12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
+                                0-5 2.239-5 5s2.239 5 5 5z"/>
+                      </svg>
+                    ) : (
                       <svg xmlns="http://www.w3.org/2000/svg" 
                           width="28" height="28" fill="white" 
                           viewBox="0 0 30 18">
@@ -89,16 +100,6 @@ export default function AuthPage() {
                                 1.343-3 3s1.343 3 3 3 3-1.343 
                                 3-3-1.343-3-3-3z"/>
                       </svg>
-                    ) : (
-                      // Icono "mostrar"
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="28" height="28" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
-                                7-12 7-12-7-12-7 4.367-7 12-7zm0 
-                                12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
-                                0-5 2.239-5 5s2.239 5 5 5z"/>
-                      </svg>
                     )}
                 </button>
               </div>
@@ -107,17 +108,14 @@ export default function AuthPage() {
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
               />
-
               <AuthButtons
                 isLogin={isLogin}
                 setIsLogin={setIsLogin}
                 loading={loading}
               />
             </form>
-
             <AuthMessage message={message} type={messageType} />
             <Footer />
-            
           </div>
         )}
       </div>
