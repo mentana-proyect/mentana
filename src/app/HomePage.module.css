@@ -1,6 +1,3 @@
-/* ======================= */
-/* 🌙 ESTILOS BASE */
-/* ======================= */
 html, body {
   height: 100%;
   margin: 0;
@@ -35,15 +32,10 @@ html, body {
   text-align: center;
 }
 
-/* ========================= */
-/* 🔹 Header y Título */
-/* ========================= */
 .header {
-  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
 
 .logo {
@@ -60,18 +52,15 @@ html, body {
 
 .tituloPrincipal {
   color: #e2e8f0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   text-align: center;
   margin: 0;
 }
 
-/* ========================= */
-/* 🎠 Carrusel de texto */
-/* ========================= */
 .carruselSection {
   width: 100%;
-  margin-top: -20px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,18 +70,14 @@ html, body {
   font-size: 15px;
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: 10px;
-  line-height: 1.5;
   min-height: 60px;
   padding: 0 10px;
-  transition: opacity 0.3s ease;
 }
 
-/* Indicadores */
 .carruselIndicators {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 6px;
 }
 
 .indicator {
@@ -114,36 +99,31 @@ html, body {
   height: 10px;
 }
 
-/* ========================= */
-/* 💬 Texto motivacional */
-/* ========================= */
 .textoMotivacional p {
   font-size: 15px;
   color: #e2e8f0;
-  margin-bottom: 12px;
-  line-height: 1.6;
 }
 
-/* ========================= */
-/* 🔘 Botones */
-/* ========================= */
 .botonesAccion {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
 .btn {
   flex: 1;
-  padding: 10px 0;
+  padding: 10px;
   border-radius: 50px;
-  text-align: center;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-weight: bold;
-  transition: all 0.3s ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Botón principal */
 .btnPrimary {
   background-color: #f999b7;
   color: #112244;
@@ -153,7 +133,6 @@ html, body {
   color: #fff;
 }
 
-/* Botón secundario */
 .btnSecondary {
   background-color: #56dbc4;
   color: #112244;
@@ -163,18 +142,13 @@ html, body {
   color: #fff;
 }
 
-/* ========================= */
-/* ⚙️ Footer */
-/* ========================= */
+
 .footer {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
-  margin: 20px 20px;
+
 }
 
-/* ========================= */
-/* 📱 Responsive */
-/* ========================= */
 @media (max-width: 360px) {
   .logo {
     width: 140px;

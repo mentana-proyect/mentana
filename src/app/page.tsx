@@ -3,16 +3,11 @@
 import Head from "next/head";
 import "./globals.css";
 import styles from "./HomePage.module.css";
-
-
-// Componentes
 import Header from "../components/PageHeader";
 import CarruselTexto from "../components/PageCarruselTexto";
 import TextoMotivacional from "../components/PageTextoMotivacional";
 import BotonesAccion from "../components/PageBotonesAccion";
-  import Footer from "../components/Footer";
-
-// Datos
+import Footer from "../components/Footer";
 import { carruselTextos } from "../app/data/carruselTextos";
 
 export default function HomePage() {

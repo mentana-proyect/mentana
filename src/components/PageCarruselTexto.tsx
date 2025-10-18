@@ -24,8 +24,6 @@ export default function CarruselTexto({ textos, interval = 4000 }: CarruselTexto
   return (
     <section className={styles.carruselSection}>
       <p className={styles.carruselTexto}>{textos[index]}</p>
-
-      {/* Indicadores */}
       <div className={styles.carruselIndicators}>
         {textos.map((_, i) => (
           <span

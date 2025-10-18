@@ -81,7 +81,7 @@ export default function AuthPage() {
                   {showPassword ? (
                       // Icono "ocultar"
                       <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="20" height="20" fill="white" 
+                          width="28" height="28" fill="white" 
                           viewBox="0 0 30 18">
                         <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
                                 0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 
@@ -92,7 +92,7 @@ export default function AuthPage() {
                     ) : (
                       // Icono "mostrar"
                       <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="20" height="20" fill="white" 
+                          width="28" height="28" fill="white" 
                           viewBox="0 0 30 18">
                         <path d="M12 5c7.633 0 12 7 12 7s-4.367 
                                 7-12 7-12-7-12-7 4.367-7 12-7zm0 
@@ -102,17 +102,12 @@ export default function AuthPage() {
                     )}
                 </button>
               </div>
-
-              {/* ======================= */}
-              {/* CHECKBOX Y LINKS */}
               <AuthExtras
                 isLogin={isLogin}
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
               />
 
-              {/* ======================= */}
-              {/* BOTONES */}
               <AuthButtons
                 isLogin={isLogin}
                 setIsLogin={setIsLogin}
