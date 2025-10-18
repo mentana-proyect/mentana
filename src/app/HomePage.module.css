@@ -164,7 +164,7 @@ html, body {
 /* ======================= */
 /* ESTILOS PARA PANTALLAS MAYORES */
 /* ======================= */
-@media (min-width: 480px) {
+@media (min-width: 300px) {
   .botonesAccion {
     flex-direction: row;
   }

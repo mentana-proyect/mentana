@@ -13,20 +13,17 @@ import { carruselTextos } from "../app/data/carruselTextos";
 
 export default function HomePage() {
   useEffect(() => {
-    // Detectar dispositivo móvil
-    const isMobile = window.innerWidth <= 768;
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    const timeout = setTimeout(() => {
+      const middle = document.body.scrollHeight / 2;
+      window.scrollTo({ top: middle, behavior: "smooth" });
+    }, 400); // espera 0.4s para asegurar que todo se haya cargado
 
-    if (isMobile) {
-      // Esperar a que el contenido se haya renderizado
-      setTimeout(() => {
-        const middle = document.body.scrollHeight / 2;
-        window.scrollTo({
-          top: middle,
-          behavior: "smooth", // desplazamiento suave
-        });
-      }, 400); // pequeño delay para asegurar render
-    }
-  }, []);
+    return () => clearTimeout(timeout);
+  }
+}, []);
+
 
   return (
     <div className={styles.page}>

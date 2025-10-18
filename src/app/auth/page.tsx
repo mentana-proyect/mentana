@@ -28,13 +28,19 @@ export default function AuthPage() {
     handleSubmit,
   } = useAuthForm();
 
- useEffect(() => {
-  const isMobile = window.innerWidth <= 768; // Solo en móviles
+  // 🔹 Scroll hacia abajo al cargar la página
+  useEffect(() => {
+  const isMobile = window.innerWidth <= 768;
   if (isMobile) {
-    const middle = document.body.scrollHeight / 2;
-    window.scrollTo({ top: middle, behavior: "smooth" });
+    const timeout = setTimeout(() => {
+      const middle = document.body.scrollHeight / 2;
+      window.scrollTo({ top: middle, behavior: "smooth" });
+    }, 400); // espera 0.4s para asegurar que todo se haya cargado
+
+    return () => clearTimeout(timeout);
   }
 }, []);
+
 
   return (
     <>
