@@ -273,7 +273,7 @@ background-color: #56dbc4;
     top: 0; /* Lo fija en la parte superior de la ventana de visualización */
     z-index: 0; /* Asegura que se muestre por encima de las preguntas */
     background: var(--background); /* Usa el color de fondo para que las preguntas no se vean por debajo */
-    padding-top: 12px; /* Pequeño padding superior */
+    padding-top: 0px; /* Pequeño padding superior */
     padding-bottom: 10px; /* Espacio debajo del encabezado fijo */
     width: 100%; /* Ocupa todo el ancho */
     text-align: center; 

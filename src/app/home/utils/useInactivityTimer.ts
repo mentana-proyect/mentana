@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-export const useInactivityTimer = (onTimeout: () => void, limitMs = 5 * 60 * 1000) => {
+export const useInactivityTimer = (onTimeout: () => void, limitMs = 10 * 60 * 1000) => {
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 
   const resetInactivityTimer = () => {

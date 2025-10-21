@@ -129,7 +129,7 @@ const Home: React.FC = () => {
           />
         ))}
         
-        <DockFooter logout={logout} />
+        {!isModalOpen && !isRecomendacionOpen && <DockFooter logout={logout} />}
       </main>
 
       <Modal isOpen={isRecomendacionOpen} onClose={() => setIsRecomendacionOpen(false)}>
