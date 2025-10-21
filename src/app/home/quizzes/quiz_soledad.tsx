@@ -119,8 +119,8 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
           </div>
         ))}
       </form>
-      <button onClick={calculateScore} disabled={loading} className="btn btn-primary">
-        {loading ? "Guardando..." : "Calcular resultado"}
+      <button onClick={calculateScore} disabled={loading} className="calculate-row">
+        {loading ? "Guardando..." : "Calcular"}
       </button>
     </div>
   );

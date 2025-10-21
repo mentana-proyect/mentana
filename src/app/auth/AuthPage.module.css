@@ -177,7 +177,7 @@ html, body {
   padding: 12px;
   border-radius: 50px;
   border: none;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: bold;
@@ -188,7 +188,8 @@ html, body {
 
 .primary {
   background-color: #f999b7;
-  color: #112244;
+  color: #ffffff;
+  border: 1px solid #f999b7;
 }
 .primary:hover:not(:disabled) {
   background-color: #f999b7;
@@ -197,7 +198,8 @@ html, body {
 
 .secondary {
   background-color: #56dbc4;
-  color: #112244;
+  color: #ffffff;
+  border: 1px solid #56dbc4;
 }
 .secondary:hover:not(:disabled) {
   background-color: #56dbc4;

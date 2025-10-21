@@ -139,7 +139,8 @@ html, body {
 
 .btnPrimary {
   background-color: #f999b7;
-  color: #112244;
+  color: #ffffff;
+  border: 1px solid #f999b7;
 }
 .btnPrimary:hover {
   background-color: #f999b7;
@@ -148,7 +149,8 @@ html, body {
 
 .btnSecondary {
   background-color: #56dbc4;
-  color: #112244;
+  color: #ffffff;
+  border: 1px solid #56dbc4;
 }
 .btnSecondary:hover {
   background-color: #56dbc4;

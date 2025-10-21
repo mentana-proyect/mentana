@@ -158,9 +158,9 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
       <button
         onClick={calculateScore}
         disabled={loading}
-        className="btn btn-primary"
+        className="calculate-row"
       >
-        {loading ? "Guardando..." : "Calcular resultado"}
+        {loading ? "Guardando..." : "Calcular"}
       </button>
     </div>
   );

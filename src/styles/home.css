@@ -12,6 +12,7 @@ header {
     max-width: 450px;
     margin: 0 auto;
     text-align: center;
+    
 }
 
 header .logo {
@@ -24,12 +25,14 @@ header .logo {
   transform: scale(1.05);
 }
 .title {
+    
     font-size: clamp(20px, 2.6vw, 34px);
     font-weight: 800;
     letter-spacing: 0.3px;
 }
 
 .subtitle {
+    
     color: #d4e0e4;
     margin-top: 10px;
 }
@@ -41,10 +44,12 @@ header .logo {
     align-items: center;
     flex-wrap: wrap;
     margin-top: 14px;
+    
 }
 
 /* ========================== PROGRESS ========================== */
 .progress-wrap {
+    margin: 10;
     flex: 1;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
@@ -103,15 +108,24 @@ header .logo {
 .action.open {
     background: #56dbc4;
     color: #e5e7eb;
+    border: 1px solid #56dbc4; /* borde blanco */
+    padding: 14px;
+    border-radius: 50px;
 }
 
 .action.view {
     background: #f999b7;
     color: #e5e7eb;
+    border: 1px solid #f999b7;
+    padding: 14px;
+    border-radius: 50px;
 }
 .action.recomendacion {
     background: #56dbc4;
     color: #e5e7eb;
+    border: 1px solid #56dbc4;
+    padding: 14px;
+    border-radius: 50px;
 }
 .action.open:hover:not(:disabled),
 .action.view:hover:not(:disabled) {
@@ -221,6 +235,7 @@ header .logo {
 
 /* ========================== QUIZ ========================== */
 .q {
+    
     margin-bottom: 16px;
     padding: 12px;
     background: rgba(255, 255, 255, 0.1);
@@ -228,18 +243,21 @@ header .logo {
 }
 
 .q legend {
+    
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 1rem;
 }
 
 .q label {
+    
     display: block;
     margin: 6px 0;
     font-size: 0.9rem;
 }
 
 .modal-footer {
+    
     display: flex;
     gap: 8px;
     justify-content: flex-end;
