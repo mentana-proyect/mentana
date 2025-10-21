@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
+import Footer from "../../../components/Footer";
 
 interface Pss10FormProps {
   onComplete?: () => void;
@@ -151,6 +152,8 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
       <button onClick={calculateScore} disabled={loading} className="calculate-row">
         {loading ? "Guardando..." : "Calcular"}
       </button>
+      <br />
+      <Footer />
     </div>
   );
 }

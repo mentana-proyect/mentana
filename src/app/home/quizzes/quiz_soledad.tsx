@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
+import Footer from "../../../components/Footer";
 
 interface UclaFormProps {
   onComplete?: () => void;
@@ -122,6 +123,8 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       <button onClick={calculateScore} disabled={loading} className="calculate-row">
         {loading ? "Guardando..." : "Calcular"}
       </button>
+      <br />
+      <Footer />
     </div>
   );
 }

@@ -4,9 +4,20 @@ import { supabase } from "../../../lib/supabaseClient";
 
 export const useLogout = () => {
   const router = useRouter();
+
   return async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) console.error("Error al cerrar sesión:", error.message);
-    else router.replace("/auth");
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      // Ignoramos el error si es "Auth session missing!"
+      if (error && error.message !== "Auth session missing!") {
+        console.error("Error al cerrar sesión:", error.message);
+      }
+    } catch (err) {
+      console.error("Error inesperado al cerrar sesión:", err);
+    } finally {
+      // Siempre redirige al login
+      router.replace("/auth");
+    }
   };
 };

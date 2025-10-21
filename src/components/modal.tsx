@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/modal.css";
 
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;

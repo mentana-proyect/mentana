@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
+import Footer from "../../../components/Footer";
 
 interface Phq9FormProps {
   onComplete?: () => void;
@@ -162,6 +163,8 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
       >
         {loading ? "Guardando..." : "Calcular"}
       </button>
+      <br />
+      <Footer />
     </div>
   );
 }

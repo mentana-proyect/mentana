@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import "../../../styles/general.css";
+import Footer from "../../../components/Footer";
 
 interface Gad7FormProps {
   onComplete?: () => void;
@@ -165,6 +166,8 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       >
         {loading ? "Guardando..." : "Calcular"}
       </button>
+      <br />
+      <Footer />
     </div>
   );
 }

@@ -128,9 +128,7 @@ const Home: React.FC = () => {
             }}
           />
         ))}
-        <footer>
-          <strong>&copy; 2025 Mentana 🧠</strong>
-        </footer>
+        
         <DockFooter logout={logout} />
       </main>
 
