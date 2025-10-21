@@ -6,7 +6,7 @@ export type Quiz = {
   description: string;
   unlocked: boolean;
   completed: boolean;
-  completedAt?: string | null; 
+  completedAt?: string | null;
 };
 
 export type Category = {
@@ -37,5 +37,5 @@ export function useProgress(initialData: Category[]) {
     return { completed, total };
   };
 
-  return { categories, completeQuiz, getProgress };
+  return { categories, completeQuiz, getProgress, setCategories };
 }

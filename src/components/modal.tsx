@@ -71,23 +71,7 @@ const Modal: React.FC<ModalProps> = ({
         {/* Cuerpo del modal */}
         <div className="modal-body">{children}</div>
 
-        {/* Confetti */}
-        {confettiPieces.length > 0 && (
-          <div className="confetti-container">
-            {confettiPieces.map((i) => (
-              <div
-                key={i}
-                className="confetti"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 5 + 5}px`,
-                  height: `${Math.random() * 5 + 5}px`,
-                  animationDuration: `${Math.random() * 0.5 + 1}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
+      
       </div>
     </div>
   );

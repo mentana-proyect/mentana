@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import "../../styles/home.css";
-import { Category, Quiz } from "../../components/useProgress";
+import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
 import Confetti from "react-confetti";
 
@@ -25,7 +24,7 @@ import { initialData } from "../data/initialData";
 
 const quizComponents: Record<
   "ansiedad1" | "depresion1" | "estres1" | "soledad1",
-  React.FC<{ onComplete?: () => void; onResult?: (score: number, interpretation: string) => void }>
+  React.FC<{ onResult?: (score: number, interpretation: string) => void }>
 > = {
   ansiedad1: CuestionarioGAD7,
   depresion1: CuestionarioPHQ9,
@@ -38,14 +37,14 @@ const Home: React.FC = () => {
   const authLoading = useAuthCheck();
   useInactivityTimer(logout);
 
-  const { categories, setCategories, results, setResults, loading, error } =
-    useFetchProgress(initialData);
+  const { categories, setCategories, results, setResults, loading, error } = useFetchProgress(initialData);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
+  const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
 
   const { handleQuizCompletion: originalHandleQuizCompletion } = useQuizHandlers(
     categories,
@@ -53,19 +52,6 @@ const Home: React.FC = () => {
     setResults,
     () => setIsModalOpen(false)
   );
-
-  // Nuevo estado para modal de recomendación
-  const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
-
-  const getDaysRemaining = (quiz: Quiz) => {
-    if (!quiz.completedAt) return 0;
-    const unlockDate = new Date(new Date(quiz.completedAt).getTime() + 30 * 24 * 60 * 60 * 1000);
-    const now = new Date();
-    const diff = unlockDate.getTime() - now.getTime();
-    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
-  };
-
-  const isQuizUnlocked = (quiz: Quiz) => getDaysRemaining(quiz) === 0;
 
   const handleQuizCompletion = (
     index: number | null,
@@ -90,18 +76,6 @@ const Home: React.FC = () => {
 
     originalHandleQuizCompletion(index, quiz, score, interpretation, setShowConfetti, setModalMode);
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newDays: Record<string, number> = {};
-      categories.forEach(cat => {
-        if (cat.quiz.completed && !isQuizUnlocked(cat.quiz)) {
-          newDays[cat.quiz.id] = getDaysRemaining(cat.quiz);
-        }
-      });
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [categories]);
 
   const completed = categories.filter(c => c.quiz.completed).length;
   const total = categories.length;
@@ -131,52 +105,41 @@ const Home: React.FC = () => {
       <ProgressHeader completed={completed} total={total} />
       <main>
         {categories.map((cat, index) => (
-          <div key={cat.name} style={{ position: "relative" }}>
-            <QuizCard
-              cat={cat}
-              index={index}
-              openModal={(q, i) => {
-                if (!isQuizUnlocked(q.quiz)) return;
-                setActiveQuiz(q);
-                setActiveIndex(i);
-                setModalMode("quiz");
-                setIsModalOpen(true);
-              }}
-              openResult={(q, i) => {
-                setActiveQuiz(q);
-                setActiveIndex(i);
-                setModalMode("result");
-                setIsModalOpen(true);
-              }}
-              openRecomendacion={(q, i) => {
-                setActiveQuiz(q);
-                setActiveIndex(i);
-                setIsRecomendacionOpen(true);
-              }}
-            />
-          </div>
+          <QuizCard
+            key={cat.name}
+            cat={cat}
+            index={index}
+            openModal={(q, i) => {
+              setActiveQuiz(q);
+              setActiveIndex(i);
+              setModalMode("quiz");
+              setIsModalOpen(true);
+            }}
+            openResult={(q, i) => {
+              setActiveQuiz(q);
+              setActiveIndex(i);
+              setModalMode("result");
+              setIsModalOpen(true);
+            }}
+            openRecomendacion={(q, i) => {
+              setActiveQuiz(q);
+              setActiveIndex(i);
+              setIsRecomendacionOpen(true);
+            }}
+          />
         ))}
-
         <footer>
           <strong>&copy; 2025 Mentana 🧠</strong>
         </footer>
         <DockFooter logout={logout} />
       </main>
 
-      {/* Modal de Recomendación */}
-      <Modal
-        isOpen={isRecomendacionOpen}
-        onClose={() => setIsRecomendacionOpen(false)}
-      >
+      <Modal isOpen={isRecomendacionOpen} onClose={() => setIsRecomendacionOpen(false)}>
         <h2>Recomendación</h2>
-        <p>
-          Aquí puedes colocar cualquier recomendación o consejo de bienestar
-          para el usuario.
-        </p>
+        <p>Aquí puedes colocar cualquier recomendación o consejo de bienestar para el usuario.</p>
       </Modal>
 
-      {/* Modal de quizzes/resultados */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} showConfetti={showConfetti}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {modalMode === "quiz" && QuizComponentToRender && (
           <QuizComponentToRender onResult={(s, i) => handleQuizCompletion(activeIndex, activeQuiz, s, i)} />
         )}
