@@ -228,9 +228,10 @@ header .logo {
 }
 
 .modal-body {
-    padding: 16px;
+    padding: 14px;
     max-height: 65vh;
     overflow: auto;
+    
 }
 
 /* ========================== QUIZ ========================== */

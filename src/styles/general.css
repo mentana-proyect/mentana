@@ -168,7 +168,7 @@ footer {
 }
 /* Título del cuestionario */
 .page h1 {
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: bold;
   margin-bottom: 10px;
   text-align: center;
@@ -190,9 +190,9 @@ footer {
 /* Pregunta en sí */
 .form-group p {
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 /* Contenedor de opciones */
 .options-row {
@@ -273,13 +273,13 @@ background-color: #56dbc4;
     top: 0; /* Lo fija en la parte superior de la ventana de visualización */
     z-index: 0; /* Asegura que se muestre por encima de las preguntas */
     background: var(--background); /* Usa el color de fondo para que las preguntas no se vean por debajo */
-    padding-top: 10px; /* Pequeño padding superior */
-    padding-bottom: 20px; /* Espacio debajo del encabezado fijo */
+    padding-top: 12px; /* Pequeño padding superior */
+    padding-bottom: 10px; /* Espacio debajo del encabezado fijo */
     width: 100%; /* Ocupa todo el ancho */
     text-align: center; 
 }
 /* Ajuste para el título y descripción dentro del contenedor fijo */
 .fixed-header-container h1,
 .fixed-header-container small {
-    margin-bottom: 0; /* Eliminamos el margin-bottom del h1 que choca con el padding-bottom del contenedor */
+    margin-bottom: 10px; /* Eliminamos el margin-bottom del h1 que choca con el padding-bottom del contenedor */
 }
