@@ -44,12 +44,12 @@ export default function AuthPage() {
         {!redirecting && (
           <div className={styles.container}>
             <Image
-  src="/logo.png"
-  alt="Logo Mentana"
-  width={150}      // ajusta según tu diseño
-  height={150}
-  className={styles.logoContainer}
-/>
+              src="/logo.png"
+              alt="Logo Mentana"
+              width={150}      // ajusta según tu diseño
+              height={150}
+              className={styles.logoContainer}
+            />
 
             <form className={styles.form} onSubmit={handleSubmit}>
 

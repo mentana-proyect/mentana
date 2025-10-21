@@ -45,6 +45,7 @@ const DockFooter: React.FC<Props> = ({ logout }) => (
         </svg>
       </a>
     </nav>
+    
   </footer>
 );
 

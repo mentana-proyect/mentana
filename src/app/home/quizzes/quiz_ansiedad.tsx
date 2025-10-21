@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
-import { useRouter } from "next/navigation";
 import "../../../styles/general.css";
 import Footer from "../../../components/Footer";
 
@@ -29,127 +28,152 @@ const options = [
 
 export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
   const [answers, setAnswers] = useState<number[]>(Array(gad7Questions.length).fill(-1));
-  const [score, setScore] = useState<number | null>(null);
-  const [interpretation, setInterpretation] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAnswer = (qIndex: number, value: number) => {
+  const handleAnswer = (index: number, value: number) => {
     const updated = [...answers];
-    updated[qIndex] = value;
+    updated[index] = value;
     setAnswers(updated);
   };
 
-  const getInterpretation = (s: number) => {
-    if (s <= 4) return "Ansiedad mínima";
-    if (s <= 9) return "Ansiedad leve";
-    if (s <= 14) return "Ansiedad moderada";
-    return "Ansiedad grave";
+  const getInterpretation = (score: number) => {
+    if (score <= 4) return "La ansiedad es baja! probablemente no se requiere intervención clínica.";
+    if (score <= 9) return "Puede haber síntomas de ansiedad, observar y evaluar si afectan la vida diaria.";
+    if (score <= 14) return "Síntomas de ansiedad significativos, considerar evaluación profesional.";
+    return "Ansiedad alta! considerar evaluación y tratamiento profesional.";
   };
 
   const calculateScore = async () => {
-  if (answers.includes(-1)) {
-    alert("Por favor responde todas las preguntas antes de continuar.");
-    return;
-  }
+    if (isSubmitting) return;
 
-  const total = answers.reduce((acc, val) => acc + val, 0);
-  const interp = getInterpretation(total);
+    setIsSubmitting(true);
+    setLoading(true);
 
-  setScore(total);
-  setInterpretation(interp);
-  setLoading(true);
+    if (answers.includes(-1)) {
+      alert("Por favor responde todas las preguntas antes de continuar.");
+      setLoading(false);
+      setIsSubmitting(false);
+      return;
+    }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const userId = user?.id;
+    const total = answers.reduce((acc, val) => acc + val, 0);
+    const interpretation = getInterpretation(total);
 
-  if (!userId) {
-    alert("⚠️ Usuario no autenticado.");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+
+    if (!userId) {
+      alert("⚠️ Usuario no autenticado.");
+      setLoading(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // --- Prevención de doble inserción ---
+    const recentAttempt = await supabase
+      .from("quiz_progress")
+      .select("*")
+      .eq("user_id", userId)
+      .like("quiz_id", "ansiedad%")
+      .order("completed_at", { ascending: false })
+      .limit(1);
+
+    if (recentAttempt.data?.length) {
+      const last = new Date(recentAttempt.data[0].completed_at).getTime();
+      const now = new Date().getTime();
+      if (now - last < 2000) {
+        alert("⏱ Espera un momento antes de intentar de nuevo.");
+        setLoading(false);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+    // Guardar resultados en results_ansiedad
+    const { error: insertError } = await supabase.from("results_ansiedad").insert([
+      { user_id: userId, answers, total, interpretation },
+    ]);
+
+    if (insertError) {
+      console.error(insertError);
+      alert("Error al guardar el resultado en results_ansiedad");
+      setLoading(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Contar quizzes previos para generar quiz_id
+    const { count, error: countError } = await supabase
+      .from("quiz_progress")
+      .select("id", { count: "exact" })
+      .eq("user_id", userId)
+      .like("quiz_id", "ansiedad%");
+
+    if (countError) {
+      console.error(countError);
+      alert("Error al obtener el número de intentos previos");
+      setLoading(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const newQuizId = `ansiedad${(count ?? 0) + 1}`;
+
+    // Insertar en quiz_progress
+    const { error: progressError } = await supabase.from("quiz_progress").insert([
+      {
+        user_id: userId,
+        quiz_id: newQuizId,
+        completed: true,
+        unlocked: true,
+        completed_at: new Date().toISOString(),
+        score: total,
+        interpretation,
+      },
+    ]);
+
+    if (progressError) {
+      console.error(progressError);
+      alert("Error al registrar el progreso del quiz");
+      setLoading(false);
+      setIsSubmitting(false);
+      return;
+    }
+
     setLoading(false);
-    return;
-  }
+    setIsSubmitting(false);
 
-  // 1️⃣ Guardar el resultado en results_ansiedad
-  const { error: insertError } = await supabase.from("results_ansiedad").insert([
-    {
-      user_id: userId,
-      answers,
-      total,
-      interpretation: interp,
-    },
-  ]);
+    if (onResult) onResult(total, interpretation);
+    if (onComplete) onComplete();
 
-  if (insertError) {
-    console.error(insertError);
-    alert("Error al guardar el resultado en results_ansiedad");
-    setLoading(false);
-    return;
-  }
-
-  // 2️⃣ Actualizar progreso de ansiedad1 (ahora con completed_at)
-  const { error: updateAnsiedadError } = await supabase
-    .from("quiz_progress")
-    .update({
-      unlocked: false,
-      completed: true,
-      completed_at: new Date().toISOString(), // ✅ guardamos la fecha
-      score: total,
-      interpretation: interp,
-    })
-    .eq("user_id", userId)
-    .eq("quiz_id", "ansiedad1");
-
-  if (updateAnsiedadError) {
-    console.error(updateAnsiedadError);
-    alert("Error al actualizar progreso de ansiedad1");
-    setLoading(false);
-    return;
-  }
-
-  // 3️⃣ Desbloquear depresión1
-  const { error: unlockDepresionError } = await supabase
-    .from("quiz_progress")
-    .update({
-      unlocked: true,
-    })
-    .eq("user_id", userId)
-    .eq("quiz_id", "depresion1");
-
-  if (unlockDepresionError) {
-    console.error(unlockDepresionError);
-    alert("Error al desbloquear depresión1");
-  }
-
-  setLoading(false);
-
-  // ✅ Callbacks
-  if (onResult) onResult(total, interp);
-  if (onComplete) onComplete();
-};
-
+    alert(`✅ Resultado guardado correctamente (ID: ${newQuizId})`);
+  };
 
   return (
     <div className="page">
-   
-    
-   <div className="fixed-header-container">
-      <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
-       <small><i>Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot;y 3 es &quot;Casi todos los días&quot;.</i></small>
-     </div>
-     <form>
-        
-        {gad7Questions.map((q, qIndex) => (
-          <div key={qIndex} className="form-group full-width">
+      <div className="fixed-header-container">
+        <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
+        <small>
+          <i>
+            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.
+          </i>
+        </small>
+      </div>
+
+      <form>
+        {gad7Questions.map((q, i) => (
+          <div key={i} className="form-group full-width">
             <p className="font-medium mb-3 text-left">{q}</p>
             <div className="options-row">
               {options.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
-                  className={`option-btn ${answers[qIndex] === opt.value ? "selected" : ""}`}
-                  onClick={() => handleAnswer(qIndex, opt.value)}
+                  className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
+                  onClick={() => handleAnswer(i, opt.value)}
                 >
                   {opt.label}
                 </button>
@@ -160,12 +184,14 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       </form>
 
       <button
+        type="button"
         onClick={calculateScore}
-        disabled={loading}
+        disabled={loading || isSubmitting}
         className="calculate-row"
       >
         {loading ? "Guardando..." : "Calcular"}
       </button>
+
       <br />
       <Footer />
     </div>
