@@ -54,7 +54,8 @@ const Home: React.FC = () => {
     () => setIsModalOpen(false)
   );
 
-  const [daysRemaining, setDaysRemaining] = useState<Record<string, number>>({});
+  // Nuevo estado para modal de recomendación
+  const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
 
   const getDaysRemaining = (quiz: Quiz) => {
     if (!quiz.completedAt) return 0;
@@ -98,7 +99,6 @@ const Home: React.FC = () => {
           newDays[cat.quiz.id] = getDaysRemaining(cat.quiz);
         }
       });
-      setDaysRemaining(newDays);
     }, 60000);
     return () => clearInterval(interval);
   }, [categories]);
@@ -136,10 +136,7 @@ const Home: React.FC = () => {
               cat={cat}
               index={index}
               openModal={(q, i) => {
-                if (!isQuizUnlocked(q.quiz)) {
-                  alert(`⏰ Este quiz se desbloquea en ${daysRemaining[q.quiz.id] || 0} días`);
-                  return;
-                }
+                if (!isQuizUnlocked(q.quiz)) return;
                 setActiveQuiz(q);
                 setActiveIndex(i);
                 setModalMode("quiz");
@@ -151,27 +148,12 @@ const Home: React.FC = () => {
                 setModalMode("result");
                 setIsModalOpen(true);
               }}
+              openRecomendacion={(q, i) => {
+                setActiveQuiz(q);
+                setActiveIndex(i);
+                setIsRecomendacionOpen(true);
+              }}
             />
-            {cat.quiz.completed && !isQuizUnlocked(cat.quiz) && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 8,
-                  right: 16,
-                  background: "rgba(0,0,0,0.6)",
-                  color: "#fff",
-                  padding: "4px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.8rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-              >
-                <span>⏰</span>
-                <span>{getDaysRemaining(cat.quiz)} días</span>
-              </div>
-            )}
           </div>
         ))}
 
@@ -181,6 +163,19 @@ const Home: React.FC = () => {
         <DockFooter logout={logout} />
       </main>
 
+      {/* Modal de Recomendación */}
+      <Modal
+        isOpen={isRecomendacionOpen}
+        onClose={() => setIsRecomendacionOpen(false)}
+      >
+        <h2>Recomendación</h2>
+        <p>
+          Aquí puedes colocar cualquier recomendación o consejo de bienestar
+          para el usuario.
+        </p>
+      </Modal>
+
+      {/* Modal de quizzes/resultados */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} showConfetti={showConfetti}>
         {modalMode === "quiz" && QuizComponentToRender && (
           <QuizComponentToRender onResult={(s, i) => handleQuizCompletion(activeIndex, activeQuiz, s, i)} />
@@ -194,7 +189,13 @@ const Home: React.FC = () => {
       </Modal>
 
       {showConfetti && typeof window !== "undefined" && (
-        <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={200} gravity={0.1} />
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.1}
+        />
       )}
     </div>
   );

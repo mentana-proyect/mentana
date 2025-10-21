@@ -10,7 +10,7 @@ interface QuizProgress {
   unlocked: boolean;
   score: number | null;
   interpretation: string | null;
-  completed_at: string | null; // ✅ Agregado
+  completed_at: string | null;
 }
 
 export const useFetchProgress = (initialData: Category[]) => {
@@ -26,11 +26,16 @@ export const useFetchProgress = (initialData: Category[]) => {
     const fetchProgress = async () => {
       try {
         setLoading(true);
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) throw new Error(userError.message);
 
-        const user = userData?.user;
-        if (!user) return;
+        // ✅ Obtener sesión primero
+        const { data: sessionData } = await supabase.auth.getSession();
+        const user = sessionData?.session?.user;
+
+        if (!user) {
+          console.warn("No hay sesión activa de usuario");
+          if (isMounted) setLoading(false);
+          return;
+        }
 
         const { data, error: fetchError } = await supabase
           .from("quiz_progress")
@@ -41,7 +46,7 @@ export const useFetchProgress = (initialData: Category[]) => {
 
         const progressData = (data ?? []) as QuizProgress[];
 
-        // ✅ Actualizar categorías incluyendo completed_at
+        // Actualizar categorías incluyendo completed_at
         const updatedCategories = initialData.map(cat => {
           const progress = progressData.find(p => p.quiz_id === cat.quiz.id);
           return {
@@ -50,19 +55,19 @@ export const useFetchProgress = (initialData: Category[]) => {
               ...cat.quiz,
               completed: progress?.completed ?? cat.quiz.completed,
               unlocked: true,
-              completedAt: progress?.completed_at ?? null, // 👈 clave para temporizador
+              completedAt: progress?.completed_at ?? null,
             },
           };
         });
 
-        // ✅ Guardar resultados
+        // Guardar resultados
         const savedResults: Record<string, QuizResult> = {};
         progressData.forEach(p => {
           if (p.score !== null && p.interpretation)
             savedResults[p.quiz_id] = { score: p.score, interpretation: p.interpretation };
         });
 
-        // ✅ Cargar timers (desde localStorage)
+        // Cargar timers desde localStorage
         const loadedTimers: Record<string, number> = {};
         initialData.forEach(cat => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
@@ -89,7 +94,7 @@ export const useFetchProgress = (initialData: Category[]) => {
     };
   }, [initialData]);
 
-  // ✅ Actualización de temporizadores (cada 1 segundo)
+  // Actualización de temporizadores (cada 1 segundo)
   useEffect(() => {
     const interval = setInterval(() => {
       setTimers(prev => {

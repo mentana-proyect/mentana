@@ -7,9 +7,10 @@ interface Props {
   index: number;
   openModal: (cat: Category, index: number) => void;
   openResult: (cat: Category, index: number) => void;
+  openRecomendacion: (cat: Category, index: number) => void; // nuevo prop
 }
 
-const QuizCard: React.FC<Props> = ({ cat, index, openModal, openResult }) => (
+const QuizCard: React.FC<Props> = ({ cat, index, openModal, openResult, openRecomendacion }) => (
   <section key={cat.name} className="grid">
     <article className="card-content">
       <h2>{cat.quiz.title}</h2>
@@ -29,6 +30,12 @@ const QuizCard: React.FC<Props> = ({ cat, index, openModal, openResult }) => (
           onClick={() => openResult(cat, index)}
         >
           <b>Resultado</b>
+        </button>
+        <button
+          className="action recomendacion"
+          onClick={() => openRecomendacion(cat, index)}
+        >
+          <b>Recomendación</b>
         </button>
       </div>
     </article>
