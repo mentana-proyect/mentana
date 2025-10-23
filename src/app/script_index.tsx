@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./HomePage.module.css";
 
@@ -18,6 +18,17 @@ const Carrusel: React.FC<CarruselProps> = ({ cards, interval = 5000 }) => {
   const [direction, setDirection] = useState(1); // 1 = derecha, -1 = izquierda
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 👉 funciones memoizadas
+  const nextSlide = useCallback(() => {
+    setDirection(1);
+    setCurrent((prev) => (prev === cards.length - 1 ? 0 : prev + 1));
+  }, [cards.length]);
+
+  const prevSlide = useCallback(() => {
+    setDirection(-1);
+    setCurrent((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
+  }, [cards.length]);
+
   // 🔁 autoplay
   useEffect(() => {
     if (interval > 0) {
@@ -28,17 +39,7 @@ const Carrusel: React.FC<CarruselProps> = ({ cards, interval = 5000 }) => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [current, interval]);
-
-  const nextSlide = () => {
-    setDirection(1);
-    setCurrent((prev) => (prev === cards.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setDirection(-1);
-    setCurrent((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
-  };
+  }, [current, interval, nextSlide]); // ✅ se agrega nextSlide
 
   // 👉 Swipe táctil
   const startX = useRef(0);
