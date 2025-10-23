@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import styles from "../app/HomePage.module.css";
 
 export default function Header() {

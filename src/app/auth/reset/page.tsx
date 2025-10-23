@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { AuthError } from "@supabase/supabase-js";
 import styles from "./ResetPage.module.css";
 import Footer from "../../../components/Footer";
-import Image from "next/image";
+
 
 export default function ResetPasswordPage() {
   const router = useRouter();
