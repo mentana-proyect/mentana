@@ -1,0 +1,99 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #112244;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  
+}
+.logoContainer {
+  width: 150px;
+  max-width: 80%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  margin-bottom: -25px;
+  margin-top: -10px;
+}
+.logoContainer:hover {
+  transform: scale(1.05);
+}
+.form {
+    
+    width: 95%;
+  max-width: 450px;
+  padding: 25px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: center;
+  color: #fff;
+}
+
+.description {
+  margin-top: -10px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #1f2a44;
+  color: #e5e7eb;
+}
+
+.button {
+  flex: 1 1 100%;
+  padding: 12px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: #56dbc4;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.button {
+  background-color: #56dbc4;
+  color: #112244;
+}
+.button:hover:not(:disabled) {
+  background-color: #56dbc4;
+  color: #fff;
+}
+.success {
+    text-align: center;
+  margin-top: 12px;
+  color: #fff;
+}
+
+.error {
+    text-align: center;
+  margin-top: 12px;
+  color: #fff;
+}
+

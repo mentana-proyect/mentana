@@ -4,7 +4,7 @@ export default function TextoMotivacional() {
   return (
     <section className={styles.textoMotivacional}>
       <p>
-       <strong>Estamos construyendo el futuro del bienestar emocional.</strong>.
+       <strong>Estamos construyendo el futuro del bienestar emocional.</strong>
       </p>
       <p>
         <strong>Únete al viaje.</strong>

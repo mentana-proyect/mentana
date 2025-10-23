@@ -1,6 +1,6 @@
 
 main {
-    max-width: 450px;
+    max-width: 500px;
     margin: 10px auto 100px;
     padding: 0 10px;
     scroll-behavior: smooth;
@@ -8,8 +8,8 @@ main {
 
 /* ========================== HEADER ========================== */
 header {
-    padding: 5px 10px 0;
-    max-width: 450px;
+    padding: 10px 10px 0;
+    max-width: 500px;
     margin: 0 auto;
     text-align: center;
     
@@ -36,6 +36,7 @@ header .logo {
     color: #d4e0e4;
     margin-top: 10px;
 }
+
 
 /* ========================== TOPBAR ========================== */
 .topbar {
@@ -162,6 +163,10 @@ header .logo {
 .card h3 {
     margin: 0 0 6px;
     font-size: 20px;
+}
+.card p {
+    margin: 0 14px 6px;
+    font-size: 14px;
 }
 
 .pill {
