@@ -8,8 +8,8 @@ export interface QuizResult {
 }
 
 export const useQuizHandlers = (
-  categories: Category[],
-  setCategories: React.Dispatch<React.SetStateAction<Category[]>>,
+  categories: Category[] | null,
+  setCategories: React.Dispatch<React.SetStateAction<Category[] | null>>,
   setResults: React.Dispatch<React.SetStateAction<Record<string, QuizResult>>>,
   closeModal: () => void
 ) => {
@@ -21,25 +21,30 @@ export const useQuizHandlers = (
     setShowConfetti: (v: boolean) => void,
     setModalMode: (v: "quiz" | "result") => void
   ): Promise<void> => {
-    if (activeIndex === null || !activeQuiz) return;
+    if (activeIndex === null || !activeQuiz || !categories) return;
 
     setShowConfetti(true);
 
-    // Actualizar categorías localmente
+    // ✅ Actualizar categorías localmente
     const updated = [...categories];
     updated[activeIndex] = {
       ...activeQuiz,
-      quiz: { ...activeQuiz.quiz, completed: true, unlocked: true, completedAt: new Date().toISOString() },
+      quiz: {
+        ...activeQuiz.quiz,
+        completed: true,
+        unlocked: true,
+        completedAt: new Date().toISOString(),
+      },
     };
     setCategories(updated);
 
-    // Guardar resultado localmente
-    setResults(prev => ({
+    // ✅ Guardar resultado localmente
+    setResults((prev) => ({
       ...prev,
       [activeQuiz.quiz.id]: { score, interpretation },
     }));
 
-    // Guardar progreso en Supabase con upsert y onConflict
+    // ✅ Guardar progreso en Supabase
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -59,13 +64,13 @@ export const useQuizHandlers = (
               last_completed_at: new Date().toISOString(),
             },
           ],
-          { onConflict: "user_id,quiz_id" } // ✅ evita duplicados
+          { onConflict: "user_id,quiz_id" } // evita duplicados
         );
 
       if (error) console.error("Error al guardar progreso:", error.message || error);
     }
 
-    // Mostrar resultado y cerrar modal
+    // ✅ Mostrar resultado y cerrar modal
     setModalMode("result");
     setTimeout(() => closeModal(), 2000);
   };

@@ -12,7 +12,7 @@ interface QuizResponse {
 }
 
 export const useFetchProgress = (initialData: Category[]) => {
-  const [categories, setCategories] = useState<Category[]>(initialData);
+  const [categories, setCategories] = useState<Category[] | null>(null);
   const [results, setResults] = useState<Record<string, QuizResult>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,17 +25,20 @@ export const useFetchProgress = (initialData: Category[]) => {
       try {
         setLoading(true);
 
-        // ✅ Obtener sesión actual
+        // 🔹 Esperar sesión primero (sin mostrar initialData)
         const { data: sessionData } = await supabase.auth.getSession();
         const user = sessionData?.session?.user;
 
         if (!user) {
           console.warn("No hay sesión activa de usuario");
-          if (isMounted) setLoading(false);
+          if (isMounted) {
+            // ✅ Mostrar quizzes vacíos solo si realmente no hay usuario
+            setCategories(initialData);
+          }
           return;
         }
 
-        // ✅ Obtener última respuesta de cada quiz
+        // 🔹 Fetch de progreso desde Supabase
         const { data, error: fetchError } = await supabase
           .from("quiz_responses")
           .select("quiz_id, score, interpretation, completed_at")
@@ -46,45 +49,39 @@ export const useFetchProgress = (initialData: Category[]) => {
 
         const responseData = (data ?? []) as QuizResponse[];
 
-        // ✅ Procesar resultados y determinar si están bloqueados (menos de 30 días)
+        // 🔹 Mapear progreso a categorías
         const updatedCategories = initialData.map((cat) => {
           const latest = responseData.find((r) => r.quiz_id === cat.quiz.id);
-          let completed = false;
-          let completedAt: string | null = null;
-
-          if (latest?.completed_at) {
-            completed = true;
-            completedAt = latest.completed_at;
-          }
-
           return {
             ...cat,
             quiz: {
               ...cat.quiz,
-              completed,
-              unlocked: true, // todas son independientes
-              completedAt,
+              completed: !!latest?.completed_at,
+              unlocked: true,
+              completedAt: latest?.completed_at ?? null,
             },
           };
         });
 
-        // ✅ Guardar resultados de los últimos intentos
+        // 🔹 Crear diccionario de resultados
         const latestResults: Record<string, QuizResult> = {};
         responseData.forEach((r) => {
-          if (r.score !== null && r.interpretation)
+          if (r.score !== null && r.interpretation) {
             latestResults[r.quiz_id] = {
               score: r.score,
               interpretation: r.interpretation,
             };
+          }
         });
 
-        // ✅ Cargar timers desde localStorage
+        // 🔹 Cargar timers desde localStorage
         const loadedTimers: Record<string, number> = {};
         initialData.forEach((cat) => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
           loadedTimers[cat.quiz.id] = stored ? parseInt(stored, 10) : 0;
         });
 
+        // 🔹 Guardar en estado solo cuando todo esté listo
         if (isMounted) {
           setCategories(updatedCategories);
           setResults(latestResults);
@@ -92,8 +89,7 @@ export const useFetchProgress = (initialData: Category[]) => {
         }
       } catch (err) {
         console.error("Error al obtener progreso:", err);
-        if (isMounted)
-          setError("No se pudo cargar el progreso del usuario.");
+        if (isMounted) setError("No se pudo cargar el progreso del usuario.");
       } finally {
         if (isMounted) setLoading(false);
       }

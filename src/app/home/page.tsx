@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
@@ -46,12 +46,29 @@ const Home: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
   const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // 🔹 trigger para actualizar QuizCard
+  // Spinner mínimo 5 segundos
+  const [spinnerDone, setSpinnerDone] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setSpinnerDone(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Supabase carga completada
+  const [dataLoaded, setDataLoaded] = useState(false);
+  useEffect(() => {
+    if (!loading && categories !== null) {
+      setDataLoaded(true);
+    }
+  }, [loading, categories]);
 
   const { handleQuizCompletion: originalHandleQuizCompletion } =
-    useQuizHandlers(categories, setCategories, setResults, () =>
-      setIsModalOpen(false)
+    useQuizHandlers(
+      categories ?? [],
+      setCategories,
+      setResults,
+      () => setIsModalOpen(false)
     );
 
   const handleQuizCompletion = (
@@ -60,7 +77,7 @@ const Home: React.FC = () => {
     score: number,
     interpretation: string
   ) => {
-    if (index === null || !quiz) return;
+    if (index === null || !quiz || !categories) return;
 
     const updatedCategories = [...categories];
     updatedCategories[index].quiz.completed = true;
@@ -74,8 +91,6 @@ const Home: React.FC = () => {
 
     setShowConfetti(true);
     setModalMode("result");
-
-    // 🔹 Incrementamos refreshTrigger para forzar actualización de QuizCard
     setRefreshTrigger((prev) => prev + 1);
 
     originalHandleQuizCompletion(
@@ -95,39 +110,47 @@ const Home: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const completed = categories.filter((c) => c.quiz.completed).length;
-  const total = categories.length;
+  // Mostrar spinner mientras no hayan pasado 5 segundos o la data no esté lista
+  const isAppLoading = authLoading || !spinnerDone || !dataLoaded;
+
+  if (isAppLoading) {
+    return (
+      <div className="loading-overlay">
+        <div className="loading-container">
+          <div className="spinner" />
+          <p>Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="loading-container">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  // Usamos non-null assertion porque categories ya no es null aquí
+  const completed = categories!.filter((c) => c.quiz.completed).length;
+  const total = categories!.length;
 
   const QuizComponentToRender =
     activeQuiz && activeQuiz.quiz.id in quizComponents
       ? quizComponents[activeQuiz.quiz.id as keyof typeof quizComponents]
       : null;
 
-  if (authLoading || loading)
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p>Cargando...</p>
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className="loading-container">
-        <p>{error}</p>
-      </div>
-    );
-
   return (
     <div>
       <ProgressHeader completed={completed} total={total} />
       <main>
-        {categories.map((cat, index) => (
+        {categories!.map((cat, index) => (
           <QuizCard
             key={cat.name}
             cat={cat}
             index={index}
-            refreshTrigger={refreshTrigger} // 🔹 pasamos trigger
+            refreshTrigger={refreshTrigger}
             openModal={() => openQuiz(cat, index)}
             openResult={(q, i) => {
               setActiveQuiz(q);
@@ -146,28 +169,35 @@ const Home: React.FC = () => {
         {!isModalOpen && !isRecomendacionOpen && <DockFooter logout={logout} />}
       </main>
 
+      {/* Modal de recomendación */}
       <Modal
         isOpen={isRecomendacionOpen}
         onClose={() => setIsRecomendacionOpen(false)}
       >
         <h2>Recomendación</h2>
-        <p>Aquí puedes colocar cualquier recomendación o consejo de bienestar para el usuario.</p>
+        <p>
+          Aquí puedes colocar cualquier recomendación o consejo de bienestar
+          para el usuario.
+        </p>
       </Modal>
 
+      {/* Modal de cuestionarios / resultados */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {modalMode === "quiz" && QuizComponentToRender && activeQuiz && (
           <QuizComponentToRender
-            onResult={(score, interpretation) => {
-              handleQuizCompletion(activeIndex, activeQuiz, score, interpretation);
-            }}
+            onResult={(score, interpretation) =>
+              handleQuizCompletion(activeIndex, activeQuiz, score, interpretation)
+            }
           />
         )}
-        {modalMode === "result" && activeQuiz && results[activeQuiz.quiz.id] && (
-          <ResultView
-            score={results[activeQuiz.quiz.id].score}
-            interpretation={results[activeQuiz.quiz.id].interpretation}
-          />
-        )}
+        {modalMode === "result" &&
+          activeQuiz &&
+          results![activeQuiz.quiz.id] && (
+            <ResultView
+              score={results![activeQuiz.quiz.id].score}
+              interpretation={results![activeQuiz.quiz.id].interpretation}
+            />
+          )}
       </Modal>
 
       {showConfetti && typeof window !== "undefined" && (
