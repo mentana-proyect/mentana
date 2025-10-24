@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
@@ -48,21 +48,6 @@ const Home: React.FC = () => {
   const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Spinner mínimo 5 segundos
-  const [spinnerDone, setSpinnerDone] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setSpinnerDone(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Supabase carga completada
-  const [dataLoaded, setDataLoaded] = useState(false);
-  useEffect(() => {
-    if (!loading && categories !== null) {
-      setDataLoaded(true);
-    }
-  }, [loading, categories]);
-
   const { handleQuizCompletion: originalHandleQuizCompletion } =
     useQuizHandlers(
       categories ?? [],
@@ -110,8 +95,8 @@ const Home: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Mostrar spinner mientras no hayan pasado 5 segundos o la data no esté lista
-  const isAppLoading = authLoading || !spinnerDone || !dataLoaded;
+  // Control de carga: solo renderiza cuando categories no es null y no hay loading
+  const isAppLoading = authLoading || loading || categories === null;
 
   if (isAppLoading) {
     return (
@@ -132,9 +117,8 @@ const Home: React.FC = () => {
     );
   }
 
-  // Usamos non-null assertion porque categories ya no es null aquí
-  const completed = categories!.filter((c) => c.quiz.completed).length;
-  const total = categories!.length;
+  const completed = categories.filter((c) => c.quiz.completed).length;
+  const total = categories.length;
 
   const QuizComponentToRender =
     activeQuiz && activeQuiz.quiz.id in quizComponents
@@ -143,9 +127,9 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <ProgressHeader completed={completed} total={total} />
+      <ProgressHeader />
       <main>
-        {categories!.map((cat, index) => (
+        {categories.map((cat, index) => (
           <QuizCard
             key={cat.name}
             cat={cat}
@@ -190,14 +174,12 @@ const Home: React.FC = () => {
             }
           />
         )}
-        {modalMode === "result" &&
-          activeQuiz &&
-          results![activeQuiz.quiz.id] && (
-            <ResultView
-              score={results![activeQuiz.quiz.id].score}
-              interpretation={results![activeQuiz.quiz.id].interpretation}
-            />
-          )}
+        {modalMode === "result" && activeQuiz && results[activeQuiz.quiz.id] && (
+          <ResultView
+            score={results[activeQuiz.quiz.id].score}
+            interpretation={results[activeQuiz.quiz.id].interpretation}
+          />
+        )}
       </Modal>
 
       {showConfetti && typeof window !== "undefined" && (

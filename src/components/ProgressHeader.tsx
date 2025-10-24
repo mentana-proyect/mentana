@@ -1,13 +1,57 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
-interface Props {
-  completed: number;
-  total: number;
+interface QuizProgress {
+  quiz_id: string;
+  completed: boolean;
 }
 
-const ProgressHeader: React.FC<Props> = ({ completed, total }) => {
-  const progress = total > 0 ? (completed / total) * 100 : 0;
+interface Props {
+  refreshTrigger?: number; // 🔹 Dependencia para refrescar
+}
+
+const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
+  const [completed, setCompleted] = useState(0);
+  const totalQuizzes = 4;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      setLoading(true);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const userId = user?.id;
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from("quiz_progress")
+        .select("quiz_id, completed")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error al obtener progreso:", error.message || error);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        const completedQuizzes = data.filter(
+          (q: QuizProgress) => q.completed
+        ).length;
+
+        setCompleted(completedQuizzes > totalQuizzes ? totalQuizzes : completedQuizzes);
+      }
+
+      setLoading(false);
+    };
+
+    fetchProgress();
+  }, [refreshTrigger]);
+
+  const progress = (completed / totalQuizzes) * 100;
 
   return (
     <header>
@@ -36,9 +80,9 @@ const ProgressHeader: React.FC<Props> = ({ completed, total }) => {
         </div>
 
         <p style={{ textAlign: "center" }}>
-          Al completar tu PEP estarás dando un paso importante hacia conocerte mejor.
-          Poco a poco, irás desbloqueando aspectos clave de ti mismo: cómo manejas la
-          ansiedad, el estrés, la soledad o la tristeza.
+          Al completar tu PEP estarás dando un paso importante hacia conocerte
+          mejor. Poco a poco, irás desbloqueando aspectos clave de ti mismo:
+          cómo manejas la ansiedad, el estrés, la soledad o la tristeza.
           <br />
           <br />
           <strong>👉 Es tu espacio seguro, pensado para ti 🌱</strong>
@@ -49,7 +93,9 @@ const ProgressHeader: React.FC<Props> = ({ completed, total }) => {
             <div className="progress-label">
               <span>Progreso</span>
               <span id="progressText">
-                {completed} / {total} completados
+                {loading
+                  ? "⏳ Cargando..."
+                  : `${completed} / ${totalQuizzes} completados`}
               </span>
             </div>
             <div className="progress">

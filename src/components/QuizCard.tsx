@@ -9,8 +9,14 @@ interface Props {
   openModal: (cat: Category, index: number) => void;
   openResult: (cat: Category, index: number) => void;
   openRecomendacion: (cat: Category, index: number) => void;
-  refreshTrigger?: number; // 🔹 se actualiza desde el padre al completar el quiz
+  refreshTrigger?: number;
 }
+
+type ButtonState = {
+  responder: { show: boolean; disabled: boolean };
+  resultado: { show: boolean; disabled: boolean };
+  recomendacion: { show: boolean; disabled: boolean };
+};
 
 const QuizCard: React.FC<Props> = ({
   cat,
@@ -24,9 +30,17 @@ const QuizCard: React.FC<Props> = ({
   const [hasResult, setHasResult] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [buttonState, setButtonState] = useState<ButtonState>({
+    responder: { show: false, disabled: false },
+    resultado: { show: false, disabled: false },
+    recomendacion: { show: false, disabled: false },
+  });
+
+  // Obtener último intento del usuario
   useEffect(() => {
     const fetchLastAttempt = async () => {
       setLoading(true);
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -45,7 +59,6 @@ const QuizCard: React.FC<Props> = ({
 
       if (error) {
         console.error("Error al obtener último intento:", error.message || error);
-        return;
       }
 
       if (data?.last_completed_at) {
@@ -65,44 +78,32 @@ const QuizCard: React.FC<Props> = ({
     fetchLastAttempt();
   }, [cat.quiz.id, refreshTrigger]);
 
-  // 🔹 Lógica de botones según el estado del quiz
-  let showResponder = true;
-  let disableResponder = false;
+  // Actualizar estados de botones en función de hasResult y daysLeft
+  useEffect(() => {
+    if (loading) return;
 
-  let showResult = true;
-  let disableResult = false;
+    const state: ButtonState = {
+      responder: { show: false, disabled: false },
+      resultado: { show: true, disabled: false },
+      recomendacion: { show: false, disabled: true },
+    };
 
-  let showRecomendacion = false;
-  let disableRecomendacion = false;
+    if (!hasResult) {
+      state.responder = { show: true, disabled: false };
+      state.resultado = { show: true, disabled: true };
+      state.recomendacion = { show: false, disabled: true };
+    } else if (daysLeft && daysLeft > 0) {
+      state.responder = { show: false, disabled: true };
+      state.resultado = { show: true, disabled: false };
+      state.recomendacion = { show: true, disabled: false };
+    } else {
+      state.responder = { show: true, disabled: false };
+      state.resultado = { show: true, disabled: false };
+      state.recomendacion = { show: false, disabled: true };
+    }
 
-  if (!hasResult) {
-    // Nunca respondió
-    showResponder = true;
-    disableResponder = false;
-
-    showResult = true;
-    disableResult = true;
-
-    showRecomendacion = false;
-  } else if (daysLeft !== null && daysLeft > 0) {
-    // Respondido hace <30 días
-    showResponder = false;
-
-    showResult = true;
-    disableResult = false;
-
-    showRecomendacion = true;
-    disableRecomendacion = false;
-  } else {
-    // Respondido hace ≥30 días
-    showResponder = true;
-    disableResponder = false;
-
-    showResult = true;
-    disableResult = false;
-
-    showRecomendacion = false;
-  }
+    setButtonState(state);
+  }, [hasResult, daysLeft, loading]);
 
   const quizStatus = !hasResult
     ? "✅ Disponible"
@@ -110,51 +111,53 @@ const QuizCard: React.FC<Props> = ({
     ? `⏳ Disponible en ${daysLeft} día${daysLeft > 1 ? "s" : ""}`
     : "✅ Disponible";
 
+  if (loading) {
+    return (
+      <section className="grid">
+        <article className="card-content">
+          <h2>{cat.quiz.title}</h2>
+          <span className="pill">⏳ Cargando...</span>
+          <p className="subtitle">{cat.quiz.description}</p>
+        </article>
+      </section>
+    );
+  }
+
   return (
-    <section key={cat.name} className="grid">
+    <section className="grid">
       <article className="card-content">
         <h2>{cat.quiz.title}</h2>
         <span className="pill">{quizStatus}</span>
         <p className="subtitle">{cat.quiz.description}</p>
 
         <div className="actions">
-          {showResponder && (
+          {buttonState.responder.show && (
             <button
               className="action open"
               onClick={() => openModal(cat, index)}
-              disabled={disableResponder}
-              style={{
-                opacity: disableResponder ? 0.6 : 1,
-                cursor: disableResponder ? "not-allowed" : "pointer",
-              }}
+              disabled={buttonState.responder.disabled}
             >
               <b>Responder</b>
             </button>
           )}
 
-          {showResult && (
+          {buttonState.resultado.show && (
             <button
               className="action view"
-              onClick={() => !disableResult && openResult(cat, index)}
-              disabled={disableResult}
-              style={{
-                opacity: disableResult ? 0.6 : 1,
-                cursor: disableResult ? "not-allowed" : "pointer",
-              }}
+              onClick={() => !buttonState.resultado.disabled && openResult(cat, index)}
+              disabled={buttonState.resultado.disabled}
             >
               <b>Resultado</b>
             </button>
           )}
 
-          {showRecomendacion && (
+          {buttonState.recomendacion.show && (
             <button
               className="action recomendacion"
-              onClick={() => !disableRecomendacion && openRecomendacion(cat, index)}
-              disabled={disableRecomendacion}
-              style={{
-                opacity: disableRecomendacion ? 0.6 : 1,
-                cursor: disableRecomendacion ? "not-allowed" : "pointer",
-              }}
+              onClick={() =>
+                !buttonState.recomendacion.disabled && openRecomendacion(cat, index)
+              }
+              disabled={buttonState.recomendacion.disabled}
             >
               <b>Recomendación</b>
             </button>
