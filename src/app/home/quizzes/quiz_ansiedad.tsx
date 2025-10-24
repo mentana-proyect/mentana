@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
 import Footer from "../../../components/Footer";
@@ -16,20 +16,21 @@ const gad7Questions = [
   "4. ¿Con qué frecuencia ha tenido dificultad para relajarse?",
   "5. ¿Con qué frecuencia se ha sentido tan inquieto que le resulta difícil permanecer quieto?",
   "6. ¿Con qué frecuencia se ha molestado o irritado con facilidad?",
-  "7. ¿Con qué frecuencia ha sentido miedo como si algo terrible pudiera pasar?"
+  "7. ¿Con qué frecuencia ha sentido miedo como si algo terrible pudiera pasar?",
 ];
 
 const options = [
   { label: "0", value: 0 },
   { label: "1", value: 1 },
   { label: "2", value: 2 },
-  { label: "3", value: 3 }
+  { label: "3", value: 3 },
 ];
 
 export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
   const [answers, setAnswers] = useState<number[]>(Array(gad7Questions.length).fill(-1));
   const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [canAnswer, setCanAnswer] = useState(true);
+  const quizId = "ansiedad1"; // 👈 identificador único del quiz
 
   const handleAnswer = (index: number, value: number) => {
     const updated = [...answers];
@@ -38,118 +39,103 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
   };
 
   const getInterpretation = (score: number) => {
-    if (score <= 4) return "La ansiedad es baja! probablemente no se requiere intervención clínica.";
-    if (score <= 9) return "Puede haber síntomas de ansiedad, observar y evaluar si afectan la vida diaria.";
-    if (score <= 14) return "Síntomas de ansiedad significativos, considerar evaluación profesional.";
-    return "Ansiedad alta! considerar evaluación y tratamiento profesional.";
+    if (score <= 4) return "La ansiedad es baja. Probablemente no se requiere intervención clínica.";
+    if (score <= 9) return "Síntomas leves de ansiedad. Observar si afectan la vida diaria.";
+    if (score <= 14) return "Síntomas moderados. Considerar evaluación profesional.";
+    return "Alta ansiedad. Se recomienda apoyo profesional.";
   };
 
+  // 🕒 Verificar si el usuario puede volver a responder
+  useEffect(() => {
+    const checkLastAttempt = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from("quiz_progress")
+        .select("last_completed_at")
+        .eq("user_id", userId)
+        .eq("quiz_id", quizId)
+        .single();
+
+      if (error) return; // no existe → puede responder
+
+      if (data?.last_completed_at) {
+        const lastDate = new Date(data.last_completed_at);
+        const now = new Date();
+        const diffDays = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays < 30) {
+          setCanAnswer(false);
+        }
+      }
+    };
+
+    checkLastAttempt();
+  }, []);
+
   const calculateScore = async () => {
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-    setLoading(true);
-
     if (answers.includes(-1)) {
       alert("Por favor responde todas las preguntas antes de continuar.");
-      setLoading(false);
-      setIsSubmitting(false);
+      return;
+    }
+
+    if (!canAnswer) {
+      alert("⏳ Solo puedes volver a responder este test después de 30 días.");
       return;
     }
 
     const total = answers.reduce((acc, val) => acc + val, 0);
     const interpretation = getInterpretation(total);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
-
     if (!userId) {
       alert("⚠️ Usuario no autenticado.");
       setLoading(false);
-      setIsSubmitting(false);
       return;
     }
 
-    // --- Prevención de doble inserción ---
-    const recentAttempt = await supabase
-      .from("quiz_progress")
-      .select("*")
-      .eq("user_id", userId)
-      .like("quiz_id", "ansiedad%")
-      .order("completed_at", { ascending: false })
-      .limit(1);
-
-    if (recentAttempt.data?.length) {
-      const last = new Date(recentAttempt.data[0].completed_at).getTime();
-      const now = new Date().getTime();
-      if (now - last < 2000) {
-        alert("⏱ Espera un momento antes de intentar de nuevo.");
-        setLoading(false);
-        setIsSubmitting(false);
-        return;
-      }
-    }
-
-    // Guardar resultados en results_ansiedad
+    // ✅ 1. Guardar resultado histórico
     const { error: insertError } = await supabase.from("results_ansiedad").insert([
-      { user_id: userId, answers, total, interpretation },
+      { user_id: userId, answers, score: total, interpretation },
     ]);
 
     if (insertError) {
       console.error(insertError);
-      alert("Error al guardar el resultado en results_ansiedad");
+      alert("Error al guardar resultado.");
       setLoading(false);
-      setIsSubmitting(false);
       return;
     }
 
-    // Contar quizzes previos para generar quiz_id
-    const { count, error: countError } = await supabase
+    // ✅ 2. Actualizar progreso general (upsert evita duplicados)
+    const { error: progressError } = await supabase
       .from("quiz_progress")
-      .select("id", { count: "exact" })
-      .eq("user_id", userId)
-      .like("quiz_id", "ansiedad%");
-
-    if (countError) {
-      console.error(countError);
-      alert("Error al obtener el número de intentos previos");
-      setLoading(false);
-      setIsSubmitting(false);
-      return;
-    }
-
-    const newQuizId = `ansiedad${(count ?? 0) + 1}`;
-
-    // Insertar en quiz_progress
-    const { error: progressError } = await supabase.from("quiz_progress").insert([
-      {
-        user_id: userId,
-        quiz_id: newQuizId,
-        completed: true,
-        unlocked: true,
-        completed_at: new Date().toISOString(),
-        score: total,
-        interpretation,
-      },
-    ]);
+      .upsert(
+        {
+          user_id: userId,
+          quiz_id: quizId,
+          completed: true,
+          unlocked: true,
+          score: total,
+          interpretation,
+          last_completed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,quiz_id" }
+      );
 
     if (progressError) {
       console.error(progressError);
-      alert("Error al registrar el progreso del quiz");
+      alert("Error al actualizar el progreso del quiz.");
       setLoading(false);
-      setIsSubmitting(false);
       return;
     }
 
     setLoading(false);
-    setIsSubmitting(false);
-
     if (onResult) onResult(total, interpretation);
     if (onComplete) onComplete();
-
-    alert(`✅ Resultado guardado correctamente (ID: ${newQuizId})`);
+    alert("✅ Resultado guardado correctamente.");
   };
 
   return (
@@ -158,39 +144,48 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
         <small>
           <i>
-            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.
+            Donde 0 es "Nunca", 1 es "Varios días", 2 es "Más de la mitad de los días" y 3 es "Casi todos los días".
           </i>
         </small>
       </div>
 
-      <form>
-        {gad7Questions.map((q, i) => (
-          <div key={i} className="form-group full-width">
-            <p className="font-medium mb-3 text-left">{q}</p>
-            <div className="options-row">
-              {options.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
-                  onClick={() => handleAnswer(i, opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </form>
+      {!canAnswer ? (
+        <p className="text-center text-red-500 font-medium mt-4">
+          ⏳ Ya completaste este cuestionario hace menos de 30 días.
+          Podrás volver a responderlo más adelante.
+        </p>
+      ) : (
+        <>
+          <form>
+            {gad7Questions.map((q, i) => (
+              <div key={i} className="form-group full-width">
+                <p className="font-medium mb-3 text-left">{q}</p>
+                <div className="options-row">
+                  {options.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
+                      onClick={() => handleAnswer(i, opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </form>
 
-      <button
-        type="button"
-        onClick={calculateScore}
-        disabled={loading || isSubmitting}
-        className="calculate-row"
-      >
-        {loading ? "Guardando..." : "Calcular"}
-      </button>
+          <button
+            type="button"
+            onClick={calculateScore}
+            disabled={loading}
+            className="calculate-row"
+          >
+            {loading ? "Guardando..." : "Calcular"}
+          </button>
+        </>
+      )}
 
       <br />
       <Footer />

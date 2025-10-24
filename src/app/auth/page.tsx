@@ -1,6 +1,5 @@
 "use client";
 import { useEffect } from "react";
-import Image from "next/image";
 import Head from "next/head";
 import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
 import Footer from "../../../components/Footer";
@@ -29,140 +29,168 @@ const phq9Options = [
 ];
 
 export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
-  const [answers, setAnswers] = useState<number[]>(
-    Array(phq9Questions.length).fill(-1)
-  );
+  const [answers, setAnswers] = useState<number[]>(Array(phq9Questions.length).fill(-1));
   const [loading, setLoading] = useState(false);
+  const [canAnswer, setCanAnswer] = useState(true);
 
-  const handleAnswer = (qIndex: number, value: number) => {
+  const quizId = "depresion1"; // identificador único del quiz
+
+  const handleAnswer = (index: number, value: number) => {
     const updated = [...answers];
-    updated[qIndex] = value;
+    updated[index] = value;
     setAnswers(updated);
   };
 
-  const getInterpretation = (s: number) => {
-    if (s <= 4) return "Depresión mínima";
-    if (s <= 9) return "Depresión leve";
-    if (s <= 14) return "Depresión moderada";
-    if (s <= 19) return "Depresión moderadamente grave";
+  const getInterpretation = (score: number) => {
+    if (score <= 4) return "Depresión mínima";
+    if (score <= 9) return "Depresión leve";
+    if (score <= 14) return "Depresión moderada";
+    if (score <= 19) return "Depresión moderadamente grave";
     return "Depresión grave";
   };
 
+  // 🕒 Verificar si el usuario puede volver a responder
+  useEffect(() => {
+    const checkLastAttempt = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) return;
+
+      const { data, error } = await supabase
+        .from("quiz_progress")
+        .select("last_completed_at")
+        .eq("user_id", userId)
+        .eq("quiz_id", quizId)
+        .single();
+
+      if (error) return; // no existe → puede responder
+
+      if (data?.last_completed_at) {
+        const lastDate = new Date(data.last_completed_at);
+        const now = new Date();
+        const diffDays = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays < 30) {
+          setCanAnswer(false);
+        }
+      }
+    };
+
+    checkLastAttempt();
+  }, []);
+
   const calculateScore = async () => {
+    if (!canAnswer) {
+      alert("⏳ Solo puedes volver a responder este test después de 30 días.");
+      return;
+    }
+
     if (answers.includes(-1)) {
       alert("Por favor responde todas las preguntas antes de continuar.");
       return;
     }
 
     const total = answers.reduce((acc, val) => acc + val, 0);
-    const interp = getInterpretation(total);
+    const interpretation = getInterpretation(total);
 
     setLoading(true);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
-
     if (!userId) {
       alert("⚠️ Usuario no autenticado.");
       setLoading(false);
       return;
     }
 
-    // 1️⃣ Guardar respuestas en results_phq9
+    // ✅ 1. Guardar resultado histórico
     const { error: insertError } = await supabase.from("results_depresion").insert([
-      {
-        user_id: userId,
-        answers,
-        total,
-        interpretation: interp,
-      },
+      { user_id: userId, answers, score: total, interpretation },
     ]);
 
     if (insertError) {
       console.error(insertError);
-      alert("Error al guardar el resultado en results_depresion");
+      alert("Error al guardar resultado.");
       setLoading(false);
       return;
     }
 
-    // 2️⃣ Actualizar progreso de depresion1
-    const { error: updateDepresionError } = await supabase
+    // ✅ 2. Actualizar progreso general (upsert evita duplicados)
+    const { error: progressError } = await supabase
       .from("quiz_progress")
-      .update({
-        unlocked: false,
-        completed: true,
-        score: total,
-        interpretation: interp,
-      })
-      .eq("user_id", userId)
-      .eq("quiz_id", "depresion1");
+      .upsert(
+        {
+          user_id: userId,
+          quiz_id: quizId,
+          completed: true,
+          unlocked: true,
+          score: total,
+          interpretation,
+          last_completed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,quiz_id" }
+      );
 
-     
-    if (updateDepresionError) {
-      console.error(updateDepresionError);
-      alert("Error al actualizar progreso de ansiedad1");
+    if (progressError) {
+      console.error(progressError);
+      alert("Error al actualizar el progreso del quiz.");
       setLoading(false);
       return;
-    }
-
-// 3️⃣ Desbloquear depresión1
-    const { error: unlockDepresionError } = await supabase
-      .from("quiz_progress")
-      .update({
-        unlocked: true,
-      })
-      .eq("user_id", userId)
-      .eq("quiz_id", "estres1");
-
-    if (unlockDepresionError) {
-      console.error(unlockDepresionError);
-      alert("Error al desbloquear depresión1");
     }
 
     setLoading(false);
-
-    // Callbacks opcionales
-    if (onResult) onResult(total, interp);
+    if (onResult) onResult(total, interpretation);
     if (onComplete) onComplete();
+    alert("✅ Resultado guardado correctamente.");
   };
-  
+
   return (
     <div className="page">
       <div className="fixed-header-container">
-      <h1 className="text-2xl font-bold mb-6">Cuestionario PHQ-9</h1>
-       <small><i>Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.</i></small>
-     </div>
-      
-      <form>
-        {phq9Questions.map((q, qIndex) => (
-          <div key={qIndex} className="form-group full-width">
-            <p className="font-medium mb-3 text-left">{q}</p>
-            <div className="options-row">
-              {phq9Options.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  className={`option-btn ${
-                    answers[qIndex] === opt.value ? "selected" : ""
-                  }`}
-                  onClick={() => handleAnswer(qIndex, opt.value)}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </form>
-      <button
-        onClick={calculateScore}
-        disabled={loading}
-        className="calculate-row"
-      >
-        {loading ? "Guardando..." : "Calcular"}
-      </button>
+        <h1 className="text-2xl font-bold mb-6">Cuestionario PHQ-9</h1>
+        <small>
+          <i>
+            Donde 0 es "Nunca", 1 es "Varios días", 2 es "Más de la mitad de los días" y 3 es "Casi todos los días".
+          </i>
+        </small>
+      </div>
+
+      {!canAnswer ? (
+        <p className="text-center text-red-500 font-medium mt-4">
+          ⏳ Ya completaste este cuestionario hace menos de 30 días.
+          Podrás volver a responderlo más adelante.
+        </p>
+      ) : (
+        <>
+          <form>
+            {phq9Questions.map((q, i) => (
+              <div key={i} className="form-group full-width">
+                <p className="font-medium mb-3 text-left">{q}</p>
+                <div className="options-row">
+                  {phq9Options.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
+                      onClick={() => handleAnswer(i, opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </form>
+
+          <button
+            type="button"
+            onClick={calculateScore}
+            disabled={loading}
+            className="calculate-row"
+          >
+            {loading ? "Guardando..." : "Calcular"}
+          </button>
+        </>
+      )}
+
       <br />
       <Footer />
     </div>

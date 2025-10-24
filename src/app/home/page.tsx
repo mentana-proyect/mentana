@@ -37,7 +37,8 @@ const Home: React.FC = () => {
   const authLoading = useAuthCheck();
   useInactivityTimer(logout);
 
-  const { categories, setCategories, results, setResults, loading, error } = useFetchProgress(initialData);
+  const { categories, setCategories, results, setResults, loading, error } =
+    useFetchProgress(initialData);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
@@ -46,12 +47,12 @@ const Home: React.FC = () => {
   const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
   const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
 
-  const { handleQuizCompletion: originalHandleQuizCompletion } = useQuizHandlers(
-    categories,
-    setCategories,
-    setResults,
-    () => setIsModalOpen(false)
-  );
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // 🔹 trigger para actualizar QuizCard
+
+  const { handleQuizCompletion: originalHandleQuizCompletion } =
+    useQuizHandlers(categories, setCategories, setResults, () =>
+      setIsModalOpen(false)
+    );
 
   const handleQuizCompletion = (
     index: number | null,
@@ -59,14 +60,14 @@ const Home: React.FC = () => {
     score: number,
     interpretation: string
   ) => {
-    if (index === null || quiz === null) return;
+    if (index === null || !quiz) return;
 
     const updatedCategories = [...categories];
     updatedCategories[index].quiz.completed = true;
     updatedCategories[index].quiz.completedAt = new Date().toISOString();
     setCategories(updatedCategories);
 
-    setResults(prev => ({
+    setResults((prev) => ({
       ...prev,
       [quiz.quiz.id]: { score, interpretation },
     }));
@@ -74,10 +75,27 @@ const Home: React.FC = () => {
     setShowConfetti(true);
     setModalMode("result");
 
-    originalHandleQuizCompletion(index, quiz, score, interpretation, setShowConfetti, setModalMode);
+    // 🔹 Incrementamos refreshTrigger para forzar actualización de QuizCard
+    setRefreshTrigger((prev) => prev + 1);
+
+    originalHandleQuizCompletion(
+      index,
+      quiz,
+      score,
+      interpretation,
+      setShowConfetti,
+      setModalMode
+    );
   };
 
-  const completed = categories.filter(c => c.quiz.completed).length;
+  const openQuiz = (q: Category, i: number) => {
+    setActiveQuiz(q);
+    setActiveIndex(i);
+    setModalMode("quiz");
+    setIsModalOpen(true);
+  };
+
+  const completed = categories.filter((c) => c.quiz.completed).length;
   const total = categories.length;
 
   const QuizComponentToRender =
@@ -109,12 +127,8 @@ const Home: React.FC = () => {
             key={cat.name}
             cat={cat}
             index={index}
-            openModal={(q, i) => {
-              setActiveQuiz(q);
-              setActiveIndex(i);
-              setModalMode("quiz");
-              setIsModalOpen(true);
-            }}
+            refreshTrigger={refreshTrigger} // 🔹 pasamos trigger
+            openModal={() => openQuiz(cat, index)}
             openResult={(q, i) => {
               setActiveQuiz(q);
               setActiveIndex(i);
@@ -128,18 +142,25 @@ const Home: React.FC = () => {
             }}
           />
         ))}
-        
+
         {!isModalOpen && !isRecomendacionOpen && <DockFooter logout={logout} />}
       </main>
 
-      <Modal isOpen={isRecomendacionOpen} onClose={() => setIsRecomendacionOpen(false)}>
+      <Modal
+        isOpen={isRecomendacionOpen}
+        onClose={() => setIsRecomendacionOpen(false)}
+      >
         <h2>Recomendación</h2>
         <p>Aquí puedes colocar cualquier recomendación o consejo de bienestar para el usuario.</p>
       </Modal>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {modalMode === "quiz" && QuizComponentToRender && (
-          <QuizComponentToRender onResult={(s, i) => handleQuizCompletion(activeIndex, activeQuiz, s, i)} />
+        {modalMode === "quiz" && QuizComponentToRender && activeQuiz && (
+          <QuizComponentToRender
+            onResult={(score, interpretation) => {
+              handleQuizCompletion(activeIndex, activeQuiz, score, interpretation);
+            }}
+          />
         )}
         {modalMode === "result" && activeQuiz && results[activeQuiz.quiz.id] && (
           <ResultView

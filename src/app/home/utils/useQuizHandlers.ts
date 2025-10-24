@@ -21,14 +21,15 @@ export const useQuizHandlers = (
     setShowConfetti: (v: boolean) => void,
     setModalMode: (v: "quiz" | "result") => void
   ): Promise<void> => {
-    setShowConfetti(true);
     if (activeIndex === null || !activeQuiz) return;
+
+    setShowConfetti(true);
 
     // Actualizar categorías localmente
     const updated = [...categories];
     updated[activeIndex] = {
       ...activeQuiz,
-      quiz: { ...activeQuiz.quiz, completed: true, unlocked: true },
+      quiz: { ...activeQuiz.quiz, completed: true, unlocked: true, completedAt: new Date().toISOString() },
     };
     setCategories(updated);
 
@@ -38,21 +39,30 @@ export const useQuizHandlers = (
       [activeQuiz.quiz.id]: { score, interpretation },
     }));
 
-    // Guardar progreso en Supabase
+    // Guardar progreso en Supabase con upsert y onConflict
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (user) {
-      const { error } = await supabase.from("quiz_progress").upsert({
-        quiz_id: activeQuiz.quiz.id,
-        completed: true,
-        unlocked: true,
-        score,
-        interpretation,
-        user_id: user.id,
-      });
-      if (error) console.error("Error al guardar progreso:", error.message);
+      const { error } = await supabase
+        .from("quiz_progress")
+        .upsert(
+          [
+            {
+              user_id: user.id,
+              quiz_id: activeQuiz.quiz.id,
+              completed: true,
+              unlocked: true,
+              score,
+              interpretation,
+              last_completed_at: new Date().toISOString(),
+            },
+          ],
+          { onConflict: "user_id,quiz_id" } // ✅ evita duplicados
+        );
+
+      if (error) console.error("Error al guardar progreso:", error.message || error);
     }
 
     // Mostrar resultado y cerrar modal

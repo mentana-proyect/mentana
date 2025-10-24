@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/modal.css";
 
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -39,13 +40,13 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  // 🔹 Generar confetti temporal al abrir el modal
+  // 🔹 Confetti temporal
   useEffect(() => {
     if (isOpen && showConfetti) {
-      const pieces = Array.from({ length: 80 }, (_, i) => i); // 🔹 cantidad ajustable
+      const pieces = Array.from({ length: 100 }, (_, i) => i);
       setConfettiPieces(pieces);
 
-      const timer = setTimeout(() => setConfettiPieces([]), 1800);
+      const timer = setTimeout(() => setConfettiPieces([]), 1500);
       return () => clearTimeout(timer);
     }
   }, [isOpen, showConfetti]);
@@ -55,46 +56,23 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className="modal-overlay">
       <div className="modal-content" ref={modalRef}>
-        {/* 🎊 Confetti animado */}
-        {showConfetti && confettiPieces.length > 0 && (
-          <div className="confetti-container">
-            {confettiPieces.map((i) => {
-              const size = Math.random() * 8 + 4; // entre 4 y 12px
-              const left = Math.random() * 100; // posición horizontal aleatoria
-              const duration = Math.random() * 1 + 1; // duración aleatoria 1–2s
-              const delay = Math.random() * 0.5; // retardo leve
-              const colors = ["#56dbc4", "#ffcc00", "#ff6699", "#66ccff", "#ffffff"];
-              const color = colors[Math.floor(Math.random() * colors.length)];
-
-              return (
-                <span
-                  key={i}
-                  className="confetti"
-                  style={{
-                    left: `${left}%`,
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    backgroundColor: color,
-                    animationDuration: `${duration}s`,
-                    animationDelay: `${delay}s`,
-                  }}
-                />
-              );
-            })}
-          </div>
-        )}
-
         {/* Header con título centrado y botón a la derecha */}
         <div className="modal-header">
-          <div style={{ flex: 1 }} />
+          <div style={{ flex: 1 }} /> {/* espacio a la izquierda */}
           {title && <h2 className="modal-title">{title}</h2>}
-          <button className="modal-close" onClick={onClose} aria-label="Cerrar modal">
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Cerrar modal"
+          >
             &times;
           </button>
         </div>
 
         {/* Cuerpo del modal */}
         <div className="modal-body">{children}</div>
+
+      
       </div>
     </div>
   );
