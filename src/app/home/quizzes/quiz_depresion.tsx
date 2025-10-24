@@ -148,7 +148,7 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario PHQ-9</h1>
         <small>
           <i>
-            Donde 0 es "Nunca", 1 es "Varios días", 2 es "Más de la mitad de los días" y 3 es "Casi todos los días".
+            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.
           </i>
         </small>
       </div>
