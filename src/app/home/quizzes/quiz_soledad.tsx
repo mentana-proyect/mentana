@@ -98,6 +98,8 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       { user_id: userId, answers, score: total, interpretation },
     ]);
 
+    
+
     if (insertError) {
       console.error(insertError);
       alert("Error al guardar el resultado en results_soledad");

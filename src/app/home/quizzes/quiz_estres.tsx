@@ -100,6 +100,8 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
       { user_id: userId, answers, score: total, interpretation },
     ]);
 
+    
+
     if (insertError) {
       console.error(insertError);
       alert("Error al guardar el resultado en results_estres");
