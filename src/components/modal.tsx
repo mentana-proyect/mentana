@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "../styles/modal.css";
-
 
 interface ModalProps {
   isOpen: boolean;
@@ -16,9 +15,7 @@ const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   title,
-  showConfetti = false,
 }) => {
-  const [confettiPieces, setConfettiPieces] = useState<number[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // 🔹 Cerrar modal al hacer clic fuera y bloquear scroll
@@ -40,17 +37,6 @@ const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  // 🔹 Confetti temporal
-  useEffect(() => {
-    if (isOpen && showConfetti) {
-      const pieces = Array.from({ length: 100 }, (_, i) => i);
-      setConfettiPieces(pieces);
-
-      const timer = setTimeout(() => setConfettiPieces([]), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, showConfetti]);
-
   if (!isOpen) return null;
 
   return (
@@ -71,8 +57,6 @@ const Modal: React.FC<ModalProps> = ({
 
         {/* Cuerpo del modal */}
         <div className="modal-body">{children}</div>
-
-      
       </div>
     </div>
   );

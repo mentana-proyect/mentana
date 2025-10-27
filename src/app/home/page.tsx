@@ -96,7 +96,6 @@ const Home: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  // Control de carga: solo renderiza cuando categories no es null y no hay loading
   const isAppLoading = authLoading || loading || categories === null;
 
   if (isAppLoading) {
@@ -117,9 +116,6 @@ const Home: React.FC = () => {
       </div>
     );
   }
-
-  const completed = categories.filter((c) => c.quiz.completed).length;
-  const total = categories.length;
 
   const QuizComponentToRender =
     activeQuiz && activeQuiz.quiz.id in quizComponents
@@ -147,7 +143,6 @@ const Home: React.FC = () => {
               }));
               setIsModalOpen(true);
             }}
-
             openRecomendacion={(q, i) => {
               setActiveQuiz(q);
               setActiveIndex(i);
@@ -166,8 +161,8 @@ const Home: React.FC = () => {
       >
         {activeQuiz && (
           <Recommendation
-            quizId={activeQuiz.quiz.id} // 'ansiedad1', 'depresion1', etc.
-            score={results[activeQuiz.quiz.id]?.score ?? 0} // si no hay score, usamos 0
+            quizId={activeQuiz.quiz.id}
+            score={results[activeQuiz.quiz.id]?.score ?? 0}
           />
         )}
       </Modal>
