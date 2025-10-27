@@ -28,9 +28,7 @@ const QuizCard: React.FC<Props> = ({
 }) => {
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [hasResult, setHasResult] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [lastResult, setLastResult] = useState<{ score: number; interpretation: string } | null>(null);
-
   const [buttonState, setButtonState] = useState<ButtonState>({
     responder: { show: false, disabled: false },
     resultado: { show: false, disabled: false },
@@ -40,8 +38,6 @@ const QuizCard: React.FC<Props> = ({
   // Obtener último intento del usuario
   useEffect(() => {
     const fetchLastAttempt = async () => {
-      setLoading(true);
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -60,7 +56,6 @@ const QuizCard: React.FC<Props> = ({
 
       if (error) {
         console.error("Error al obtener último intento:", error.message || error);
-        setLoading(false);
         return;
       }
 
@@ -77,8 +72,6 @@ const QuizCard: React.FC<Props> = ({
         setLastResult(null);
         setDaysLeft(null);
       }
-
-      setLoading(false);
     };
 
     fetchLastAttempt();
@@ -86,8 +79,6 @@ const QuizCard: React.FC<Props> = ({
 
   // Actualizar estados de botones
   useEffect(() => {
-    if (loading) return;
-
     const state: ButtonState = {
       responder: { show: false, disabled: false },
       resultado: { show: true, disabled: false },
@@ -109,25 +100,13 @@ const QuizCard: React.FC<Props> = ({
     }
 
     setButtonState(state);
-  }, [hasResult, daysLeft, loading]);
+  }, [hasResult, daysLeft]);
 
   const quizStatus = !hasResult
     ? "✅ Disponible"
     : daysLeft && daysLeft > 0
     ? `⏳ Disponible en ${daysLeft} día${daysLeft > 1 ? "s" : ""}`
     : "✅ Disponible";
-
-  if (loading) {
-    return (
-      <section className="grid">
-        <article className="card-content">
-          <h2>{cat.quiz.title}</h2>
-          <span className="pill">⏳ Cargando...</span>
-          <p className="subtitle">{cat.quiz.description}</p>
-        </article>
-      </section>
-    );
-  }
 
   return (
     <section className="grid">
@@ -150,11 +129,7 @@ const QuizCard: React.FC<Props> = ({
           {buttonState.resultado.show && (
             <button
               className="action view"
-              onClick={() => {
-                if (!buttonState.resultado.disabled && lastResult) {
-                  openResult(cat, index, lastResult);
-                }
-              }}
+              onClick={() => lastResult && openResult(cat, index, lastResult)}
               disabled={buttonState.resultado.disabled}
             >
               <b>Resultado</b>
@@ -164,9 +139,7 @@ const QuizCard: React.FC<Props> = ({
           {buttonState.recomendacion.show && (
             <button
               className="action recomendacion"
-              onClick={() =>
-                !buttonState.recomendacion.disabled && openRecomendacion(cat, index)
-              }
+              onClick={() => openRecomendacion(cat, index)}
               disabled={buttonState.recomendacion.disabled}
             >
               <b>Recomendación</b>

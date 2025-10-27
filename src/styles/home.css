@@ -1,4 +1,3 @@
-
 main {
     max-width: 500px;
     margin: 10px auto 100px;
@@ -12,7 +11,7 @@ header {
     max-width: 500px;
     margin: 0 auto;
     text-align: center;
-    
+
 }
 
 header .logo {
@@ -22,17 +21,18 @@ header .logo {
 }
 
 .logo:hover {
-  transform: scale(1.05);
+    transform: scale(1.05);
 }
+
 .title {
-    
+
     font-size: clamp(20px, 2.6vw, 34px);
     font-weight: 800;
     letter-spacing: 0.3px;
 }
 
 .subtitle {
-    
+
     color: #d4e0e4;
     margin-top: 10px;
 }
@@ -45,7 +45,7 @@ header .logo {
     align-items: center;
     flex-wrap: wrap;
     margin-top: 14px;
-    
+
 }
 
 /* ========================== PROGRESS ========================== */
@@ -72,7 +72,7 @@ header .logo {
     overflow: hidden;
 }
 
-.progress > div {
+.progress>div {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #f999b7, #56dbc4);
@@ -81,8 +81,10 @@ header .logo {
 }
 
 /* ========================== BUTTONS ========================== */
-.btn, .action {
-    padding: 10px; /* mantiene el padding interno */
+.btn,
+.action {
+    padding: 10px;
+    /* mantiene el padding interno */
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -91,17 +93,21 @@ header .logo {
     justify-content: center;
     gap: 6px;
 
-    width: 100%;       /* ocupa todo el ancho del contenedor */
-    box-sizing: border-box; /* para que padding no rompa el ancho */
+    width: 100%;
+    /* ocupa todo el ancho del contenedor */
+    box-sizing: border-box;
+    /* para que padding no rompa el ancho */
 }
 
 
-.btn.primary, .btn.secondary {
+.btn.primary,
+.btn.secondary {
     background: #112244;
     color: #e5e7eb;
 }
 
-.btn:disabled, .action:disabled {
+.btn:disabled,
+.action:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -109,7 +115,8 @@ header .logo {
 .action.open {
     background: #56dbc4;
     color: #e5e7eb;
-    border: 1px solid #56dbc4; /* borde blanco */
+    border: 1px solid #56dbc4;
+    /* borde blanco */
     padding: 12px;
     border-radius: 50px;
 }
@@ -121,6 +128,7 @@ header .logo {
     padding: 12px;
     border-radius: 50px;
 }
+
 .action.recomendacion {
     background: #56dbc4;
     color: #e5e7eb;
@@ -128,6 +136,7 @@ header .logo {
     padding: 12px;
     border-radius: 50px;
 }
+
 .action.open:hover:not(:disabled),
 .action.view:hover:not(:disabled) {
     color: #112244;
@@ -164,6 +173,7 @@ header .logo {
     margin: 0 0 6px;
     font-size: 20px;
 }
+
 .card p {
     margin: 0 14px 6px;
     font-size: 14px;
@@ -215,7 +225,8 @@ header .logo {
 }
 
 /* ========================== MODAL ========================== */
-.dialog, .modal-content {
+.dialog,
+.modal-content {
     width: min(92vw, 720px);
     border-radius: 16px;
     background: linear-gradient(to right, #23bcd7, #112244);
@@ -238,12 +249,12 @@ header .logo {
     padding: 14px;
     max-height: 65vh;
     overflow: auto;
-    
+
 }
 
 /* ========================== QUIZ ========================== */
 .q {
-    
+
     margin-bottom: 16px;
     padding: 12px;
     background: rgba(255, 255, 255, 0.1);
@@ -251,21 +262,21 @@ header .logo {
 }
 
 .q legend {
-    
+
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 1rem;
 }
 
 .q label {
-    
+
     display: block;
     margin: 6px 0;
     font-size: 0.9rem;
 }
 
 .modal-footer {
-    
+
     display: flex;
     gap: 8px;
     justify-content: flex-end;
@@ -318,10 +329,24 @@ header .logo {
 }
 
 @keyframes fade {
-    0% { opacity: 0; transform: translate(-50%, 20px); }
-    10% { opacity: 1; transform: translate(-50%, 0); }
-    90% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, -10px); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
 }
 
 /* ========================== CONFETTI ========================== */
@@ -333,70 +358,75 @@ header .logo {
 
 /* ===== Dock flotante ===== */
 .dock-footer {
-position: relative; /* antes estaba fixed */
-  margin: 60px auto 40px auto; /* espacio arriba y abajo */
-  width: 90%;
-  max-width: 900px;
-  display: flex;
-  justify-content: center;
-  z-index: 1;
+    position: relative;
+    /* antes estaba fixed */
+    margin: 60px auto 40px auto;
+    /* espacio arriba y abajo */
+    width: 90%;
+    max-width: 900px;
+    display: flex;
+    justify-content: center;
+    z-index: 1;
 }
 
 /* Contenedor visual del dock */
 .dock {
- display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  border-radius: 50px;
-  padding: 6px 24px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  margin-top: -50px;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    border-radius: 50px;
+    padding: 6px 24px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    margin-top: -50px;
+    margin-bottom: 20px;
 }
+
 .dock button,
 .dock a {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #333;
-  transition: transform 0.2s ease, color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #333;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .dock button:hover,
 .dock a:hover {
-  transform: scale(1.1);
-  color: #56dbc4;
+    transform: scale(1.1);
+    color: #56dbc4;
 }
+
 .dock:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .dock button,
 .dock a {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.6rem;
-  color: #333;
-  transition: transform 0.2s ease, color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.6rem;
+    color: #333;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .dock button:hover,
 .dock a:hover {
-  transform: scale(1.15);
-  color: #56dbc4;
+    transform: scale(1.15);
+    color: #56dbc4;
 }
 
 /* ===== Compensación visual debajo ===== */
 .page,
 .main-content,
 .container {
-  padding-bottom: 220px; /* 💥 espacio suficiente para ver la última card */
+    padding-bottom: 220px;
+    /* 💥 espacio suficiente para ver la última card */
 }
 
 /* ========================== GRID ========================== */
@@ -426,20 +456,64 @@ position: relative; /* antes estaba fixed */
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ========================== MEDIA QUERIES ========================== */
 @media (min-width: 768px) {
-    ::-webkit-scrollbar { display: none; }
-    .hide-scroll { overflow: hidden; }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hide-scroll {
+        overflow: hidden;
+    }
+
     .viewport {
         overflow: auto;
         max-height: 100%;
         margin-right: -100px;
         padding-right: 100px;
     }
+
     .logo:hover {
-  transform: scale(1.05);
+        transform: scale(1.05);
+    }
 }
+
+.loading-overlay {
+    position: fixed;
+    /* Absoluto sobre todo */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #112244;
+    /*background: rgba(255, 255, 255, 0.8); /* Semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Encima de todo */
+}
+
+.loading-container {
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ccc;
+    border-top-color: #56dbc4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

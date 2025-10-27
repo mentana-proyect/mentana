@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
@@ -24,7 +24,7 @@ import Recommendation from "../../components/Recommendation";
 import { initialData } from "../data/initialData";
 
 const quizComponents: Record<
-  "ansiedad1" | "depresion1" | "estres1" | "soledad1",
+  string,
   React.FC<{ onResult?: (score: number, interpretation: string) => void }>
 > = {
   ansiedad1: CuestionarioGAD7,
@@ -41,43 +41,64 @@ const Home: React.FC = () => {
   const { categories, setCategories, results, setResults, loading, error } =
     useFetchProgress(initialData);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [modalMode, setModalMode] = useState<"quiz" | "result">("quiz");
-  const [isRecomendacionOpen, setIsRecomendacionOpen] = useState(false);
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [recommendModalOpen, setRecommendModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // ⏳ Overlay de carga de 5 segundos
+  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoadingOverlay(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const { handleQuizCompletion: originalHandleQuizCompletion } =
     useQuizHandlers(
       categories ?? [],
       setCategories,
       setResults,
-      () => setIsModalOpen(false)
+      () => setQuizModalOpen(false)
     );
 
   const handleQuizCompletion = (
-    index: number | null,
-    quiz: Category | null,
+    index: number,
+    quiz: Category,
     score: number,
     interpretation: string
   ) => {
-    if (index === null || !quiz || !categories) return;
+    if (index === null) return;
 
-    const updatedCategories = [...categories];
-    updatedCategories[index].quiz.completed = true;
-    updatedCategories[index].quiz.completedAt = new Date().toISOString();
-    setCategories(updatedCategories);
+    // Actualizar categorías
+    setCategories(prev =>
+      prev!.map((cat, i) =>
+        i === index
+          ? {
+              ...cat,
+              quiz: {
+                ...cat.quiz,
+                completed: true,
+                completedAt: new Date().toISOString(),
+              },
+            }
+          : cat
+      )
+    );
 
-    setResults((prev) => ({
+    // Actualizar resultados
+    setResults(prev => ({
       ...prev,
       [quiz.quiz.id]: { score, interpretation },
     }));
 
+    // Mostrar confetti y resultados
     setShowConfetti(true);
-    setModalMode("result");
-    setRefreshTrigger((prev) => prev + 1);
+    setResultModalOpen(true);
+    setRefreshTrigger(prev => prev + 1);
 
     originalHandleQuizCompletion(
       index,
@@ -85,48 +106,41 @@ const Home: React.FC = () => {
       score,
       interpretation,
       setShowConfetti,
-      setModalMode
+      (mode: "quiz" | "result") => {
+        setQuizModalOpen(mode === "quiz");
+        setResultModalOpen(mode === "result");
+      }
     );
   };
 
+  // Auto-cierre del confetti
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => setShowConfetti(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
+
   const openQuiz = (q: Category, i: number) => {
+    if (q.quiz.completed) return;
     setActiveQuiz(q);
     setActiveIndex(i);
-    setModalMode("quiz");
-    setIsModalOpen(true);
+    setQuizModalOpen(true);
   };
 
   const isAppLoading = authLoading || loading || categories === null;
 
-  if (isAppLoading) {
-    return (
-      <div className="loading-overlay">
-        <div className="loading-container">
-          <div className="spinner" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="loading-container">
-        <p>{error}</p>
-      </div>
-    );
-  }
-
   const QuizComponentToRender =
     activeQuiz && activeQuiz.quiz.id in quizComponents
-      ? quizComponents[activeQuiz.quiz.id as keyof typeof quizComponents]
+      ? quizComponents[activeQuiz.quiz.id]
       : null;
 
   return (
-    <div>
+    <div className="home-container">
+      {/* Todo el contenido se renderiza siempre */}
       <ProgressHeader />
       <main>
-        {categories.map((cat, index) => (
+        {categories?.map((cat, index) => (
           <QuizCard
             key={cat.name}
             cat={cat}
@@ -136,28 +150,36 @@ const Home: React.FC = () => {
             openResult={(q, i, result) => {
               setActiveQuiz(q);
               setActiveIndex(i);
-              setModalMode("result");
-              setResults((prev) => ({
-                ...prev,
-                [q.quiz.id]: result,
-              }));
-              setIsModalOpen(true);
+              setResultModalOpen(true);
+              setResults(prev => ({ ...prev, [q.quiz.id]: result }));
             }}
             openRecomendacion={(q, i) => {
               setActiveQuiz(q);
               setActiveIndex(i);
-              setIsRecomendacionOpen(true);
+              setRecommendModalOpen(true);
             }}
           />
         ))}
 
-        {!isModalOpen && !isRecomendacionOpen && <DockFooter logout={logout} />}
+        {!quizModalOpen && !resultModalOpen && !recommendModalOpen && (
+          <DockFooter logout={logout} />
+        )}
       </main>
 
-      {/* Modal de recomendación */}
+      {/* Overlay de carga */}
+      {showLoadingOverlay && (
+        <div className="loading-overlay">
+          <div className="loading-container">
+            <div className="spinner" />
+            <p>Cargando...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Modales */}
       <Modal
-        isOpen={isRecomendacionOpen}
-        onClose={() => setIsRecomendacionOpen(false)}
+        isOpen={recommendModalOpen}
+        onClose={() => setRecommendModalOpen(false)}
       >
         {activeQuiz && (
           <Recommendation
@@ -167,16 +189,18 @@ const Home: React.FC = () => {
         )}
       </Modal>
 
-      {/* Modal de cuestionarios / resultados */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {modalMode === "quiz" && QuizComponentToRender && activeQuiz && (
+      <Modal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)}>
+        {QuizComponentToRender && activeQuiz && (
           <QuizComponentToRender
             onResult={(score, interpretation) =>
-              handleQuizCompletion(activeIndex, activeQuiz, score, interpretation)
+              handleQuizCompletion(activeIndex!, activeQuiz, score, interpretation)
             }
           />
         )}
-        {modalMode === "result" && activeQuiz && results[activeQuiz.quiz.id] && (
+      </Modal>
+
+      <Modal isOpen={resultModalOpen} onClose={() => setResultModalOpen(false)}>
+        {activeQuiz && results[activeQuiz.quiz.id] && (
           <ResultView
             score={results[activeQuiz.quiz.id].score}
             interpretation={results[activeQuiz.quiz.id].interpretation}
@@ -184,6 +208,7 @@ const Home: React.FC = () => {
         )}
       </Modal>
 
+      {/* Confetti */}
       {showConfetti && typeof window !== "undefined" && (
         <Confetti
           width={window.innerWidth}

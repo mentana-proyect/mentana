@@ -18,6 +18,7 @@ export const useFetchProgress = (initialData: Category[]) => {
   const [error, setError] = useState<string | null>(null);
   const [timers, setTimers] = useState<Record<string, number>>({});
 
+  // 🔹 Fetch inicial y carga de progreso
   useEffect(() => {
     let isMounted = true;
 
@@ -25,20 +26,13 @@ export const useFetchProgress = (initialData: Category[]) => {
       try {
         setLoading(true);
 
-        // 🔹 Esperar sesión primero (sin mostrar initialData)
         const { data: sessionData } = await supabase.auth.getSession();
         const user = sessionData?.session?.user;
-
         if (!user) {
-          console.warn("No hay sesión activa de usuario");
-          if (isMounted) {
-            // ✅ Mostrar quizzes vacíos solo si realmente no hay usuario
-            setCategories(initialData);
-          }
+          if (isMounted) setCategories(initialData);
           return;
         }
 
-        // 🔹 Fetch de progreso desde Supabase
         const { data, error: fetchError } = await supabase
           .from("quiz_responses")
           .select("quiz_id, score, interpretation, completed_at")
@@ -49,9 +43,13 @@ export const useFetchProgress = (initialData: Category[]) => {
 
         const responseData = (data ?? []) as QuizResponse[];
 
-        // 🔹 Mapear progreso a categorías
-        const updatedCategories = initialData.map((cat) => {
-          const latest = responseData.find((r) => r.quiz_id === cat.quiz.id);
+        // 🔹 Diccionario para acceso rápido
+        const responseDict: Record<string, QuizResponse> = {};
+        responseData.forEach(r => { responseDict[r.quiz_id] = r; });
+
+        // 🔹 Mapear categorías
+        const updatedCategories = initialData.map(cat => {
+          const latest = responseDict[cat.quiz.id];
           return {
             ...cat,
             quiz: {
@@ -63,25 +61,23 @@ export const useFetchProgress = (initialData: Category[]) => {
           };
         });
 
-        // 🔹 Crear diccionario de resultados
+        // 🔹 Crear resultados
         const latestResults: Record<string, QuizResult> = {};
-        responseData.forEach((r) => {
-          if (r.score !== null && r.interpretation) {
+        responseData.forEach(r => {
+          if (r.score !== null && r.interpretation)
             latestResults[r.quiz_id] = {
               score: r.score,
               interpretation: r.interpretation,
             };
-          }
         });
 
-        // 🔹 Cargar timers desde localStorage
-        const loadedTimers: Record<string, number> = {};
-        initialData.forEach((cat) => {
+        // 🔹 Cargar timers
+        const loadedTimers = initialData.reduce((acc, cat) => {
           const stored = localStorage.getItem(`quiz_timer_${cat.quiz.id}`);
-          loadedTimers[cat.quiz.id] = stored ? parseInt(stored, 10) : 0;
-        });
+          acc[cat.quiz.id] = stored ? parseInt(stored, 10) : 0;
+          return acc;
+        }, {} as Record<string, number>);
 
-        // 🔹 Guardar en estado solo cuando todo esté listo
         if (isMounted) {
           setCategories(updatedCategories);
           setResults(latestResults);
@@ -96,21 +92,18 @@ export const useFetchProgress = (initialData: Category[]) => {
     };
 
     fetchProgress();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [initialData]);
 
-  // 🕒 Actualización de temporizadores cada segundo
+  // 🔹 Temporizadores automáticos
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimers((prev) => {
+      setTimers(prev => {
         const next: Record<string, number> = {};
-        Object.keys(prev).forEach((quizId) => {
+        Object.keys(prev).forEach(quizId => {
           const newTime = prev[quizId] + 1;
-          next[quizId] = newTime;
           localStorage.setItem(`quiz_timer_${quizId}`, newTime.toString());
+          next[quizId] = newTime;
         });
         return next;
       });
@@ -119,14 +112,33 @@ export const useFetchProgress = (initialData: Category[]) => {
     return () => clearInterval(interval);
   }, []);
 
-  // 🧹 Reiniciar temporizador
+  // 🔹 Reset de timer
   const resetTimer = (quizId: string) => {
-    setTimers((prev) => {
-      const newTimers = { ...prev, [quizId]: 0 };
+    setTimers(prev => {
       localStorage.removeItem(`quiz_timer_${quizId}`);
-      return newTimers;
+      return { ...prev, [quizId]: 0 };
     });
   };
+
+  // 🔹 Persistencia automática de resultados en Supabase
+  useEffect(() => {
+    const saveResults = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
+      if (!user) return;
+
+      for (const [quiz_id, result] of Object.entries(results)) {
+        await supabase.from("quiz_responses").upsert({
+          user_id: user.id,
+          quiz_id,
+          score: result.score,
+          interpretation: result.interpretation,
+          completed_at: new Date().toISOString(),
+        });
+      }
+    };
+    if (Object.keys(results).length > 0) saveResults();
+  }, [results]);
 
   return {
     categories,
