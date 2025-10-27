@@ -7,7 +7,7 @@ interface Props {
   cat: Category;
   index: number;
   openModal: (cat: Category, index: number) => void;
-  openResult: (cat: Category, index: number) => void;
+  openResult: (cat: Category, index: number, result: { score: number; interpretation: string }) => void;
   openRecomendacion: (cat: Category, index: number) => void;
   refreshTrigger?: number;
 }
@@ -29,6 +29,7 @@ const QuizCard: React.FC<Props> = ({
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [hasResult, setHasResult] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [lastResult, setLastResult] = useState<{ score: number; interpretation: string } | null>(null);
 
   const [buttonState, setButtonState] = useState<ButtonState>({
     responder: { show: false, disabled: false },
@@ -50,7 +51,7 @@ const QuizCard: React.FC<Props> = ({
 
       const { data, error } = await supabase
         .from("quiz_progress")
-        .select("last_completed_at")
+        .select("score, interpretation, last_completed_at")
         .eq("user_id", userId)
         .eq("quiz_id", cat.quiz.id)
         .order("last_completed_at", { ascending: false })
@@ -59,16 +60,21 @@ const QuizCard: React.FC<Props> = ({
 
       if (error) {
         console.error("Error al obtener último intento:", error.message || error);
+        setLoading(false);
+        return;
       }
 
-      if (data?.last_completed_at) {
+      if (data) {
         setHasResult(true);
+        setLastResult({ score: data.score, interpretation: data.interpretation });
+
         const lastDate = new Date(data.last_completed_at);
         const diffMs = new Date().getTime() - lastDate.getTime();
         const remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
         setDaysLeft(remainingDays > 0 ? remainingDays : 0);
       } else {
         setHasResult(false);
+        setLastResult(null);
         setDaysLeft(null);
       }
 
@@ -78,7 +84,7 @@ const QuizCard: React.FC<Props> = ({
     fetchLastAttempt();
   }, [cat.quiz.id, refreshTrigger]);
 
-  // Actualizar estados de botones en función de hasResult y daysLeft
+  // Actualizar estados de botones
   useEffect(() => {
     if (loading) return;
 
@@ -144,7 +150,11 @@ const QuizCard: React.FC<Props> = ({
           {buttonState.resultado.show && (
             <button
               className="action view"
-              onClick={() => !buttonState.resultado.disabled && openResult(cat, index)}
+              onClick={() => {
+                if (!buttonState.resultado.disabled && lastResult) {
+                  openResult(cat, index, lastResult);
+                }
+              }}
               disabled={buttonState.resultado.disabled}
             >
               <b>Resultado</b>

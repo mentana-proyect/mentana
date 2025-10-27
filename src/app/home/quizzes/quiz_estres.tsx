@@ -10,16 +10,14 @@ interface Pss10FormProps {
 }
 
 const pss10Questions = [
-  { q: "1. En el último mes, ¿con qué frecuencia se ha sentido molesto/a por algo que ocurrió inesperadamente?", isReversed: false },
-  { q: "2. En el último mes, ¿con qué frecuencia sintió que no podía controlar las cosas importantes en su vida?", isReversed: false },
-  { q: "3. En el último mes, ¿con qué frecuencia se sintió nervioso/a y lleno/a de tensión?", isReversed: false },
-  { q: "4. En el último mes, ¿con qué frecuencia sintió confianza en poder manejar sus problemas personales?", isReversed: true },
-  { q: "5. En el último mes, ¿con qué frecuencia sintió que las cosas estaban sucediendo de manera favorable para usted?", isReversed: true },
-  { q: "6. En el último mes, ¿con qué frecuencia sintió que no podía hacer frente a todas las cosas que tenía que hacer?", isReversed: false },
-  { q: "7. En el último mes, ¿con qué frecuencia pudo controlar los disgustos en su vida?", isReversed: true },
-  { q: "8. En el último mes, ¿con qué frecuencia sintió que tenía todo bajo control?", isReversed: true },
-  { q: "9. En el último mes, ¿con qué frecuencia se enojó por cosas que estaban fuera de su control?", isReversed: false },
-  { q: "10. En el último mes, ¿con qué frecuencia sintió que tenía tantas dificultades que no podía superarlas?", isReversed: false },
+  { q: "1. ¿Te has sentido incapaz de controlar las cosas importantes en tu vida?", isReversed: false },
+  { q: "2. ¿Te has sentido abrumado/a por tus responsabilidades?", isReversed: false },
+  { q: "3. ¿Te has sentido nervioso/sa o tenso/sa sin razón clara?", isReversed: false },
+  { q: "4. ¿Has sentido que no puedes manejar todo lo que tienes que hacer?", isReversed: true },
+  { q: "5. ¿Te has sentido molesto/a por cosas que normalmente no te afectan?", isReversed: true },
+  { q: "6. ¿Has sentido que no tienes suficiente tiempo para ti?", isReversed: false },
+  { q: "7. ¿Has sentido que todo te supera?", isReversed: true },
+  { q: "8. ¿Has sentido que no tienes control sobre tu futuro?", isReversed: true },
 ];
 
 const pss10Options = [
@@ -44,9 +42,12 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
   };
 
   const getInterpretation = (score: number) => {
-    if (score <= 13) return "Nivel de estrés bajo";
-    if (score <= 26) return "Nivel de estrés moderado";
-    return "Nivel de estrés alto";
+    if (score <= 13)
+  return "Nivel de estrés bajo. Probablemente maneja bien situaciones estresantes y no hay señales de estrés elevado.";
+if (score <= 26)
+  return "Nivel de estrés moderado. Es posible que algunas situaciones generen tensión o ansiedad. Se recomienda practicar técnicas de manejo de estrés y autocuidado.";
+return "Nivel de estrés alto. Las demandas diarias pueden estar generando estrés significativo. Considera apoyo profesional y estrategias efectivas de reducción de estrés.";
+
   };
 
   useEffect(() => {

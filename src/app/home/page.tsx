@@ -20,6 +20,7 @@ import ProgressHeader from "../../components/ProgressHeader";
 import QuizCard from "../../components/QuizCard";
 import DockFooter from "../../components/DockFooter";
 import ResultView from "../../components/ResultView";
+import Recommendation from "../../components/Recommendation";
 import { initialData } from "../data/initialData";
 
 const quizComponents: Record<
@@ -136,12 +137,17 @@ const Home: React.FC = () => {
             index={index}
             refreshTrigger={refreshTrigger}
             openModal={() => openQuiz(cat, index)}
-            openResult={(q, i) => {
+            openResult={(q, i, result) => {
               setActiveQuiz(q);
               setActiveIndex(i);
               setModalMode("result");
+              setResults((prev) => ({
+                ...prev,
+                [q.quiz.id]: result,
+              }));
               setIsModalOpen(true);
             }}
+
             openRecomendacion={(q, i) => {
               setActiveQuiz(q);
               setActiveIndex(i);
@@ -158,11 +164,12 @@ const Home: React.FC = () => {
         isOpen={isRecomendacionOpen}
         onClose={() => setIsRecomendacionOpen(false)}
       >
-        <h2>Recomendación</h2>
-        <p>
-          Aquí puedes colocar cualquier recomendación o consejo de bienestar
-          para el usuario.
-        </p>
+        {activeQuiz && (
+          <Recommendation
+            quizId={activeQuiz.quiz.id} // 'ansiedad1', 'depresion1', etc.
+            score={results[activeQuiz.quiz.id]?.score ?? 0} // si no hay score, usamos 0
+          />
+        )}
       </Modal>
 
       {/* Modal de cuestionarios / resultados */}

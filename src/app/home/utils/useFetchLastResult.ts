@@ -2,16 +2,29 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 
+/**
+ * Hook para obtener el último resultado completado de un quiz.
+ * 
+ * @param quizType - tipo del quiz: "ansiedad" | "depresion" | "estres" | "soledad"
+ * @param userId - identificador del usuario
+ * @param trigger - número que fuerza la recarga manual
+ */
 export const useFetchLastResult = (
-  quizId: string | null,
+  quizType: "ansiedad" | "depresion" | "estres" | "soledad",
+  userId: string | null,
   trigger: number
 ) => {
-  const [lastResult, setLastResult] = useState<{ completed_at: string } | null>(null);
+  const [lastResult, setLastResult] = useState<{
+    completed_at: string;
+    score: number;
+    interpretation: string;
+  } | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!quizId) {
+    if (!userId) {
       setLastResult(null);
       setErrorMsg(null);
       return;
@@ -22,23 +35,30 @@ export const useFetchLastResult = (
       setErrorMsg(null);
 
       try {
+        // Nombre de la tabla dinámico según el tipo de quiz
+        const tableName = `results_${quizType}`;
+
         const { data, error } = await supabase
-          .from("results_ansiedad") // tu tabla
-          .select("completed_at")
+          .from(tableName)
+          .select("score, interpretation, completed_at")
+          .eq("user_id", userId)
           .order("completed_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Supabase returned an error:", error);
-          console.log("Raw data:", data);
-          setErrorMsg(error?.message || "Error desconocido al consultar Supabase");
+          setErrorMsg(error.message || "Error al consultar la base de datos");
           setLastResult(null);
         } else if (!data) {
-          console.warn("No se encontraron resultados para quizId:", quizId);
+          console.warn("No se encontraron resultados para:", quizType, userId);
           setLastResult(null);
         } else {
-          setLastResult(data);
+          setLastResult({
+            score: data.score,
+            interpretation: data.interpretation,
+            completed_at: data.completed_at,
+          });
         }
       } catch (err) {
         console.error("Error inesperado al consultar Supabase:", err);
@@ -50,7 +70,7 @@ export const useFetchLastResult = (
     };
 
     fetchLastResult();
-  }, [quizId, trigger]);
+  }, [quizType, userId, trigger]);
 
   return { lastResult, loading, error: errorMsg };
 };

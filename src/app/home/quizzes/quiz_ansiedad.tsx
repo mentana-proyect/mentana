@@ -10,13 +10,14 @@ interface Gad7FormProps {
 }
 
 const gad7Questions = [
-  "1. ¿Con qué frecuencia se ha sentido nervioso, ansioso o con los nervios de punta?",
-  "2. ¿Con qué frecuencia no ha podido dejar de preocuparse o controlar la preocupación?",
-  "3. ¿Con qué frecuencia se ha preocupado demasiado por diferentes cosas?",
-  "4. ¿Con qué frecuencia ha tenido dificultad para relajarse?",
-  "5. ¿Con qué frecuencia se ha sentido tan inquieto que le resulta difícil permanecer quieto?",
-  "6. ¿Con qué frecuencia se ha molestado o irritado con facilidad?",
-  "7. ¿Con qué frecuencia ha sentido miedo como si algo terrible pudiera pasar?",
+  "1. ¿Te has sentido nervioso/a, ansioso/a o al borde?",
+  "2. ¿Te has preocupado demasiado por diferentes cosas?",
+  "3. ¿Te ha costado relajarte?",
+  "4. ¿Te has sentido inquieto/a o incapaz de quedarse quieto/a?",
+  "5. ¿Te has sentido fácilmente irritable?",
+  "6. ¿Has tenido miedo de que algo terrible pudiera pasar?",
+  "7. ¿Has sentido que tu respiración se acelera sin razón aparente?",
+  "8. ¿Has evitado situaciones por miedo a sentir ansiedad?",
 ];
 
 const options = [

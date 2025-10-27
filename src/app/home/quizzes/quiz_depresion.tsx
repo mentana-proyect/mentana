@@ -10,15 +10,14 @@ interface Phq9FormProps {
 }
 
 const phq9Questions = [
-  "1. ¿Poco interés o placer en hacer las cosas?",
-  "2. ¿Sentirse decaído/a, deprimido/a o sin esperanzas?",
-  "3. ¿Dificultad para dormir o permanecer dormido/a, o ha dormido demasiado?",
-  "4. ¿Sentirse cansado/a o con poca energía?",
-  "5. ¿Poco apetito o comer en exceso?",
-  "6. ¿Sentirse mal con usted mismo/a, o sentir que es un fracaso o que ha decepcionado a su familia?",
-  "7. ¿Dificultad para concentrarse en cosas, como leer el periódico o ver la televisión?",
-  "8. ¿Moverse o hablar tan lentamente que otras personas podrían notarlo? O lo contrario, estar tan inquieto/a que se ha estado moviendo mucho más de lo normal?",
-  "9. ¿Ha tenido pensamientos de que estaría mejor muerto/a, o de lastimarse de alguna manera?",
+  "1. ¿Te has sentido poco interesado/a o sin ganas de hacer cosas?",
+  "2. ¿Te has sentido triste, deprimido/a o sin esperanza?",
+  "3. ¿Has tenido dificultades para dormir o has dormido demasiado?",
+  "4. ¿Te has sentido cansado/da o con poca energía?",
+  "5. ¿Has tenido poco apetito o has comido en exceso?",
+  "6. ¿Te has sentido mal contigo mismo/a o que eres un fracaso?",
+  "7. ¿Has tenido dificultades para concentrarte?",
+  "8. ¿Has sentido que tu vida no tiene sentido o que no vale la pena vivirla?",
 ];
 
 const phq9Options = [
@@ -42,11 +41,11 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
   };
 
   const getInterpretation = (score: number) => {
-    if (score <= 4) return "Depresión mínima";
-    if (score <= 9) return "Depresión leve";
-    if (score <= 14) return "Depresión moderada";
-    if (score <= 19) return "Depresión moderadamente grave";
-    return "Depresión grave";
+    if (score <= 4) return "Depresión mínima. No se observan síntomas clínicamente significativos.";
+    if (score <= 9) return "Depresión leve. Puede haber síntomas ocasionales, pero no suelen interferir con las actividades diarias.";
+    if (score <= 14) return "Depresión moderada. Los síntomas pueden afectar el bienestar y el desempeño cotidiano. Se recomienda observar evolución y considerar apoyo profesional si persisten.";
+    if (score <= 19) return "Depresión moderadamente grave. Los síntomas tienen un impacto importante en la vida diaria. Se sugiere buscar orientación psicológica o médica.";
+    return "Depresión grave. Los síntomas son intensos y afectan significativamente la funcionalidad. Se recomienda buscar apoyo profesional cuanto antes.";
   };
 
   // 🕒 Verificar si el usuario puede volver a responder

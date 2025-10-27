@@ -10,9 +10,14 @@ interface UclaFormProps {
 }
 
 const uclaQuestions = [
-  "1. ¿Con qué frecuencia siente que le falta compañía?",
-  "2. ¿Con qué frecuencia se siente excluido?",
-  "3. ¿Con qué frecuencia se siente aislado de los demás?",
+  "1. ¿Te has sentido solo/a incluso estando acompañado/da?",
+  "2. ¿Sientes que no tienes con quién hablar de lo que realmente te importa?",
+  "3. ¿Te has sentido excluido/a o desconectado/a de los demás?",
+  "4. ¿Sientes que no formas parte de ningún grupo o comunidad?",
+  "5. ¿Te cuesta encontrar personas que te entiendan?",
+  "6. ¿Sientes que tu presencia no es valorada por otros?",
+  "7. ¿Has sentido que nadie se preocupa por ti de verdad?",
+  "8. ¿Te has sentido invisible o ignorado/a?",
 ];
 
 const uclaOptions = [
@@ -35,9 +40,12 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
   };
 
   const getInterpretation = (score: number) => {
-    if (score <= 5) return "Ausencia de soledad o soledad leve";
-    if (score <= 8) return "Soledad moderada";
-    return "Soledad grave";
+    if (score <= 5)
+      return "Ausencia de soledad o soledad leve. Probablemente se siente conectado socialmente y satisfecha/o con sus relaciones.";
+    if (score <= 8)
+      return "Soledad moderada. Puede experimentar sentimientos de aislamiento ocasional. Se recomienda fortalecer la red social y actividades de conexión.";
+    return "Soledad grave. Es posible que se sienta muy aislado o desconectado de los demás. Se sugiere buscar apoyo social y profesional si es necesario.";
+
   };
 
   // 🕒 Verificar si el usuario puede volver a responder
@@ -98,7 +106,7 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       { user_id: userId, answers, score: total, interpretation },
     ]);
 
-    
+
 
     if (insertError) {
       console.error(insertError);
