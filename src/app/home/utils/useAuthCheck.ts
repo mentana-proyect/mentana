@@ -2,15 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
+import type { User } from "@supabase/supabase-js"; // ✅ Importamos el tipo correcto
 
 interface AuthState {
-  user: any | null;
+  user: User | null;
   loading: boolean;
   error: string | null;
 }
 
 export const useAuthCheck = (): AuthState => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -34,9 +35,11 @@ export const useAuthCheck = (): AuthState => {
         } else {
           setUser(user);
         }
-      } catch (err: any) {
-        console.error("Error de autenticación:", err.message);
-        setError(err.message || "Error al verificar la sesión");
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Error al verificar la sesión";
+        console.error("Error de autenticación:", message);
+        setError(message);
         setUser(null);
         router.replace("/auth");
       } finally {
