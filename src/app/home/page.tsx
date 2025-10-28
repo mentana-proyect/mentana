@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
@@ -23,6 +23,7 @@ import ResultView from "../../components/ResultView";
 import Recommendation from "../../components/Recommendation";
 import { initialData } from "../data/initialData";
 
+// 🧩 Mapeo de cuestionarios disponibles
 const quizComponents: Record<
   string,
   React.FC<{ onResult?: (score: number, interpretation: string) => void }>
@@ -49,7 +50,7 @@ const Home: React.FC = () => {
   const [recommendModalOpen, setRecommendModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // ⏳ Overlay de carga de 5 segundos
+  // ⏳ Overlay de carga de 3 segundos
   const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
 
   useEffect(() => {
@@ -57,88 +58,94 @@ const Home: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const { handleQuizCompletion: originalHandleQuizCompletion } =
-    useQuizHandlers(
-      categories ?? [],
-      setCategories,
-      setResults,
-      () => setQuizModalOpen(false)
-    );
+  // ⚙️ Handlers de cuestionarios (memoizados para evitar renders innecesarios)
+  const { handleQuizCompletion: originalHandleQuizCompletion } = useQuizHandlers(
+    categories ?? [],
+    setCategories,
+    setResults,
+    () => setQuizModalOpen(false)
+  );
 
-  const handleQuizCompletion = (
-    index: number,
-    quiz: Category,
-    score: number,
-    interpretation: string
-  ) => {
-    if (index === null) return;
+  const handleQuizCompletion = useCallback(
+    (index: number, quiz: Category, score: number, interpretation: string) => {
+      if (index === null) return;
 
-    // Actualizar categorías
-    setCategories(prev =>
-      prev!.map((cat, i) =>
-        i === index
-          ? {
-              ...cat,
-              quiz: {
-                ...cat.quiz,
-                completed: true,
-                completedAt: new Date().toISOString(),
-              },
-            }
-          : cat
-      )
-    );
+      // Actualizar progreso en categorías
+      setCategories(prev =>
+        prev!.map((cat, i) =>
+          i === index
+            ? {
+                ...cat,
+                quiz: {
+                  ...cat.quiz,
+                  completed: true,
+                  completedAt: new Date().toISOString(),
+                },
+              }
+            : cat
+        )
+      );
 
-    // Actualizar resultados
-    setResults(prev => ({
-      ...prev,
-      [quiz.quiz.id]: { score, interpretation },
-    }));
+      // Guardar resultado
+      setResults(prev => ({
+        ...prev,
+        [quiz.quiz.id]: { score, interpretation },
+      }));
 
-    // Mostrar confetti y resultados
-    setShowConfetti(true);
-    setResultModalOpen(true);
-    setRefreshTrigger(prev => prev + 1);
+      // Mostrar confetti y resultado
+      setShowConfetti(true);
+      setResultModalOpen(true);
+      setRefreshTrigger(prev => prev + 1);
 
-    originalHandleQuizCompletion(
-      index,
-      quiz,
-      score,
-      interpretation,
-      setShowConfetti,
-      (mode: "quiz" | "result") => {
-        setQuizModalOpen(mode === "quiz");
-        setResultModalOpen(mode === "result");
-      }
-    );
-  };
+      // Ejecutar handler base
+      originalHandleQuizCompletion(
+        index,
+        quiz,
+        score,
+        interpretation,
+        setShowConfetti,
+        (mode: "quiz" | "result") => {
+          setQuizModalOpen(mode === "quiz");
+          setResultModalOpen(mode === "result");
+        }
+      );
+    },
+    [originalHandleQuizCompletion, setCategories, setResults]
+  );
 
-  // Auto-cierre del confetti
+  // 🎉 Auto-cierre del confetti tras 5 segundos
   useEffect(() => {
-    if (showConfetti) {
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
-      return () => clearTimeout(timer);
-    }
+    if (!showConfetti) return;
+    const timer = setTimeout(() => setShowConfetti(false), 5000);
+    return () => clearTimeout(timer);
   }, [showConfetti]);
 
-  const openQuiz = (q: Category, i: number) => {
+  // 🧭 Abrir cuestionario
+  const openQuiz = useCallback((q: Category, i: number) => {
     if (q.quiz.completed) return;
     setActiveQuiz(q);
     setActiveIndex(i);
     setQuizModalOpen(true);
-  };
+  }, []);
 
-  const isAppLoading = authLoading || loading || categories === null;
+  // 📊 Estado de carga general
+  const isAppLoading = useMemo(
+    () => authLoading || loading || categories === null,
+    [authLoading, loading, categories]
+  );
 
-  const QuizComponentToRender =
-    activeQuiz && activeQuiz.quiz.id in quizComponents
-      ? quizComponents[activeQuiz.quiz.id]
-      : null;
+  const QuizComponentToRender = useMemo(() => {
+    if (activeQuiz && activeQuiz.quiz.id in quizComponents) {
+      return quizComponents[activeQuiz.quiz.id];
+    }
+    return null;
+  }, [activeQuiz]);
 
   return (
     <div className="home-container">
-      {/* Todo el contenido se renderiza siempre */}
+      {/* ✅ Contenido principal renderizado siempre */}
       <ProgressHeader />
+
       <main>
         {categories?.map((cat, index) => (
           <QuizCard
@@ -161,12 +168,13 @@ const Home: React.FC = () => {
           />
         ))}
 
+        {/* Dock visible solo cuando no hay modales */}
         {!quizModalOpen && !resultModalOpen && !recommendModalOpen && (
           <DockFooter logout={logout} />
         )}
       </main>
 
-      {/* Overlay de carga */}
+      {/* 🌀 Overlay de carga */}
       {showLoadingOverlay && (
         <div className="loading-overlay">
           <div className="loading-container">
@@ -176,7 +184,7 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* Modales */}
+      {/* 📦 Modales */}
       <Modal
         isOpen={recommendModalOpen}
         onClose={() => setRecommendModalOpen(false)}
@@ -208,7 +216,7 @@ const Home: React.FC = () => {
         )}
       </Modal>
 
-      {/* Confetti */}
+      {/* 🎊 Confetti */}
       {showConfetti && typeof window !== "undefined" && (
         <Confetti
           width={window.innerWidth}
