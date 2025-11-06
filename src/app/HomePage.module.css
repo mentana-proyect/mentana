@@ -44,6 +44,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: -85px;
 }
 
 .logo {
@@ -113,6 +114,7 @@ html, body {
 .textoMotivacional p {
   font-size: 15px;
   color: #e2e8f0;
+  margin-top: -70px;
 }
 
 /* ===== BOTONES ===== */
@@ -121,6 +123,7 @@ html, body {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  margin-top: -40px;
 }
 
 .btn {
@@ -138,22 +141,22 @@ html, body {
 }
 
 .btnPrimary {
-  background-color: #f999b7;
-  color: #ffffff;
-  border: 1px solid #f999b7;
-}
-.btnPrimary:hover {
-  background-color: #f999b7;
-  color: #fff;
-}
-
-.btnSecondary {
   background-color: #56dbc4;
   color: #ffffff;
   border: 1px solid #56dbc4;
 }
-.btnSecondary:hover {
+.btnPrimary:hover {
   background-color: #56dbc4;
+  color: #fff;
+}
+
+.btnSecondary {
+  background-color: #ff8cd3;
+  color: #ffffff;
+  border: 1px solid #ff8cd3;
+}
+.btnSecondary:hover {
+  background-color: #ff8cd3;
   color: #fff;
 }
 
@@ -186,3 +189,27 @@ html, body {
     font-size: 16px;
   }
 }
+
+
+.imagenMotivacional {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.svgResponsive {
+  width: 100%;
+  max-width: 200px; /* tamaño máximo */
+  height: auto;
+  transition: transform 0.3s ease;
+  margin-top: -60px;
+  margin-bottom: -60px;
+}
+
+/* Efecto opcional al pasar el mouse */
+.svgResponsive:hover {
+  transform: scale(1.05);
+}
+

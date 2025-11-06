@@ -7,8 +7,9 @@ export default function TextoMotivacional() {
        <strong>Estamos construyendo el futuro del bienestar emocional.</strong>
       </p>
       <p>
-        <strong>Únete al viaje.</strong>
+       <strong>Estamos construyendo el futuro del bienestar emocional.</strong>
       </p>
+      
 
       <svg
         xmlns="http://www.w3.org/2000/svg"

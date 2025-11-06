@@ -1,13 +1,20 @@
 "use client";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";
 import { AuthMessage } from "../../components/AuthMessage";
 import { useAuthForm } from "../../hooks/useAuthForm";
-import "../globals.css"; // ✅ Importa los estilos globales
+import "../globals.css";
 import styles from "./AuthPage.module.css";
 import Footer from "../../components/Footer";
+import { createClient } from "@supabase/supabase-js";
+
+// ✅ Inicializa Supabase
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function AuthPage() {
   const {
@@ -28,10 +35,42 @@ export default function AuthPage() {
     handleSubmit,
   } = useAuthForm();
 
-  // 🔹 Scroll hacia abajo al cargar la página
+  const [showSocialOptions, setShowSocialOptions] = useState(false);
+
   useEffect(() => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }, []);
+
+  // ✅ Cambiar a modo registro
+  const handleRegisterClick = () => {
+    setIsLogin(false);
+    setShowSocialOptions(true);
+  };
+
+  // ✅ Iniciar sesión con Google
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "https://mentanachile.cl/auth/callback", // 👈 URL de redirección configurada en Google Cloud
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error("Error al iniciar con Google:", err.message);
+      alert("Hubo un problema con el inicio de sesión con Google.");
+    }
+  };
+
+  // (Opcional) Agregar después Facebook y Apple
+  const handleFacebookLogin = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "facebook" });
+  };
+
+  const handleAppleLogin = async () => {
+    await supabase.auth.signInWithOAuth({ provider: "apple" });
+  };
 
   return (
     <>
@@ -62,14 +101,14 @@ export default function AuthPage() {
               <circle fill="#ff8cd3" cx="596.8" cy="625.41" r="37.24" />
             </svg>
 
+            {/* FORMULARIO */}
             <form className={styles.form} onSubmit={handleSubmit}>
-
               <div className={styles.inputGroup}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder=" " // 🔹 importante para floating label
+                  placeholder=" "
                   disabled={loading}
                 />
                 <label>Correo</label>
@@ -89,39 +128,54 @@ export default function AuthPage() {
                   className={styles.showPasswordToggle}
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="28" height="28" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
-                                7-12 7-12-7-12-7 4.367-7 12-7zm0 
-                                12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
-                                0-5 2.239-5 5s2.239 5 5 5z"/>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="28" height="28" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
-                                0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 
-                                5 5s-2.239 5-5 5zm0-8c-1.657 0-3 
-                                1.343-3 3s1.343 3 3 3 3-1.343 
-                                3-3-1.343-3-3-3z"/>
-                      </svg>
-                    )}
+                  {showPassword ? "🙈" : "👁️"}
                 </button>
               </div>
+
               <AuthExtras
                 isLogin={isLogin}
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
               />
+
               <AuthButtons
                 isLogin={isLogin}
                 setIsLogin={setIsLogin}
                 loading={loading}
+                onRegisterClick={handleRegisterClick}
               />
             </form>
+
+            {/* 🔹 Opciones sociales (solo si registrando) */}
+            {showSocialOptions && !isLogin && (
+              <div className={styles.socialContainer}>
+                <p>O continúa con</p>
+                <div className={styles.socialButtons}>
+                  <button
+                    className={styles.googleBtn}
+                    onClick={handleGoogleLogin}
+                    type="button"
+                  >
+                    <img src="/icons/google.svg" alt="Google" /> Google
+                  </button>
+                  <button
+                    className={styles.facebookBtn}
+                    onClick={handleFacebookLogin}
+                    type="button"
+                  >
+                    <img src="/icons/facebook.svg" alt="Facebook" /> Facebook
+                  </button>
+                  <button
+                    className={styles.appleBtn}
+                    onClick={handleAppleLogin}
+                    type="button"
+                  >
+                    <img src="/icons/apple.svg" alt="Apple" /> Apple
+                  </button>
+                </div>
+              </div>
+            )}
+
             <AuthMessage message={message} type={messageType} />
             <Footer />
           </div>
