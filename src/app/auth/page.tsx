@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Head from "next/head";
+import Image from "next/image";
 import { AuthExtras } from "../../components/AuthExtras";
 import { AuthButtons } from "../../components/AuthButtons";
 import { AuthMessage } from "../../components/AuthMessage";
@@ -8,7 +9,7 @@ import { useAuthForm } from "../../hooks/useAuthForm";
 import "../globals.css";
 import styles from "./AuthPage.module.css";
 import Footer from "../../components/Footer";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, AuthError } from "@supabase/supabase-js";
 
 // ✅ Inicializa Supabase
 const supabase = createClient(
@@ -48,28 +49,53 @@ export default function AuthPage() {
   };
 
   // ✅ Iniciar sesión con Google
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = async (): Promise<void> => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "https://mentanachile.cl/auth/callback", // 👈 URL de redirección configurada en Google Cloud
+          redirectTo: "https://mentanachile.cl/auth/callback", // 👈 URL configurada en Google Cloud
         },
       });
       if (error) throw error;
-    } catch (err: any) {
-      console.error("Error al iniciar con Google:", err.message);
+    } catch (err: unknown) {
+      if (err instanceof AuthError || err instanceof Error) {
+        console.error("Error al iniciar con Google:", err.message);
+      } else {
+        console.error("Error desconocido:", err);
+      }
       alert("Hubo un problema con el inicio de sesión con Google.");
     }
   };
 
-  // (Opcional) Agregar después Facebook y Apple
-  const handleFacebookLogin = async () => {
-    await supabase.auth.signInWithOAuth({ provider: "facebook" });
+  // ✅ Iniciar sesión con Facebook
+  const handleFacebookLogin = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: "facebook" });
+      if (error) throw error;
+    } catch (err: unknown) {
+      if (err instanceof AuthError || err instanceof Error) {
+        console.error("Error al iniciar con Facebook:", err.message);
+      } else {
+        console.error("Error desconocido:", err);
+      }
+      alert("No se pudo iniciar sesión con Facebook.");
+    }
   };
 
-  const handleAppleLogin = async () => {
-    await supabase.auth.signInWithOAuth({ provider: "apple" });
+  // ✅ Iniciar sesión con Apple
+  const handleAppleLogin = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: "apple" });
+      if (error) throw error;
+    } catch (err: unknown) {
+      if (err instanceof AuthError || err instanceof Error) {
+        console.error("Error al iniciar con Apple:", err.message);
+      } else {
+        console.error("Error desconocido:", err);
+      }
+      alert("No se pudo iniciar sesión con Apple.");
+    }
   };
 
   return (
@@ -81,7 +107,7 @@ export default function AuthPage() {
       <div className={styles.page}>
         {!redirecting && (
           <div className={styles.container}>
-            <svg
+             <svg
               id="Capa_4"
               data-name="Capa 4"
               xmlns="http://www.w3.org/2000/svg"
@@ -110,6 +136,7 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder=" "
                   disabled={loading}
+                  required
                 />
                 <label>Correo</label>
               </div>
@@ -121,6 +148,7 @@ export default function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder=" "
                   disabled={loading}
+                  required
                 />
                 <label>Contraseña</label>
                 <button
@@ -128,7 +156,26 @@ export default function AuthPage() {
                   className={styles.showPasswordToggle}
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" 
+                          width="28" height="28" fill="white" 
+                          viewBox="0 0 30 18">
+                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
+                                7-12 7-12-7-12-7 4.367-7 12-7zm0 
+                                12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
+                                0-5 2.239-5 5s2.239 5 5 5z"/>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" 
+                          width="28" height="28" fill="white" 
+                          viewBox="0 0 30 18">
+                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
+                                0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 
+                                5 5s-2.239 5-5 5zm0-8c-1.657 0-3 
+                                1.343-3 3s1.343 3 3 3 3-1.343 
+                                3-3-1.343-3-3-3z"/>
+                      </svg>
+                    )}
                 </button>
               </div>
 
@@ -156,21 +203,41 @@ export default function AuthPage() {
                     onClick={handleGoogleLogin}
                     type="button"
                   >
-                    <img src="/icons/google.svg" alt="Google" /> Google
+                    <Image
+                      src="/icons/google.svg"
+                      alt="Google"
+                      width={20}
+                      height={20}
+                    />{" "}
+                    Google
                   </button>
+
                   <button
                     className={styles.facebookBtn}
                     onClick={handleFacebookLogin}
                     type="button"
                   >
-                    <img src="/icons/facebook.svg" alt="Facebook" /> Facebook
+                    <Image
+                      src="/icons/facebook.svg"
+                      alt="Facebook"
+                      width={20}
+                      height={20}
+                    />{" "}
+                    Facebook
                   </button>
+
                   <button
                     className={styles.appleBtn}
                     onClick={handleAppleLogin}
                     type="button"
                   >
-                    <img src="/icons/apple.svg" alt="Apple" /> Apple
+                    <Image
+                      src="/icons/apple.svg"
+                      alt="Apple"
+                      width={20}
+                      height={20}
+                    />{" "}
+                    Apple
                   </button>
                 </div>
               </div>
