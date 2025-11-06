@@ -1,4 +1,3 @@
-import styles from "../app/HomePage.module.css";
 
 export default function svgImgPost() {
   return (
