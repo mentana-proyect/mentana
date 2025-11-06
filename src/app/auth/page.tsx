@@ -193,55 +193,7 @@ export default function AuthPage() {
               />
             </form>
 
-            {/* 🔹 Opciones sociales (solo si registrando) */}
-            {showSocialOptions && !isLogin && (
-              <div className={styles.socialContainer}>
-                <p>O continúa con</p>
-                <div className={styles.socialButtons}>
-                  <button
-                    className={styles.googleBtn}
-                    onClick={handleGoogleLogin}
-                    type="button"
-                  >
-                    <Image
-                      src="/icons/google.svg"
-                      alt="Google"
-                      width={20}
-                      height={20}
-                    />{" "}
-                    Google
-                  </button>
-
-                  <button
-                    className={styles.facebookBtn}
-                    onClick={handleFacebookLogin}
-                    type="button"
-                  >
-                    <Image
-                      src="/icons/facebook.svg"
-                      alt="Facebook"
-                      width={20}
-                      height={20}
-                    />{" "}
-                    Facebook
-                  </button>
-
-                  <button
-                    className={styles.appleBtn}
-                    onClick={handleAppleLogin}
-                    type="button"
-                  >
-                    <Image
-                      src="/icons/apple.svg"
-                      alt="Apple"
-                      width={20}
-                      height={20}
-                    />{" "}
-                    Apple
-                  </button>
-                </div>
-              </div>
-            )}
+            
 
             <AuthMessage message={message} type={messageType} />
             <Footer />
