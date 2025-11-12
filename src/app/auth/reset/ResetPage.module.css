@@ -103,3 +103,25 @@
   text-align: center;
   margin-top: 40px;
 }
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eyeButton:hover svg {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
