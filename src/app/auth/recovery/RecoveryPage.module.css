@@ -79,7 +79,7 @@
 }
 .button {
   background-color: #56dbc4;
-  color: #112244;
+  color: #fff;
 }
 .button:hover:not(:disabled) {
   background-color: #56dbc4;
