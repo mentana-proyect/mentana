@@ -79,7 +79,7 @@ export const useAuthForm = () => {
     setMessage("");
     setMessageType(null);
 
-    // Validaciones previas
+    // ✅ Validaciones previas
     if (!email.trim()) {
       setMessage("⚠️ Debes ingresar un correo electrónico.");
       setMessageType("error");
@@ -100,6 +100,7 @@ export const useAuthForm = () => {
 
     try {
       if (isLogin) {
+        // 🔹 Iniciar sesión
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
@@ -109,31 +110,40 @@ export const useAuthForm = () => {
           setRedirecting(true);
           setTimeout(() => router.push("/home"), 1500);
         }
-      
- } else {
-  // 🔹 Registro con confirmación de correo
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${window.location.origin}/auth/callback`, // ⬅️ Redirige tras confirmar
-    },
-  });
+      } else {
+        // 🔹 Verificar si el usuario ya existe
+        const { error: checkError } = await supabase.auth.signInWithPassword({
+          email,
+          password: "contraseña_incorrecta_de_prueba",
+        });
 
-  if (error) throw error;
+        // Si no hay error o el error indica credenciales inválidas, significa que ya existe
+        if (!checkError || checkError.message.toLowerCase().includes("invalid login credentials")) {
+          setMessage("⚠️ Este correo ya está registrado. Si olvidaste tu contraseña, puedes recuperarla desde la opción '¿Olvidaste tu contraseña?'.");
+          setMessageType("error");
+          setLoading(false);
+          return;
+        }
 
-  // 🔹 Si el proyecto requiere confirmación, Supabase no inicia sesión inmediatamente
-  if (!data.user) {
-    setMessage("⚠️ Ocurrió un error al crear la cuenta.");
-    setMessageType("error");
-    return;
-  }
+        // 🆕 Crear cuenta si el correo realmente no existe
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
 
-  setMessage("✅ Registro exitoso. Revisa tu correo para confirmar tu cuenta.");
-  setMessageType("success");
-}
+        if (signUpError) throw signUpError;
 
-
+        if (data.user) {
+          setMessage("✅ Registro exitoso. Revisa tu correo para confirmar tu cuenta.");
+          setMessageType("success");
+        } else {
+          setMessage("⚠️ No se pudo completar el registro. Intenta nuevamente más tarde.");
+          setMessageType("error");
+        }
+      }
     } catch (err: unknown) {
       const e = err as AuthError;
       setMessage(traducirError(e.code || "", e.message || "Error desconocido."));

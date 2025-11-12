@@ -6,6 +6,7 @@ import ClarityScript from "@/components/ClarityScript"; // 👈 Agregamos el scr
 export const metadata: Metadata = {
   title: "Mentana",
   description: "Evaluaciones emocionales y bienestar psicológico",
+  
 };
 
 export default function RootLayout({

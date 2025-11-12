@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
-import type { User } from "@supabase/supabase-js"; // ✅ Importamos el tipo correcto
+import type { User } from "@supabase/supabase-js";
 
 interface AuthState {
   user: User | null;
@@ -22,22 +22,31 @@ export const useAuthCheck = (): AuthState => {
         setLoading(true);
         setError(null);
 
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
+        const { data, error } = await supabase.auth.getUser();
 
         if (error) throw error;
 
-        if (!user) {
+        if (!data?.user) {
           setUser(null);
-          router.replace("/auth"); // 🔁 Redirige al login si no hay usuario
+          router.replace("/auth");
         } else {
-          setUser(user);
+          setUser(data.user);
         }
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Error al verificar la sesión";
+
+        // ⚠️ Caso: token JWT inválido o usuario inexistente
+        if (message.includes("User from sub claim in JWT does not exist")) {
+          console.warn("⚠️ Sesión inválida o expirada. Cerrando sesión silenciosamente...");
+          await supabase.auth.signOut(); // 🧹 Limpia la sesión local
+          setUser(null);
+          setError("Tu sesión ha expirado. Inicia sesión nuevamente.");
+          router.replace("/auth");
+          return; // ⬅️ Detenemos aquí, no mostramos error en consola
+        }
+
+        // 🔸 Otros errores de autenticación
         console.error("Error de autenticación:", message);
         setError(message);
         setUser(null);
@@ -49,7 +58,7 @@ export const useAuthCheck = (): AuthState => {
 
     checkAuth();
 
-    // 🔄 Escucha cambios en el estado de autenticación (login/logout)
+    // 🔄 Escucha cambios de autenticación (login / logout)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
