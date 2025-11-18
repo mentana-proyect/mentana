@@ -26,10 +26,4 @@ export default function AuthCallback() {
     handleCallback();
   }, [router]);
 
-  return (
-    <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
-      <h2>Confirmando tu cuenta...</h2>
-      <p>Por favor espera un momento.</p>
-    </div>
-  );
 }
