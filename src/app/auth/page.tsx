@@ -9,13 +9,6 @@ import { useAuthForm } from "../../hooks/useAuthForm";
 import "../globals.css";
 import styles from "./AuthPage.module.css";
 import Footer from "../../components/Footer";
-import { createClient, AuthError } from "@supabase/supabase-js";
-
-// ✅ Inicializa Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function AuthPage() {
   const {
@@ -36,67 +29,9 @@ export default function AuthPage() {
     handleSubmit,
   } = useAuthForm();
 
-  const [showSocialOptions, setShowSocialOptions] = useState(false);
-
   useEffect(() => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }, []);
-
-  // ✅ Cambiar a modo registro
-  const handleRegisterClick = () => {
-    setIsLogin(false);
-    setShowSocialOptions(true);
-  };
-
-  // ✅ Iniciar sesión con Google
-  const handleGoogleLogin = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: "https://mentanachile.cl/auth/callback", // 👈 URL configurada en Google Cloud
-        },
-      });
-      if (error) throw error;
-    } catch (err: unknown) {
-      if (err instanceof AuthError || err instanceof Error) {
-        console.error("Error al iniciar con Google:", err.message);
-      } else {
-        console.error("Error desconocido:", err);
-      }
-      alert("Hubo un problema con el inicio de sesión con Google.");
-    }
-  };
-
-  // ✅ Iniciar sesión con Facebook
-  const handleFacebookLogin = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: "facebook" });
-      if (error) throw error;
-    } catch (err: unknown) {
-      if (err instanceof AuthError || err instanceof Error) {
-        console.error("Error al iniciar con Facebook:", err.message);
-      } else {
-        console.error("Error desconocido:", err);
-      }
-      alert("No se pudo iniciar sesión con Facebook.");
-    }
-  };
-
-  // ✅ Iniciar sesión con Apple
-  const handleAppleLogin = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: "apple" });
-      if (error) throw error;
-    } catch (err: unknown) {
-      if (err instanceof AuthError || err instanceof Error) {
-        console.error("Error al iniciar con Apple:", err.message);
-      } else {
-        console.error("Error desconocido:", err);
-      }
-      alert("No se pudo iniciar sesión con Apple.");
-    }
-  };
 
   return (
     <>
@@ -107,7 +42,8 @@ export default function AuthPage() {
       <div className={styles.page}>
         {!redirecting && (
           <div className={styles.container}>
-             <svg
+            {/* LOGO */}
+            <svg
               id="Capa_4"
               data-name="Capa 4"
               xmlns="http://www.w3.org/2000/svg"
@@ -151,31 +87,40 @@ export default function AuthPage() {
                   required
                 />
                 <label>Contraseña</label>
+
                 <button
                   type="button"
                   className={styles.showPasswordToggle}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="28" height="28" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c7.633 0 12 7 12 7s-4.367 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="28"
+                      height="28"
+                      fill="white"
+                      viewBox="0 0 30 18"
+                    >
+                      <path d="M12 5c7.633 0 12 7 12 7s-4.367 
                                 7-12 7-12-7-12-7 4.367-7 12-7zm0 
                                 12c2.761 0 5-2.239 5-5s-2.239-5-5-5c-2.761 
                                 0-5 2.239-5 5s2.239 5 5 5z"/>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" 
-                          width="28" height="28" fill="white" 
-                          viewBox="0 0 30 18">
-                        <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="28"
+                      height="28"
+                      fill="white"
+                      viewBox="0 0 30 18"
+                    >
+                      <path d="M12 5c-7.633 0-12 7-12 7s4.367 7 12 7 12-7 12-7-4.367-7-12-7zm0 12c-2.761 
                                 0-5-2.239-5-5s2.239-5 5-5c2.761 0 5 2.239 
                                 5 5s-2.239 5-5 5zm0-8c-1.657 0-3 
                                 1.343-3 3s1.343 3 3 3 3-1.343 
                                 3-3-1.343-3-3-3z"/>
-                      </svg>
-                    )}
+                    </svg>
+                  )}
                 </button>
               </div>
 
@@ -189,11 +134,8 @@ export default function AuthPage() {
                 isLogin={isLogin}
                 setIsLogin={setIsLogin}
                 loading={loading}
-                onRegisterClick={handleRegisterClick}
               />
             </form>
-
-            
 
             <AuthMessage message={message} type={messageType} />
             <Footer />

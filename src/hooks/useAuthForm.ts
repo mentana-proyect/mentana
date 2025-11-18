@@ -15,7 +15,8 @@ export const useAuthForm = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+  const [messageType, setMessageType] =
+    useState<"success" | "error" | null>(null);
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -23,26 +24,29 @@ export const useAuthForm = () => {
 
   const router = useRouter();
 
-  // ==========================
-  // Obtener sesión y cambios de auth
-  // ==========================
+  // ===============================
+  // Obtener sesión inicial
+  // ===============================
   useEffect(() => {
-    const getSession = async () => {
+    const loadSession = async () => {
       const { data } = await supabase.auth.getSession();
       setUser(data?.session?.user ?? null);
     };
-    getSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    loadSession();
 
-    return () => subscription.subscription.unsubscribe();
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // ==========================
-  // Traducción de errores
-  // ==========================
+  // ===============================
+  // Traducir errores de Supabase
+  // ===============================
   const traducirError = (code: string, msg: string) => {
     switch (code) {
       case "invalid_credentials":
@@ -54,32 +58,43 @@ export const useAuthForm = () => {
       case "email_exists":
         return "⚠️ Ya existe una cuenta registrada con este correo.";
       case "invalid_email":
-        return "⚠️ El correo ingresado no tiene un formato válido.";
+        return "⚠️ El correo ingresado no es válido.";
       case "email_not_confirmed":
         return "⚠️ Debes confirmar tu correo antes de iniciar sesión.";
       case "weak_password":
       case "password_length_invalid":
-        return "⚠️ La contraseña es demasiado débil. Usa al menos 6 caracteres.";
-      case "no_email_provided":
-        return "⚠️ Debes ingresar un correo electrónico.";
-      case "no_phone_provided":
-        return "⚠️ Debes ingresar un número de teléfono.";
-      case "anonymous_sign_in_disabled":
-        return "⚠️ El inicio de sesión anónimo está deshabilitado.";
+        return "⚠️ La contraseña es demasiado débil (mínimo 6 caracteres).";
       default:
         return "⚠️ " + msg;
     }
   };
 
-  // ==========================
-  // Manejo de submit (login / registro)
-  // ==========================
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // ===============================
+  // Verificar si existe el usuario
+  // Sin redes sociales (solo email/password)
+  // ===============================
+  const verificarUsuarioExiste = async (email: string) => {
+    const { data, error } = await supabase
+      .from("auth.users")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (error) return false;
+    return !!data; // true si existe
+  };
+
+  // ===============================
+  // Manejo del formulario
+  // ===============================
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     setMessage("");
     setMessageType(null);
 
-    // ✅ Validaciones previas
+    // Validaciones
     if (!email.trim()) {
       setMessage("⚠️ Debes ingresar un correo electrónico.");
       setMessageType("error");
@@ -91,7 +106,7 @@ export const useAuthForm = () => {
       return;
     }
     if (!isLogin && !termsAccepted) {
-      setMessage("⚠️ Debes aceptar los términos y condiciones para registrarte.");
+      setMessage("⚠️ Debes aceptar los términos y condiciones.");
       setMessageType("error");
       return;
     }
@@ -99,33 +114,42 @@ export const useAuthForm = () => {
     setLoading(true);
 
     try {
+      // ================
+      // LOGIN
+      // ================
       if (isLogin) {
-        // 🔹 Iniciar sesión
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
         if (error) throw error;
 
         if (data?.user) {
           setMessage("✅ Inicio de sesión correcto.");
           setMessageType("success");
-          setRedirecting(true);
-          setTimeout(() => router.push("/home"), 1500);
-        }
-      } else {
-        // 🔹 Verificar si el usuario ya existe
-        const { error: checkError } = await supabase.auth.signInWithPassword({
-          email,
-          password: "contraseña_incorrecta_de_prueba",
-        });
 
-        // Si no hay error o el error indica credenciales inválidas, significa que ya existe
-        if (!checkError || checkError.message.toLowerCase().includes("invalid login credentials")) {
-          setMessage("⚠️ Este correo ya está registrado. Si olvidaste tu contraseña, puedes recuperarla desde la opción '¿Olvidaste tu contraseña?'.");
+          setRedirecting(true);
+          setTimeout(() => router.push("/home"), 1200);
+        }
+      }
+
+      // ================
+      // REGISTRO
+      // ================
+      else {
+        // Verificar si ya existe
+        const existe = await verificarUsuarioExiste(email);
+
+        if (existe) {
+          setMessage(
+            "⚠️ Ya existe una cuenta registrada con este correo. Puedes iniciar sesión o recuperar tu contraseña."
+          );
           setMessageType("error");
-          setLoading(false);
           return;
         }
 
-        // 🆕 Crear cuenta si el correo realmente no existe
+        // Crear usuario
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -136,26 +160,28 @@ export const useAuthForm = () => {
 
         if (signUpError) throw signUpError;
 
-        if (data.user) {
-          setMessage("✅ Registro exitoso. Revisa tu correo para confirmar tu cuenta.");
+        if (data?.user) {
+          setMessage(
+            "✅ Registro exitoso. Revisa tu correo para confirmar tu cuenta."
+          );
           setMessageType("success");
         } else {
-          setMessage("⚠️ No se pudo completar el registro. Intenta nuevamente más tarde.");
+          setMessage("⚠️ No se pudo completar el registro.");
           setMessageType("error");
         }
       }
     } catch (err: unknown) {
       const e = err as AuthError;
-      setMessage(traducirError(e.code || "", e.message || "Error desconocido."));
+      setMessage(traducirError(e.code || "", e.message || ""));
       setMessageType("error");
     } finally {
       setLoading(false);
     }
   };
 
-  // ==========================
-  // Redirigir si ya está logueado
-  // ==========================
+  // ===============================
+  // Redirección si ya está autenticado
+  // ===============================
   useEffect(() => {
     if (user) router.push("/home");
   }, [user, router]);
