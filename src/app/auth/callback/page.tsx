@@ -1,17 +1,25 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
 
 export default function AuthCallback() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Maneja el token de confirmación que llega en la URL
     const handleCallback = async () => {
-      const { data, error } = await supabase.auth.getSession();
+      const code = searchParams.get("code");
+
+      if (!code) {
+        router.push("/auth");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
       if (error) {
-        console.error(error);
+        console.error("Error al intercambiar el código:", error.message);
         router.push("/auth");
         return;
       }
@@ -24,6 +32,7 @@ export default function AuthCallback() {
     };
 
     handleCallback();
-  }, [router]);
+  }, [router, searchParams]);
 
+  return null; // ⬅️ Nada de UI, pasa directo
 }
