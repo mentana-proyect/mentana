@@ -138,7 +138,7 @@ const Home: React.FC = () => {
   return (
     <div className="home-container">
       {/* Todo el contenido se renderiza siempre */}
-      <ProgressHeader />
+      <ProgressHeader refreshTrigger={refreshTrigger} />
       <main>
         {categories?.map((cat, index) => (
           <QuizCard
