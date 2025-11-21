@@ -362,8 +362,7 @@ header .logo {
     /* antes estaba fixed */
     margin: 60px auto 40px auto;
     /* espacio arriba y abajo */
-    width: 90%;
-    max-width: 900px;
+    width: 50%;
     display: flex;
     justify-content: center;
     z-index: 1;
@@ -382,6 +381,36 @@ header .logo {
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
     margin-top: -50px;
     margin-bottom: 20px;
+}
+
+.floating-logout-btn {
+    position: fixed;
+    bottom: 8px;
+    /* ↓ Estaba en 22px — ahora queda más abajo */
+    right: 8px;
+    /* un poco más pegado al borde derecho */
+    width: 38px;
+    height: 38px;
+    background: #DB2A30;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s;
+    z-index: 9999;
+}
+
+.floating-logout-btn:hover {
+    transform: scale(1.07);
+    background: #DB2A30;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+.floating-logout-btn:active {
+    transform: scale(0.93);
 }
 
 .dock button,
