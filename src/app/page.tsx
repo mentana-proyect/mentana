@@ -34,7 +34,7 @@ export default function HomePage() {
           </svg>
           </p>
 
-          
+
         </section>
         <BotonesAccion />
         <Footer />

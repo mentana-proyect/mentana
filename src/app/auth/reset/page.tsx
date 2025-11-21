@@ -152,7 +152,6 @@ export default function ResetPasswordPage() {
 
         
       </form>
-      <Footer />
     </div>
   );
 }
