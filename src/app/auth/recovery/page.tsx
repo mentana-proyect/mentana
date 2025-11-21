@@ -87,7 +87,7 @@ export default function RecoveryPage() {
             {message}
           </p>
         )}
-        <Footer />
+        {/*<Footer />*/}
       </form>
       
     </div>
