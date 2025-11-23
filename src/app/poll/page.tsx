@@ -29,6 +29,26 @@ export default function MentalHealthSurvey() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 
+    const [nameError, setNameError] = useState("");
+    const [emailError, setEmailError] = useState("");
+
+    const validateName = (value: string) => {
+        if (value.trim().length < 2) {
+            setNameError("El nombre debe tener al menos 2 caracteres.");
+        } else {
+            setNameError("");
+        }
+    };
+
+    const validateEmail = (value: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value.trim())) {
+            setEmailError("Ingresa un correo electrónico válido.");
+        } else {
+            setEmailError("");
+        }
+    };
+
     const handleChange = (index: number, value: number) => {
         const updated = [...responses];
         updated[index] = value;
@@ -36,6 +56,8 @@ export default function MentalHealthSurvey() {
     };
 
     const handleSubmit = async () => {
+        if (nameError || emailError) return;
+
         if (!name.trim() || !email.trim()) {
             alert("Por favor completa tu nombre y correo.");
             return;
@@ -90,39 +112,47 @@ export default function MentalHealthSurvey() {
                 <strong>5</strong> = Totalmente de acuerdo
             </p>
 
-            {/* Campos Nombre y Correo */}
+            {/* Nombre */}
             <div className={styles.formGroup}>
                 <label className={styles.label}>Nombre</label>
                 <input
                     type="text"
                     className={styles.input}
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                        setName(e.target.value);
+                        validateName(e.target.value);
+                    }}
                     placeholder="Tu nombre"
                 />
+                {nameError && <p className={styles.errorText}>{nameError}</p>}
             </div>
 
+            {/* Correo */}
             <div className={styles.formGroup}>
                 <label className={styles.label}>Correo</label>
                 <input
                     type="email"
                     className={styles.input}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                        setEmail(e.target.value);
+                        validateEmail(e.target.value);
+                    }}
                     placeholder="correo@ejemplo.com"
                 />
+                {emailError && <p className={styles.errorText}>{emailError}</p>}
             </div>
+
             {questions.map((q, i) => (
                 <div key={i} className={styles.questionCard}>
                     <p className={styles.questionText}>{i + 1}. {q}</p>
 
-                    {/* Etiquetas de los extremos */}
                     <div className={styles.scaleLabels}>
                         <span>Totalmente <br />en desacuerdo</span>
                         <span>Totalmente <br />de acuerdo</span>
                     </div>
 
-                    {/* Escala 1–5 */}
                     <div className={styles.scale}>
                         {[1, 2, 3, 4, 5].map((val) => (
                             <button
@@ -139,7 +169,7 @@ export default function MentalHealthSurvey() {
 
             <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || nameError !== "" || emailError !== ""}
                 className={styles.submitButton}
             >
                 {loading ? "Enviando..." : "Enviar encuesta"}

@@ -197,3 +197,9 @@
     font-size: 1.05rem;
   }
 }
+.errorText {
+  color: #ff8cd3;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
