@@ -1,122 +1,199 @@
-/* --- NUEVA VERSIÓN PROFESIONAL, MODERNA Y LEGIBLE (MOBILE-FIRST) --- */
 :root {
   --primary: #56dbc4;
   --secondary: #ff8cd3;
   --accent: #00bcd4;
-  --card: #15243c;
+  --background: #112244;
   --text: #ffffff;
-  --text-light: #cfd9e6;
+  --text-light: #e0e0e0;
+  --radius: 16px;
+  --transition: 0.3s ease;
   --font: "Poppins", sans-serif;
-  --radius: 14px;
-  --transition: 0.25s ease;
-}
-.scaleLabels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin-bottom: 8px;
-  padding: 0 4px;
 }
 
+/* ========== CONTAINER PRINCIPAL ========== */
+
 .container {
-  max-width: 600px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 22px;
-  font-family: var(--font);
   color: var(--text);
-  background: var(--background);
+  font-family: var(--font);
 }
 
 .title {
   text-align: center;
-  font-size: 1.9rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  margin-bottom: 10px;
   color: var(--primary);
+  margin-bottom: 12px;
 }
+
+/* ========== EXPLICACIÓN DE ESCALA ========== */
 
 .scaleExplanation {
-  background: var(--card);
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 4px solid var(--primary);
   padding: 16px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 0.97rem;
-  line-height: 1.45;
-  margin-bottom: 24px;
+  font-size: 0.95rem;
   color: var(--text-light);
-  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
 }
 
-.questionCard {
-  background: var(--card);
-  padding: 20px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* ========== INPUTS NOMBRE Y CORREO ========== */
+
+.formGroup {
   margin-bottom: 18px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  background: rgba(255,255,255,0.12);
+}
+
+/* ========== TARJETA DE CADA PREGUNTA ========== */
+
+.questionCard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(6px);
+  transition: 0.2s ease;
+}
+
+.questionCard:hover {
+  border-color: rgba(255,255,255,0.15);
 }
 
 .questionText {
-  color: var(--text);
-  font-size: 1.05rem;
+  font-size: 1rem;
   margin-bottom: 14px;
-  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
 }
 
-.scale {
+/* ========== LABELS DE LOS EXTREMOS ========== */
+
+.scaleLabels {
   display: flex;
   justify-content: space-between;
+  color: var(--text-light);
+  font-size: 0.75rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* ========== ESCALA 1–5 ========== */
+
+.scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 
-.option,
-.selectedOption {
-  flex: 1;
-  padding: 12px 0;
-  border-radius: 10px;
-  font-size: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+.option {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
   color: var(--text-light);
+  padding: 10px 0;
+  border-radius: 12px;
+  font-size: 1rem;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .option:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.16);
+  border-color: var(--primary);
 }
 
 .selectedOption {
   background: var(--primary);
   color: #000;
-  font-weight: 600;
-  border-color: var(--primary);
+  font-weight: bold;
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 8px rgba(86, 219, 196, 0.6);
+  transition: var(--transition);
 }
+
+/* ========== BOTÓN ENVIAR ========== */
 
 .submitButton {
   width: 100%;
-  padding: 15px;
-  font-size: 1.1rem;
+  padding: 14px;
   background: var(--primary);
+  color: #000;
+  font-size: 1.1rem;
   border: none;
+  cursor: pointer;
   border-radius: var(--radius);
   font-weight: 600;
-  cursor: pointer;
-  margin-top: 25px;
   transition: var(--transition);
-  color: #000;
+  margin-top: 24px;
 }
 
 .submitButton:hover {
-  background: var(--secondary);
+  background: var(--accent);
 }
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== MENSAJE DE ÉXITO ========== */
 
 .successMessage {
   text-align: center;
-  padding: 40px 20px;
-  background: var(--card);
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text);
+  padding: 40px;
+}
+
+.successMessage h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+}
+
+.successMessage p {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+/* ========== RESPONSIVE (DESKTOP) ========== */
+
+@media (min-width: 760px) {
+  .title {
+    font-size: 2.1rem;
+  }
+
+  .questionText {
+    font-size: 1.05rem;
+  }
+
+  .option,
+  .selectedOption {
+    padding: 12px 0;
+    font-size: 1.05rem;
+  }
 }

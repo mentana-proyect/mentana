@@ -92,7 +92,7 @@ export default function MentalHealthSurvey() {
 
             {/* Campos Nombre y Correo */}
             <div className={styles.formGroup}>
-                <label className={styles.label}>Nombre completo</label>
+                <label className={styles.label}>Nombre</label>
                 <input
                     type="text"
                     className={styles.input}
@@ -103,16 +103,15 @@ export default function MentalHealthSurvey() {
             </div>
 
             <div className={styles.formGroup}>
-                <label className={styles.label}>Correo electrónico</label>
+                <label className={styles.label}>Correo</label>
                 <input
                     type="email"
                     className={styles.input}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tucorreo@ejemplo.com"
+                    placeholder="correo@ejemplo.com"
                 />
             </div>
-            <br />
             {questions.map((q, i) => (
                 <div key={i} className={styles.questionCard}>
                     <p className={styles.questionText}>{i + 1}. {q}</p>
