@@ -147,6 +147,7 @@ export default function MentalHealthSurvey() {
                         <span>Totalmente <br />en desacuerdo</span>
                         <span>Totalmente <br />de acuerdo</span>
                     </div>
+                    
 
                     <div className={styles.scale}>
                         {[1, 2, 3, 4, 5].map((val) => (
