@@ -6,20 +6,15 @@ import styles from "./Survey.module.css";
 export default function MentalHealthSurvey() {
     const questions = [
         "¿Considera que la salud mental es igual de importante que la salud física?",
-        "¿Cree que la mayoría de las personas en Chile no comprende bien qué es la salud mental?",
-        "¿Se siente cómodo(a) hablando sobre sus emociones con personas cercanas?",
         "¿Percibe que en Chile todavía existe mucho estigma hacia quienes buscan ayuda psicológica?",
-        "¿Sabe dónde acudir si necesita apoyo emocional o psicológico?",
+        "¿Cree que la mayoría de las personas en Chile no comprende bien qué es la salud mental?",
         "¿Considera que la salud mental debería ser una prioridad para el sistema público de salud?",
-        "¿Se siente capaz de reconocer señales de problemas de salud mental en sí mismo(a) o en otros?",
-        "¿Percibe que las redes sociales influyen negativamente en la salud mental de las personas?",
-        "¿Considera que el costo del tratamiento psicológico es una barrera importante?",
-        "¿Se sentiría cómodo(a) recomendando a alguien que busque ayuda profesional?",
-        "¿Cree que hablar de salud mental en el trabajo o en los estudios puede traer consecuencias negativas?",
-        "¿Considera que la calidad de atención en salud mental en Chile es insuficiente?",
+        "¿Sabe dónde acudir si necesita apoyo emocional o psicológico?",
+        "¿Percibe que el costo del tratamiento psicológico es una barrera importante?",
+        "¿Se siente cómodo(a) hablando sobre sus emociones con personas cercanas?",
         "¿Está dispuesto(a) a buscar ayuda profesional si siente que la necesita?",
-        "¿Cree que la educación en salud mental debería enseñarse desde edades tempranas?",
-        "¿Percibe que Chile tiene una baja conciencia sobre la importancia del bienestar emocional?"
+        "¿Considera que la calidad de atención en salud mental en Chile es insuficiente?",
+        "¿Cree que la educación en salud mental debería enseñarse desde edades tempranas?"
     ];
 
     const [responses, setResponses] = useState<(number | null)[]>(Array(questions.length).fill(null));
@@ -70,7 +65,7 @@ export default function MentalHealthSurvey() {
 
         setLoading(true);
 
-        const { error } = await supabase.from("poll_link").insert([
+        const { error } = await supabase.from("survey_link").insert([
             {
                 name,
                 email,
