@@ -2,12 +2,12 @@
 import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
-
+import ProgressHeaderPreferences from "../../../components/ProgressHeaderPreferences";
 import { questionConfig, styles, ButtonStyle } from "./config";
 
-// =============================
-//  COMPONENTE QuestionCard
-// =============================
+/* =========================================
+   TIPOS DEL COMPONENTE QUESTION CARD
+========================================= */
 interface QuestionCardProps {
   question: string;
   options: { value: string; label: string }[];
@@ -15,55 +15,57 @@ interface QuestionCardProps {
   onChange: (value: string[]) => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({
+/* =========================================
+   COMPONENTE QUESTION CARD
+========================================= */
+function QuestionCard({
   question,
   options,
   currentAnswer,
   onChange,
-}) => (
-  <div style={{ ...styles.card, textAlign: "center" }}>
-    <h2 style={{ ...styles.question, textAlign: "center" }}>{question}</h2>
+}: QuestionCardProps) {
+  const toggle = (value: string) => {
+    onChange(
+      currentAnswer.includes(value)
+        ? currentAnswer.filter((v) => v !== value)
+        : [...currentAnswer, value]
+    );
+  };
 
-    <div
-      style={{
-        ...styles.tagContainer,
-        justifyContent: "center",
-      }}
-    >
-      {options.map((opt) => {
-        const selected = currentAnswer.includes(opt.value);
+  return (
+    <div style={{ ...styles.card, textAlign: "center" }}>
+      <h2 style={{ ...styles.questcardion, textAlign: "center" }}>{question}</h2>
+      
 
-        const toggle = () => {
-          if (selected) {
-            onChange(currentAnswer.filter((v) => v !== opt.value));
-          } else {
-            onChange([...currentAnswer, opt.value]);
-          }
-        };
+      <div style={{ ...styles.tagContainer, justifyContent: "center" }}>
+        {options.map((opt) => {
+          const selected = currentAnswer.includes(opt.value);
 
-        return (
-          <div
-            key={opt.value}
-            onClick={toggle}
-            style={{
-              ...styles.tag,
-              ...(selected ? styles.tagSelected : {}),
-            }}
-          >
-            {opt.label}
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={opt.value}
+              onClick={() => toggle(opt.value)}
+              style={{
+                ...styles.tag,
+                ...(selected ? styles.tagSelected : {}),
+              }}
+            >
+              {opt.label}
+            </div>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-// =============================
-//  COMPONENTE PRINCIPAL
-// =============================
+/* =========================================
+   COMPONENTE PRINCIPAL
+========================================= */
 export default function PreferenciasPsicologicas() {
   const router = useRouter();
 
+  // Inicializar respuestas
   const initialAnswers = useMemo(() => {
     return questionConfig.reduce(
       (acc, q) => ({ ...acc, [q.field]: [] as string[] }),
@@ -71,21 +73,28 @@ export default function PreferenciasPsicologicas() {
     );
   }, []);
 
-  const [answers, setAnswers] = useState<Record<string, string[]>>(initialAnswers);
+  const [answers, setAnswers] =
+    useState<Record<string, string[]>>(initialAnswers);
+
   const [step, setStep] = useState(1);
   const stepsTotal = questionConfig.length;
 
+  // Actualizar respuestas
   const handleChange = useCallback((field: string, value: string[]) => {
     setAnswers((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  // Navegación
   const next = () => setStep((prev) => prev + 1);
   const back = () => setStep((prev) => prev - 1);
 
+  // Validación
   const currentQuestionField = questionConfig[step - 1].field;
   const isCurrentAnswerSelected =
-    answers[currentQuestionField] && answers[currentQuestionField].length > 0;
+    answers[currentQuestionField] &&
+    answers[currentQuestionField].length > 0;
 
+  // Guardar en Supabase
   const handleSubmit = async () => {
     const {
       data: { user },
@@ -104,7 +113,7 @@ export default function PreferenciasPsicologicas() {
 
     if (error) {
       console.error("Error guardando preferencias:", error);
-      alert("Error al guardar las preferencias. Por favor, inténtalo de nuevo.");
+      alert("Error al guardar las preferencias. Por favor, inténtalo nuevamente.");
       return;
     }
 
@@ -116,12 +125,7 @@ export default function PreferenciasPsicologicas() {
 
   return (
     <div style={{ ...styles.container, textAlign: "center" }}>
-      <h1 style={{ ...styles.title, textAlign: "center" }}>
-        Preferencias Psicológicas 🧠
-      </h1>
-      <p style={{ ...styles.subtitle, textAlign: "center" }}>
-        Paso {step} de {stepsTotal}
-      </p>
+      <ProgressHeaderPreferences />
 
       {/* Barra de progreso */}
       <div
@@ -131,7 +135,7 @@ export default function PreferenciasPsicologicas() {
           height: "10px",
           borderRadius: "5px",
           margin: "20px 0",
-          overflow: "hidden", // asegura bordes limpios del gradiente
+          overflow: "hidden",
         }}
       >
         <div
@@ -145,7 +149,7 @@ export default function PreferenciasPsicologicas() {
         />
       </div>
 
-
+      {/* Tarjeta */}
       <QuestionCard
         question={currentQuestion.question}
         options={currentQuestion.options}
@@ -153,9 +157,7 @@ export default function PreferenciasPsicologicas() {
         onChange={(value) => handleChange(currentQuestion.field, value)}
       />
 
-      {/* =============================
-           BOTONES ALINEADOS IZQ / DER
-         ============================= */}
+      {/* Botones alineados */}
       <div
         style={{
           display: "flex",
@@ -164,7 +166,7 @@ export default function PreferenciasPsicologicas() {
           marginTop: "30px",
         }}
       >
-        {/* IZQUIERDA */}
+        {/* Izquierda */}
         <div>
           {step > 1 && (
             <button onClick={back} style={ButtonStyle.back}>
@@ -173,12 +175,16 @@ export default function PreferenciasPsicologicas() {
           )}
         </div>
 
-        {/* DERECHA */}
+        {/* Derecha */}
         <div>
           {step < stepsTotal && (
             <button
               onClick={next}
-              style={isCurrentAnswerSelected ? ButtonStyle.next : ButtonStyle.disabled}
+              style={
+                isCurrentAnswerSelected
+                  ? ButtonStyle.next
+                  : ButtonStyle.disabled
+              }
               disabled={!isCurrentAnswerSelected}
             >
               Siguiente
@@ -188,7 +194,11 @@ export default function PreferenciasPsicologicas() {
           {step === stepsTotal && (
             <button
               onClick={handleSubmit}
-              style={isCurrentAnswerSelected ? ButtonStyle.submit : ButtonStyle.disabled}
+              style={
+                isCurrentAnswerSelected
+                  ? ButtonStyle.submit
+                  : ButtonStyle.disabled
+              }
               disabled={!isCurrentAnswerSelected}
             >
               Finalizar

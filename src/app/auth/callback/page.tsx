@@ -16,7 +16,7 @@ export default function AuthCallback() {
       }
 
       // 🚀 Después de validar correo → preferencias psicológicas
-      router.push("/preferencias");
+      router.push("/auth/preferences");
     };
 
     handleCallback();

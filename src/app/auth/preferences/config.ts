@@ -110,18 +110,21 @@ export const questionConfig = [
 
 export const styles: Record<string, React.CSSProperties> = {
   container: {
+    
     maxWidth: "700px",
     margin: "0 auto",
     padding: "20px",
     fontFamily: "sans-serif",
   },
   title: {
+    
     textAlign: "center",
     fontSize: "28px",
     fontWeight: "bold",
     color: "#56dbc4",
   },
   subtitle: {
+    
     textAlign: "center",
     marginBottom: "20px",
     color: "#fff",
@@ -137,8 +140,10 @@ export const styles: Record<string, React.CSSProperties> = {
   question: {
     fontSize: "20px",
     marginBottom: "14px",
+    
   },
   tagContainer: {
+    paddingTop: "10px",
     display: "flex",
     flexWrap: "wrap",
     gap: "10px",
@@ -146,9 +151,11 @@ export const styles: Record<string, React.CSSProperties> = {
   tag: {
     padding: "6px 16px",
     borderRadius: "30px",
-    background: "#ff8cd3",
+    background: "#ccc",
     cursor: "pointer",
     transition: "0.2s",
+    color: "#666",
+    fontWeight: "bold",
   },
   tagSelected: {
     background: "#79e7d3",
@@ -179,17 +186,17 @@ const baseButtonStyles: React.CSSProperties = {
 export const ButtonStyle = {
   next: {
     ...baseButtonStyles,
-    background: "#0070f3",
+    background: "#79e7d3",
     color: "white",
   },
   back: {
     ...baseButtonStyles,
-    background: "#777",
+    background: "#ff8cd3",
     color: "white",
   },
   submit: {
     ...baseButtonStyles,
-    background: "#28a745",
+    background: "#79e7d3",
     color: "white",
   },
   disabled: {

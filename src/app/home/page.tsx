@@ -4,7 +4,6 @@ import "../../styles/home.css";
 import { Category } from "../../components/useProgress";
 import Modal from "../../components/modal";
 import Confetti from "react-confetti";
-import Footer from "../../components/Footer";
 
 import CuestionarioGAD7 from "./quizzes/quiz_ansiedad";
 import CuestionarioPHQ9 from "./quizzes/quiz_depresion";
