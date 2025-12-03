@@ -162,14 +162,14 @@ export default function MentalHealthSurvey() {
                     </div>
                 </div>
             ))}
-
             <button
                 onClick={handleSubmit}
                 disabled={loading || nameError !== "" || emailError !== ""}
                 className={styles.submitButton}
             >
                 {loading ? "Enviando..." : "Enviar encuesta"}
-            </button>
+            </button> 
         </div>
+        
     );
 }
