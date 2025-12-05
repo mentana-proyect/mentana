@@ -45,12 +45,12 @@ const quizComponents: Record<
 const Home: React.FC = () => {
   /* ------------------ AUTH / LOGOUT ------------------ */
   const logout = useLogout();
-  const authLoading = useAuthCheck();
+  useAuthCheck(); // 🔹 quitado el warning
   useInactivityTimer(logout);
 
   /* ------------------ QUIZZES ------------------ */
-  const { categories, setCategories, results, setResults, loading } =
-    useFetchProgress(initialData);
+  const { categories, setCategories, results, setResults } =
+    useFetchProgress(initialData); // 🔹 quitado "loading"
 
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -76,7 +76,7 @@ const Home: React.FC = () => {
   ) => {
     if (index === null) return;
 
-    // 1. Guardar progreso
+    // Guardar progreso
     setCategories((prev) =>
       prev!.map((cat, i) =>
         i === index
@@ -88,18 +88,18 @@ const Home: React.FC = () => {
       )
     );
 
-    // 2. Guardar resultado
+    // Guardar resultado
     setResults((prev) => ({
       ...prev,
       [quiz.quiz.id]: { score, interpretation },
     }));
 
-    // 3. Feedback UI
+    // UI feedback
     setShowConfetti(true);
     setResultModalOpen(true);
     setRefreshTrigger((prev) => prev + 1);
 
-    // 4. Handler base
+    // Handler base
     baseHandleQuizCompletion(
       index,
       quiz,
@@ -147,7 +147,6 @@ const Home: React.FC = () => {
 
   const deleteNote = (index: number) => {
     if (deletingIndexes.includes(index)) return;
-
     if (!confirm("¿Quieres eliminar esta nota?")) return;
 
     setDeletingIndexes((prev) => [...prev, index]);
@@ -171,7 +170,7 @@ const Home: React.FC = () => {
   ========================================= */
   return (
     <div className="home-container">
-      {/* ================= HEADER NOTAS ================= */}
+      {/* HEADER NOTAS */}
       <div className="daily-notes-container">
         <ProgressHeaderNote refreshTrigger={refreshTrigger} />
 
@@ -183,32 +182,49 @@ const Home: React.FC = () => {
             className={`toggle-btn ${activeView === "diario" ? "active" : ""}`}
             onClick={() => setActiveView("diario")}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-              stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M4 19.5A2.5 2.5 0 0 0 6.5 22h11A2.5 2.5 0 0 0 20 19.5V5H4z" />
               <path d="M16 3V5" />
               <path d="M8 3V5" />
               <path d="M4 9h16" />
-            </svg> <strong>Diario</strong>
+            </svg>{" "}
+            <strong>Diario</strong>
           </button>
 
           <button
             className={`toggle-btn ${activeView === "perfil" ? "active" : ""}`}
             onClick={() => setActiveView("perfil")}
-          ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-            stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
               <circle cx="12" cy="7" r="4" />
-            </svg><strong>Perfil</strong>
+            </svg>
+            <strong>Perfil</strong>
           </button>
         </div>
       </div>
       <DockFooter logout={logout} />
 
-      {/* ===========================
-            SECCIÓN → DIARIO
-         =========================== */}
+      {/* SECCIÓN → DIARIO */}
       {activeView === "diario" && (
         <div className="daily-notes-container">
           <h2 style={{ textAlign: "left" }}>Mentana Chile</h2>
@@ -233,7 +249,10 @@ const Home: React.FC = () => {
               <p className="empty-notes">Aún no tienes notas guardadas.</p>
             ) : (
               notes.map((n, i) => (
-                <div key={i} className={`note-item ${deletingIndexes.includes(i) ? "fade-out" : ""}`}>
+                <div
+                  key={i}
+                  className={`note-item ${deletingIndexes.includes(i) ? "fade-out" : ""}`}
+                >
                   <div className="note-main">
                     <div className="note-date">{n.date}</div>
                     <div className="note-text">{n.text}</div>
@@ -264,9 +283,7 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* ===========================
-            SECCIÓN → PERFIL
-         =========================== */}
+      {/* SECCIÓN → PERFIL */}
       {activeView === "perfil" && (
         <main className="perfil-container">
           {categories?.map((cat, index) => (
@@ -295,14 +312,11 @@ const Home: React.FC = () => {
               }}
             />
           ))}
-
           <DockFooter logout={logout} />
         </main>
       )}
 
-      {/* ===========================
-            MODALES
-         =========================== */}
+      {/* MODALES */}
       <Modal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)}>
         {QuizComponentToRender && activeQuiz && (
           <QuizComponentToRender

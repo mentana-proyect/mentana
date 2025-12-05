@@ -1,7 +1,15 @@
+import Image from "next/image";
 import styles from "../app/HomePage.module.css";
 
-export default function svgImgPleople() {
+export default function SvgImgPeople() {
   return (
-    <img src="/Gente.svg" alt="Imagen motivacional" className={styles.svgResponsive} />
+    <Image
+      src="/Gente.svg"
+      alt="Imagen motivacional"
+      className={styles.svgResponsive}
+      width={500}       // Ajusta según tu necesidad real
+      height={500}      // Ajusta según tu necesidad real
+      priority          // Opcional: mejora LCP si aparece en pantalla al inicio
+    />
   );
 }
