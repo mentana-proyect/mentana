@@ -13,7 +13,8 @@
   --font: "Poppins", sans-serif;
   --radius: 16px;
   --transition: 0.3s ease;
-  --accent-primary: #56dbc4;
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --card-border: rgba(255, 255, 255, 0.15);
 }
 
 /* Reset */
@@ -42,6 +43,7 @@ h5,
 h6 {
   font-weight: 600;
   margin-bottom: 10px;
+  color: var(--text);
 }
 
 p {
@@ -60,14 +62,14 @@ a:hover {
   color: var(--accent);
 }
 
-/* 🔹 Inputs y formularios */
+/* 🔹 Inputs */
 input,
 select,
 textarea {
   width: 100%;
   padding: 12px;
   margin-top: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.1);
   color: var(--text);
@@ -84,31 +86,212 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--primary);
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   outline: none;
 }
 
+/* =============================== */
+/* 📝 Estilos Notas Diarias */
+/* =============================== */
 
-/* 🔹 Utilidades */
-.text-center {
+.daily-notes-container {
+  width: 95%;
+  max-width: 480px;
+  margin: 10px auto;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+  animation: fadeIn 0.4s ease;
+}
+
+.daily-notes-title {
   text-align: center;
-}
-.text-right {
-  text-align: right;
-}
-.text-left {
-  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
-.mt-1 {
-  margin-top: 10px;
+.daily-note-input {
+  min-height: 100px;
+  resize: none;
 }
-.mt-2 {
+
+/* Botón Guardar Nota */
+.save-note-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  background: var(--primary);
+  color: #112244;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.save-note-btn:hover {
+  background: #3abfa7;
+}
+
+.notes-history {
   margin-top: 20px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
-.mb-1 {
+
+/* Scroll estilizado */
+.notes-history::-webkit-scrollbar {
+  width: 6px;
+}
+.notes-history::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 8px;
+}
+
+/* Cada nota */
+.note-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  animation: fadeInUp 0.3s ease;
+  transition: transform 0.18s ease, opacity 0.32s ease;
+}
+
+.note-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.note-date {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.note-text {
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* No hay notas */
+.empty-notes {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Fade-out cuando se borra */
+.fade-out {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.96);
+}
+
+/* Icono tacho */
+.delete-icon {
+  margin-left: 8px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.18s ease;
+}
+
+/* Hover del tacho */
+.delete-icon:hover {
+  transform: scale(1.1) rotate(-6deg);
+}
+
+/* Active */
+.delete-icon:active {
+  transform: scale(0.92);
+}
+
+/* SVG */
+.trash-svg {
+  color: #ffffff;
+  transition: 0.2s ease;
+}
+
+.delete-icon:hover .trash-svg {
+
+  transform: scale(1.12);
+}
+
+/* ========================= */
+/* ✨ Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.view-toggle {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;   /* ⬅ centra horizontal */
+  align-items: center;
+  gap: 10px;
+  width: 100%;
   margin-bottom: 10px;
 }
-.mb-2 {
-  margin-bottom: 20px;
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;       /* ⬅ ÍCONO ARRIBA / TEXTO ABAJO */
+  justify-content: center;
+  align-items: center;
+  gap: 4px;                     /* espacio entre SVG y texto */
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  color: var(--text);
+  backdrop-filter: blur(8px);
+  height: 70px;
+}
+
+
+
+/* Estado ACTIVE */
+.toggle-btn.active {
+  background: var(--primary);
+  color: #112244;
+  border-color: var(--primary);
+  
+}
+
+/* Iconos */
+.toggle-btn svg {
+  stroke: currentColor;
+  transition: 0.25s ease;
+}
+
+/* Icono hover */
+.toggle-btn:hover svg {
+  transform: scale(1.15);
 }

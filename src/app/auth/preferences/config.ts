@@ -149,7 +149,7 @@ export const styles: Record<string, React.CSSProperties> = {
     gap: "10px",
   },
   tag: {
-    padding: "6px 16px",
+    padding: "6px 14px",
     borderRadius: "30px",
     background: "#ccc",
     cursor: "pointer",

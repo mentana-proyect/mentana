@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
+
 interface QuizProgress {
   quiz_id: string;
   completed: boolean;
@@ -55,7 +56,7 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
   return (
     <header>
-      <article className="card">
+      <article>
         <div style={{ textAlign: "center" }}>
           <svg
               id="Capa_4"
@@ -76,15 +77,14 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
               <circle fill="#ff8cd3" cx="454.93" cy="625.36" r="37.24" />
               <circle fill="#ff8cd3" cx="596.8" cy="625.41" r="37.24" />
             </svg>
-          <h3>Preferencias Psicológicas</h3>
+          <h3 >Mi diario personal</h3>
         </div>
 
         <p style={{ textAlign: "center" }}>
-          
-          <strong>👉 Es tu espacio seguro, pensado para ti 🌱</strong>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+          <br />
         </p>
 
-      
       </article>
     </header>
   );

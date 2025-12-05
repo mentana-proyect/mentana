@@ -1,0 +1,58 @@
+/* ======================= */
+/*      DOCK FOOTER        */
+/* ======================= */
+
+/* Suaviza la animación en hover */
+.dock-btn {
+  transition: transform 0.22s ease, background 0.22s ease, opacity 0.22s ease;
+}
+
+.dock-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Iconos un poco más suaves */
+.dock-btn svg {
+  transition: stroke 0.22s ease, transform 0.22s ease;
+}
+
+.dock-btn:hover svg {
+  transform: scale(1.12);
+}
+
+/* Efecto de rebote suave al presionar */
+.dock-btn:active {
+  transform: scale(0.92);
+}
+
+/* Sombra más elegante */
+.dock-container {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+}
+
+/* Ajuste fino para Edge/Chrome */
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+  .dock-container {
+    background-color: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Espacio para evitar overlap con el dock */
+body {
+  padding-bottom: 110px;
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+  .dock-container {
+    border-radius: 1.4rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .dock-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+}
