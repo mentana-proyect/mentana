@@ -1,17 +1,35 @@
+import React from "react";
 import QuizCard from "../../../components/QuizCard";
 import DockFooter from "../../../components/DockFooter";
 import { Category } from "../../../components/useProgress";
+
+interface ResultsRecord {
+  [quizId: string]: {
+    score: number;
+    interpretation: string;
+  };
+}
+
+// Firmas exactas que parece que tu padre está pasando
+type SetActiveQuizFn = (q: Category | null) => void;
+type SetActiveIndexFn = (i: number | null) => void;
+type SetBoolFn = (v: boolean) => void;
+type SetResultsFn = (updater: ResultsRecord | ((prev: ResultsRecord) => ResultsRecord)) => void;
 
 interface Props {
   categories: Category[];
   refreshTrigger: number;
   logout: () => void;
-  setActiveQuiz: any;
-  setActiveIndex: any;
-  setResultModalOpen: any;
-  setRecommendModalOpen: any;
-  setResults: any;
-  results: any;
+
+  // aquí usamos las firmas simples que el padre provee
+  setActiveQuiz: SetActiveQuizFn;
+  setActiveIndex: SetActiveIndexFn;
+
+  setResultModalOpen: SetBoolFn;
+  setRecommendModalOpen: SetBoolFn;
+
+  setResults: SetResultsFn;
+  results: ResultsRecord;
 }
 
 const PerfilSection = ({
@@ -43,7 +61,12 @@ const PerfilSection = ({
             setActiveQuiz(q);
             setActiveIndex(i);
             setResultModalOpen(true);
-            setResults((prev: any) => ({ ...prev, [q.quiz.id]: result }));
+
+            // setResults acepta tanto un objeto como una función actualizadora
+            setResults((prev: ResultsRecord) => ({
+              ...prev,
+              [q.quiz.id]: result,
+            }));
           }}
           openRecomendacion={(q, i) => {
             setActiveQuiz(q);

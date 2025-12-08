@@ -4,7 +4,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
 import Footer from "../../../components/Footer";
 
-interface Phq9FormProps {
+export interface Phq9FormProps {
   onComplete?: () => void;
   onResult?: (score: number, interpretation: string) => void;
 }
@@ -28,11 +28,13 @@ const phq9Options = [
 ];
 
 export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
-  const [answers, setAnswers] = useState<number[]>(Array(phq9Questions.length).fill(-1));
+  const [answers, setAnswers] = useState<number[]>(
+    Array(phq9Questions.length).fill(-1)
+  );
   const [loading, setLoading] = useState(false);
   const [canAnswer, setCanAnswer] = useState(true);
 
-  const quizId = "depresion1"; // identificador único del quiz
+  const quizId = "depresion1";
 
   const handleAnswer = (index: number, value: number) => {
     const updated = [...answers];
@@ -40,15 +42,19 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
     setAnswers(updated);
   };
 
-  const getInterpretation = (score: number) => {
-    if (score <= 4) return "Depresión mínima. No se observan síntomas clínicamente significativos.";
-    if (score <= 9) return "Depresión leve. Puede haber síntomas ocasionales, pero no suelen interferir con las actividades diarias.";
-    if (score <= 14) return "Depresión moderada. Los síntomas pueden afectar el bienestar y el desempeño cotidiano. Se recomienda observar evolución y considerar apoyo profesional si persisten.";
-    if (score <= 19) return "Depresión moderadamente grave. Los síntomas tienen un impacto importante en la vida diaria. Se sugiere buscar orientación psicológica o médica.";
-    return "Depresión grave. Los síntomas son intensos y afectan significativamente la funcionalidad. Se recomienda buscar apoyo profesional cuanto antes.";
+  const getInterpretation = (score: number): string => {
+    if (score <= 4)
+      return "Depresión mínima. No se observan síntomas clínicamente significativos.";
+    if (score <= 9)
+      return "Depresión leve. Puede haber síntomas ocasionales, pero no suelen interferir con las actividades diarias.";
+    if (score <= 14)
+      return "Depresión moderada. Los síntomas pueden afectar el bienestar y el desempeño cotidiano.";
+    if (score <= 19)
+      return "Depresión moderadamente grave. Los síntomas tienen impacto importante en la vida diaria.";
+    return "Depresión grave. Síntomas intensos que afectan la funcionalidad. Se recomienda apoyo profesional.";
   };
 
-  // 🕒 Verificar si el usuario puede volver a responder
+  // 🕒 Verificar si puede responder antes de 30 días
   useEffect(() => {
     const checkLastAttempt = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -62,15 +68,14 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
         .eq("quiz_id", quizId)
         .single();
 
-      if (error) return; // no existe → puede responder
+      if (error) return;
 
       if (data?.last_completed_at) {
-        const lastDate = new Date(data.last_completed_at);
+        const last = new Date(data.last_completed_at);
         const now = new Date();
-        const diffDays = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
-        if (diffDays < 30) {
-          setCanAnswer(false);
-        }
+        const diffDays = (now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (diffDays < 30) setCanAnswer(false);
       }
     };
 
@@ -92,6 +97,7 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
     const interpretation = getInterpretation(total);
 
     setLoading(true);
+
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
     if (!userId) {
@@ -100,10 +106,10 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
       return;
     }
 
-    // ✅ 1. Guardar resultado histórico
-    const { error: insertError } = await supabase.from("results_depresion").insert([
-      { user_id: userId, answers, score: total, interpretation },
-    ]);
+    // Guardar resultados históricos
+    const { error: insertError } = await supabase
+      .from("results_depresion")
+      .insert([{ user_id: userId, answers, score: total, interpretation }]);
 
     if (insertError) {
       console.error(insertError);
@@ -112,7 +118,7 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
       return;
     }
 
-    // ✅ 2. Actualizar progreso general (upsert evita duplicados)
+    // Actualizar progreso del quiz
     const { error: progressError } = await supabase
       .from("quiz_progress")
       .upsert(
@@ -136,8 +142,11 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
     }
 
     setLoading(false);
-    if (onResult) onResult(total, interpretation);
-    if (onComplete) onComplete();
+
+    // 🔥 tipos seguros → evita errores TS
+    onResult?.(total, interpretation);
+    onComplete?.();
+
     alert("✅ Resultado guardado correctamente.");
   };
 
@@ -147,7 +156,7 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario PHQ-9</h1>
         <small>
           <i>
-            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.
+            Donde 0 = "Nunca", 1 = "Varios días", 2 = "Más de la mitad de los días", 3 = "Casi todos los días".
           </i>
         </small>
       </div>
@@ -163,12 +172,15 @@ export default function Phq9Form({ onComplete, onResult }: Phq9FormProps) {
             {phq9Questions.map((q, i) => (
               <div key={i} className="form-group full-width">
                 <p className="font-medium mb-3 text-left">{q}</p>
+
                 <div className="options-row">
                   {phq9Options.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
+                      className={`option-btn ${
+                        answers[i] === opt.value ? "selected" : ""
+                      }`}
                       onClick={() => handleAnswer(i, opt.value)}
                     >
                       {opt.label}

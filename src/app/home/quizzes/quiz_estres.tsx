@@ -33,21 +33,24 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
   const [loading, setLoading] = useState(false);
   const [canAnswer, setCanAnswer] = useState(true);
 
-  const quizId = "estres1"; // identificador único del quiz
+  const quizId = "estres1";
 
   const handleAnswer = (qIndex: number, value: number) => {
-    const updated = [...answers];
-    updated[qIndex] = value;
-    setAnswers(updated);
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[qIndex] = value;
+      return updated;
+    });
   };
 
   const getInterpretation = (score: number) => {
     if (score <= 13)
-  return "Nivel de estrés bajo. Probablemente maneja bien situaciones estresantes y no hay señales de estrés elevado.";
-if (score <= 26)
-  return "Nivel de estrés moderado. Es posible que algunas situaciones generen tensión o ansiedad. Se recomienda practicar técnicas de manejo de estrés y autocuidado.";
-return "Nivel de estrés alto. Las demandas diarias pueden estar generando estrés significativo. Considera apoyo profesional y estrategias efectivas de reducción de estrés.";
+      return "Nivel de estrés bajo. Probablemente maneja bien situaciones estresantes y no hay señales de estrés elevado.";
 
+    if (score <= 26)
+      return "Nivel de estrés moderado. Es posible que algunas situaciones generen tensión o ansiedad. Se recomienda practicar técnicas de manejo de estrés y autocuidado.";
+
+    return "Nivel de estrés alto. Las demandas diarias pueden estar generando estrés significativo. Considera apoyo profesional y estrategias efectivas de reducción de estrés.";
   };
 
   useEffect(() => {
@@ -56,16 +59,17 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
       const userId = user?.id;
       if (!userId) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("quiz_progress")
         .select("last_completed_at")
         .eq("user_id", userId)
         .eq("quiz_id", quizId)
         .single();
 
-      if (!error && data?.last_completed_at) {
+      if (data?.last_completed_at) {
         const lastDate = new Date(data.last_completed_at);
         const diffDays = (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+
         if (diffDays < 30) setCanAnswer(false);
       }
     };
@@ -84,24 +88,27 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
       return;
     }
 
-    const total = answers.reduce((acc, val, index) => acc + (pss10Questions[index].isReversed ? 4 - val : val), 0);
+    const total = answers.reduce(
+      (acc, val, index) => acc + (pss10Questions[index].isReversed ? 4 - val : val),
+      0
+    );
+
     const interpretation = getInterpretation(total);
     setLoading(true);
 
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
+
     if (!userId) {
       alert("⚠️ Usuario no autenticado.");
       setLoading(false);
       return;
     }
 
-    // Guardar resultado histórico
+    // guardar resultados en historial
     const { error: insertError } = await supabase.from("results_estres").insert([
       { user_id: userId, answers, score: total, interpretation },
     ]);
-
-    
 
     if (insertError) {
       console.error(insertError);
@@ -110,7 +117,7 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
       return;
     }
 
-    // Actualizar progreso general (upsert)
+    // actualizar progreso general
     const { error: updateError } = await supabase.from("quiz_progress").upsert(
       {
         user_id: userId,
@@ -130,8 +137,10 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
     }
 
     setLoading(false);
-    if (onResult) onResult(total, interpretation);
-    if (onComplete) onComplete();
+
+    onResult?.(total, interpretation); // ← seguro
+    onComplete?.(); // ← seguro
+
     alert("✅ Resultado guardado correctamente.");
   };
 
@@ -141,7 +150,7 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
         <h1 className="text-2xl font-bold mb-6">Cuestionario PSS-10</h1>
         <small>
           <i>
-            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Casi nunca&quot;, 2 es &quot;A veces&quot;, 3 es &quot;Bastante seguido&quot; y 4 es &quot;Muy a menudo&quot;.
+            Donde 0 es “Nunca”, 1 “Casi nunca”, 2 “A veces”, 3 “Bastante seguido”, 4 “Muy a menudo”.
           </i>
         </small>
       </div>
@@ -149,7 +158,6 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
       {!canAnswer ? (
         <p className="text-center text-red-500 font-medium mt-4">
           ⏳ Ya completaste este cuestionario hace menos de 30 días.
-          Podrás volver a responderlo más adelante.
         </p>
       ) : (
         <>
@@ -157,6 +165,7 @@ return "Nivel de estrés alto. Las demandas diarias pueden estar generando estr�
             {pss10Questions.map((q, qIndex) => (
               <div key={qIndex} className="form-group full-width">
                 <p className="font-medium mb-3 text-left">{q.q}</p>
+
                 <div className="options-row">
                   {pss10Options.map((opt) => (
                     <button

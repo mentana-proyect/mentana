@@ -31,46 +31,44 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
   const [loading, setLoading] = useState(false);
   const [canAnswer, setCanAnswer] = useState(true);
 
-  const quizId = "soledad1"; // identificador único del quiz
+  const quizId = "soledad1";
 
   const handleAnswer = (qIndex: number, value: number) => {
-    const updated = [...answers];
-    updated[qIndex] = value;
-    setAnswers(updated);
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[qIndex] = value;
+      return updated;
+    });
   };
 
   const getInterpretation = (score: number) => {
     if (score <= 5)
       return "Ausencia de soledad o soledad leve. Probablemente se siente conectado socialmente y satisfecha/o con sus relaciones.";
+
     if (score <= 8)
       return "Soledad moderada. Puede experimentar sentimientos de aislamiento ocasional. Se recomienda fortalecer la red social y actividades de conexión.";
-    return "Soledad grave. Es posible que se sienta muy aislado o desconectado de los demás. Se sugiere buscar apoyo social y profesional si es necesario.";
 
+    return "Soledad grave. Es posible que se sienta muy aislado o desconectado de los demás. Se sugiere buscar apoyo social y profesional si es necesario.";
   };
 
-  // 🕒 Verificar si el usuario puede volver a responder
+  // Verificar si ya respondió dentro de los últimos 30 días
   useEffect(() => {
     const checkLastAttempt = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       const userId = user?.id;
       if (!userId) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("quiz_progress")
         .select("last_completed_at")
         .eq("user_id", userId)
         .eq("quiz_id", quizId)
         .single();
 
-      if (error) return;
-
       if (data?.last_completed_at) {
         const lastDate = new Date(data.last_completed_at);
-        const now = new Date();
-        const diffDays = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
-        if (diffDays < 30) {
-          setCanAnswer(false);
-        }
+        const diffDays = (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays < 30) setCanAnswer(false);
       }
     };
 
@@ -92,6 +90,7 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
     const interpretation = getInterpretation(total);
 
     setLoading(true);
+
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
 
@@ -101,12 +100,10 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       return;
     }
 
-    // ✅ Guardar resultado histórico
+    // Guardar resultado histórico
     const { error: insertError } = await supabase.from("results_soledad").insert([
       { user_id: userId, answers, score: total, interpretation },
     ]);
-
-
 
     if (insertError) {
       console.error(insertError);
@@ -115,7 +112,7 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       return;
     }
 
-    // ✅ Actualizar progreso general (upsert)
+    // Actualizar progreso general
     const { error: updateError } = await supabase
       .from("quiz_progress")
       .upsert(
@@ -137,8 +134,11 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
     }
 
     setLoading(false);
-    if (onResult) onResult(total, interpretation);
-    if (onComplete) onComplete();
+
+    // Uso seguro de callbacks opcionales
+    onResult?.(total, interpretation);
+    onComplete?.();
+
     alert("✅ Resultado guardado correctamente.");
   };
 
@@ -147,14 +147,15 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
       <div className="fixed-header-container">
         <h1 className="text-2xl font-bold mb-6">Cuestionario UCLA</h1>
         <small>
-          <i>Donde 1 es &quot;Nunca&quot;, 2 es &quot;A veces&quot; y 3 es &quot;Casi siempre&quot;.</i>
+          <i>
+            Donde 1 es "Nunca", 2 es "A veces" y 3 es "Casi siempre".
+          </i>
         </small>
       </div>
 
       {!canAnswer ? (
         <p className="text-center text-red-500 font-medium mt-4">
           ⏳ Ya completaste este cuestionario hace menos de 30 días.
-          Podrás volver a responderlo más adelante.
         </p>
       ) : (
         <>
@@ -162,6 +163,7 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
             {uclaQuestions.map((q, qIndex) => (
               <div key={qIndex} className="form-group full-width">
                 <p className="font-medium mb-3 text-left">{q}</p>
+
                 <div className="options-row">
                   {uclaOptions.map((opt) => (
                     <button
@@ -178,7 +180,11 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
             ))}
           </form>
 
-          <button onClick={calculateScore} disabled={loading} className="calculate-row">
+          <button
+            onClick={calculateScore}
+            disabled={loading}
+            className="calculate-row"
+          >
             {loading ? "Guardando..." : "Calcular"}
           </button>
         </>

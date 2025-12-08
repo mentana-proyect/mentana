@@ -4,7 +4,7 @@ import { supabase } from "../../../lib/supabaseClient";
 import "../../../styles/general.css";
 import Footer from "../../../components/Footer";
 
-interface Gad7FormProps {
+export interface Gad7FormProps {
   onComplete?: () => void;
   onResult?: (score: number, interpretation: string) => void;
 }
@@ -27,11 +27,18 @@ const options = [
   { label: "3", value: 3 },
 ];
 
-export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
-  const [answers, setAnswers] = useState<number[]>(Array(gad7Questions.length).fill(-1));
+export default function Gad7Form({
+  onComplete,
+  onResult,
+}: Gad7FormProps) {
+  
+  const [answers, setAnswers] = useState<number[]>(
+    Array(gad7Questions.length).fill(-1)
+  );
   const [loading, setLoading] = useState(false);
   const [canAnswer, setCanAnswer] = useState(true);
-  const quizId = "ansiedad1"; // 👈 identificador único del quiz
+  
+  const quizId = "ansiedad1";
 
   const handleAnswer = (index: number, value: number) => {
     const updated = [...answers];
@@ -40,13 +47,16 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
   };
 
   const getInterpretation = (score: number) => {
-    if (score <= 4) return "La ansiedad es baja. Probablemente no se requiere intervención clínica.";
-    if (score <= 9) return "Síntomas leves de ansiedad. Observar si afectan la vida diaria.";
-    if (score <= 14) return "Síntomas moderados. Considerar evaluación profesional.";
+    if (score <= 4)
+      return "La ansiedad es baja. Probablemente no se requiere intervención clínica.";
+    if (score <= 9)
+      return "Síntomas leves de ansiedad. Observar si afectan la vida diaria.";
+    if (score <= 14)
+      return "Síntomas moderados. Considerar evaluación profesional.";
     return "Alta ansiedad. Se recomienda apoyo profesional.";
   };
 
-  // 🕒 Verificar si el usuario puede volver a responder
+  // 🕒 Verificar si puede volver a responder
   useEffect(() => {
     const checkLastAttempt = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -60,15 +70,15 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
         .eq("quiz_id", quizId)
         .single();
 
-      if (error) return; // no existe → puede responder
+      if (error) return;
 
       if (data?.last_completed_at) {
         const lastDate = new Date(data.last_completed_at);
         const now = new Date();
-        const diffDays = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
-        if (diffDays < 30) {
-          setCanAnswer(false);
-        }
+        const diffDays =
+          (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (diffDays < 30) setCanAnswer(false);
       }
     };
 
@@ -92,16 +102,19 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
+
     if (!userId) {
       alert("⚠️ Usuario no autenticado.");
       setLoading(false);
       return;
     }
 
-    // ✅ 1. Guardar resultado histórico
-    const { error: insertError } = await supabase.from("results_ansiedad").insert([
-      { user_id: userId, answers, score: total, interpretation },
-    ]);
+    // 1️⃣ Guardar histórico
+    const { error: insertError } = await supabase
+      .from("results_ansiedad")
+      .insert([
+        { user_id: userId, answers, score: total, interpretation },
+      ]);
 
     if (insertError) {
       console.error(insertError);
@@ -110,7 +123,7 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
       return;
     }
 
-    // ✅ 2. Actualizar progreso general (upsert evita duplicados)
+    // 2️⃣ Actualizar progreso
     const { error: progressError } = await supabase
       .from("quiz_progress")
       .upsert(
@@ -134,8 +147,11 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
     }
 
     setLoading(false);
-    if (onResult) onResult(total, interpretation);
-    if (onComplete) onComplete();
+
+    // 👇👇👇 FIX del error:
+    onResult?.(total, interpretation);
+    onComplete?.();
+
     alert("✅ Resultado guardado correctamente.");
   };
 
@@ -145,7 +161,7 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario GAD-7</h1>
         <small>
           <i>
-            Donde 0 es &quot;Nunca&quot;, 1 es &quot;Varios días&quot;, 2 es &quot;Más de la mitad de los días&quot; y 3 es &quot;Casi todos los días&quot;.
+            Donde 0 es "Nunca", 1 es "Varios días", 2 es "Más de la mitad de los días" y 3 es "Casi todos los días".
           </i>
         </small>
       </div>
@@ -161,12 +177,15 @@ export default function Gad7Form({ onComplete, onResult }: Gad7FormProps) {
             {gad7Questions.map((q, i) => (
               <div key={i} className="form-group full-width">
                 <p className="font-medium mb-3 text-left">{q}</p>
+
                 <div className="options-row">
                   {options.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      className={`option-btn ${answers[i] === opt.value ? "selected" : ""}`}
+                      className={`option-btn ${
+                        answers[i] === opt.value ? "selected" : ""
+                      }`}
                       onClick={() => handleAnswer(i, opt.value)}
                     >
                       {opt.label}
