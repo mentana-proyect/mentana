@@ -7,6 +7,14 @@ export interface NoteItem {
   date: string;
 }
 
+// Tipo estricto del row que devuelve Supabase
+interface DailyNoteRow {
+  id: string;
+  note_text: string;
+  created_at: string;
+  user_id?: string;
+}
+
 export const useNotes = (userId: string) => {
   const [note, setNote] = useState("");
   const [notes, setNotes] = useState<NoteItem[]>([]);
@@ -17,7 +25,7 @@ export const useNotes = (userId: string) => {
 
     const { data, error } = await supabase
       .from("daily_notes")
-      .select("id, note_text, created_at")
+      .select("id, note_text, created_at, user_id")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
@@ -26,7 +34,7 @@ export const useNotes = (userId: string) => {
       return;
     }
 
-    const formatted = (data ?? []).map((n: any) => ({
+    const formatted = (data ?? []).map((n: DailyNoteRow) => ({
       id: n.id,
       text: n.note_text,
       date: new Date(n.created_at).toLocaleString("es-CL", {
@@ -44,30 +52,28 @@ export const useNotes = (userId: string) => {
 
   // realtime
   useEffect(() => {
-  if (!userId) return;
+    if (!userId) return;
 
-  const channel = supabase
-    .channel("public:daily_notes")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "daily_notes" },
-      (payload) => {
-        const newRow = payload.new as { user_id?: string };
-        const oldRow = payload.old as { user_id?: string };
+    const channel = supabase
+      .channel("public:daily_notes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "daily_notes" },
+        (payload) => {
+          const newRow = payload.new as { user_id?: string };
+          const oldRow = payload.old as { user_id?: string };
 
-        if (newRow?.user_id === userId || oldRow?.user_id === userId) {
-          fetchNotes();
+          if (newRow?.user_id === userId || oldRow?.user_id === userId) {
+            fetchNotes();
+          }
         }
-      }
-    )
-    .subscribe();
+      )
+      .subscribe();
 
-  // IMPORTANT: cleanup NO async
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, [userId, fetchNotes]);
-
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, fetchNotes]);
 
   const saveNote = async () => {
     if (!note.trim() || !userId) return;

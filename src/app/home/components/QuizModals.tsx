@@ -1,18 +1,42 @@
 import Modal from "../../../components/modal";
 import ResultView from "../../../components/ResultView";
 import Recommendation from "../../../components/Recommendation";
+import React from "react";
+import { Category } from "../../../components/useProgress";
+
+interface ResultsRecord {
+  [quizId: string]: {
+    score: number;
+    interpretation: string;
+  };
+}
+
+interface QuizComponentProps {
+  onResult: (score: number, interpretation: string) => void;
+}
+
+type QuizComponent = React.ComponentType<QuizComponentProps>;
+
+type SetStateBool = React.Dispatch<React.SetStateAction<boolean>>;
+
+type HandleQuizCompletion = (
+  index: number,
+  activeQuiz: Category,
+  score: number,
+  interpretation: string
+) => void;
 
 interface Props {
-  activeQuiz: any;
-  results: any;
+  activeQuiz: Category | null;
+  results: ResultsRecord;
   quizModalOpen: boolean;
   resultModalOpen: boolean;
   recommendModalOpen: boolean;
-  setQuizModalOpen: any;
-  setResultModalOpen: any;
-  setRecommendModalOpen: any;
-  QuizComponentToRender: any;
-  handleQuizCompletion: any;
+  setQuizModalOpen: SetStateBool;
+  setResultModalOpen: SetStateBool;
+  setRecommendModalOpen: SetStateBool;
+  QuizComponentToRender: QuizComponent | null;
+  handleQuizCompletion: HandleQuizCompletion;
   activeIndex: number | null;
 }
 
@@ -34,8 +58,13 @@ const QuizModals = ({
       <Modal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)}>
         {QuizComponentToRender && activeQuiz && (
           <QuizComponentToRender
-            onResult={(score: number, interpretation: string) =>
-              handleQuizCompletion(activeIndex!, activeQuiz, score, interpretation)
+            onResult={(score, interpretation) =>
+              handleQuizCompletion(
+                activeIndex!,
+                activeQuiz,
+                score,
+                interpretation
+              )
             }
           />
         )}
