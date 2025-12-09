@@ -148,7 +148,7 @@ export default function UclaForm({ onComplete, onResult }: UclaFormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario UCLA</h1>
         <small>
           <i>
-            Donde 1 es "Nunca", 2 es "A veces" y 3 es "Casi siempre".
+            Donde 1 es &quot;Nunca&quot;, 2 es &quot;A veces&quot; y 3 es &quot;Casi siempre&quot;.
           </i>
         </small>
       </div>

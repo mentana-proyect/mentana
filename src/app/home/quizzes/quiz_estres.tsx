@@ -150,7 +150,7 @@ export default function Pss10Form({ onComplete, onResult }: Pss10FormProps) {
         <h1 className="text-2xl font-bold mb-6">Cuestionario PSS-10</h1>
         <small>
           <i>
-            Donde 0 es “Nunca”, 1 “Casi nunca”, 2 “A veces”, 3 “Bastante seguido”, 4 “Muy a menudo”.
+            Donde 0 es &quot;Nunca&quot;, 1 &quot;Casi nunca&quot;, 2 &quot;A veces&quot;, 3 &quot;Bastante seguido&quot;, 4 &quot;Muy a menudo&quot;.
           </i>
         </small>
       </div>

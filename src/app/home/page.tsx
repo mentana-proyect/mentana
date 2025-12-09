@@ -18,14 +18,13 @@ import NotesSection from "./components/NotesSection";
 import PerfilSection from "./components/PerfilSection";
 import QuizModals from "./components/QuizModals";
 
-import { useNotes } from "./hooks/useNotes";
 import { useQuizManager } from "./hooks/useQuizManager";
 
 import ProgressHeaderNote from "../../components/ProgressHeaderNote";
 import Footer from "../../components/Footer";
 import Confetti from "react-confetti";
 
-import CuestionarioGAD7 from "./quizzes/quiz_ansiedad";
+import CuestionarioGAD7, { Gad7FormProps } from "./quizzes/quiz_ansiedad";
 import CuestionarioPHQ9 from "./quizzes/quiz_depresion";
 import CuestionarioPSS10 from "./quizzes/quiz_estres";
 import CuestionarioUCLA from "./quizzes/quiz_soledad";
@@ -33,7 +32,7 @@ import CuestionarioUCLA from "./quizzes/quiz_soledad";
 /* ⬅⬅ SOLUCIÓN DEL ERROR */
 type QuizKey = "ansiedad1" | "depresion1" | "estres1" | "soledad1";
 
-const quizComponents: Record<QuizKey, React.FC<any>> = {
+const quizComponents: Record<QuizKey, React.FC<Gad7FormProps>> = {
   ansiedad1: CuestionarioGAD7,
   depresion1: CuestionarioPHQ9,
   estres1: CuestionarioPSS10,
@@ -52,7 +51,9 @@ const Home = () => {
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [recommendModalOpen, setRecommendModalOpen] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // ❗ Eliminado setRefreshTrigger (no usado)
+  const [refreshTrigger] = useState(0);
 
   const { handleQuizCompletion: baseHandleQuizCompletion } = useQuizHandlers(
     categories ?? [],
@@ -69,7 +70,8 @@ const Home = () => {
     });
   }, []);
 
-  const notes = useNotes(userId);
+  // ❗ Eliminado: notes no se usa
+  // const notes = useNotes(userId);
 
   const quizManager = useQuizManager(
     categories ?? [],
