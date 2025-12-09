@@ -1,26 +1,15 @@
-// =========================
-// TIPOS GENÉRICOS UNIFICADOS
-// =========================
 
-// Lo que cada formulario debe recibir
 export interface QuizComponentProps {
   onComplete: (score: number, interpretation: string) => void;
   onResult?: (score: number, interpretation: string) => void;
 }
 
-// =========================
-// TIPOS ESPECÍFICOS POR FORMULARIO
-// (todos extienden al tipo genérico)
-// =========================
+export type Gad7FormProps = QuizComponentProps;
+export type Phq9FormProps = QuizComponentProps;
+export type Pss10FormProps = QuizComponentProps;
+export type UclaFormProps = QuizComponentProps;
 
-export interface Gad7FormProps extends QuizComponentProps {}
-export interface Phq9FormProps extends QuizComponentProps {}
-export interface Pss10FormProps extends QuizComponentProps {}
-export interface UclaFormProps extends QuizComponentProps {}
 
-// =========================
-// TIPO DE CATEGORY
-// =========================
 export interface QuizInfo {
   id: string;
   completed: boolean;
