@@ -4,6 +4,31 @@ import { PasswordInput } from "../components/PasswordInput";
 import { AuthExtras } from "../../../components/AuthExtras";
 import { AuthButtons } from "../../../components/AuthButtons";
 import { AuthMessage } from "../../../components/AuthMessage";
+import { FormEvent } from "react";
+
+export interface AuthFormProps {
+  isLogin: boolean;
+  setIsLogin: (v: boolean) => void;
+
+  email: string;
+  setEmail: (v: string) => void;
+
+  password: string;
+  setPassword: (v: string) => void;
+
+  showPassword: boolean;
+  setShowPassword: (v: boolean) => void;
+
+  loading: boolean;
+
+  termsAccepted: boolean;
+  setTermsAccepted: (v: boolean) => void;
+
+  message: string | null;
+  messageType: "success" | "error" | null;
+
+  handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
+}
 
 export const AuthForm = ({
   isLogin,
@@ -20,7 +45,7 @@ export const AuthForm = ({
   message,
   messageType,
   handleSubmit,
-}: any) => (
+}: AuthFormProps) => (
   <>
     <form className={styles.form} onSubmit={handleSubmit}>
       <EmailInput email={email} setEmail={setEmail} loading={loading} />

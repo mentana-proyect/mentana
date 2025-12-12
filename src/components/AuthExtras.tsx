@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "../app/auth/AuthPage.module.css";
 
 interface AuthExtrasProps {
@@ -8,11 +8,11 @@ interface AuthExtrasProps {
   setTermsAccepted: (val: boolean) => void;
 }
 
-export const AuthExtras: React.FC<AuthExtrasProps> = ({
+export const AuthExtras = ({
   isLogin,
   termsAccepted,
   setTermsAccepted,
-}) => {
+}: AuthExtrasProps) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleAccept = () => {
@@ -34,9 +34,10 @@ export const AuthExtras: React.FC<AuthExtrasProps> = ({
               type="checkbox"
               checked={termsAccepted}
               readOnly
-              onClick={() => setModalOpen(true)} // Abrir modal al hacer clic
+              onClick={() => setModalOpen(true)}
             />
             <span className={styles.slider}></span>
+
             <span className={styles.switchText}>
               Acepto los{" "}
               <a
@@ -64,13 +65,14 @@ export const AuthExtras: React.FC<AuthExtrasProps> = ({
           <div className={styles.modalContent}>
             <h2>Términos y Condiciones</h2>
             <p>
-              {/* Aquí puedes agregar tus términos y condiciones reales */}
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </p>
+
             <div className={styles.modalButtons}>
               <button className={styles.acceptBtn} onClick={handleAccept}>
                 Aceptar
               </button>
+
               <button className={styles.declineBtn} onClick={handleDecline}>
                 No aceptar
               </button>

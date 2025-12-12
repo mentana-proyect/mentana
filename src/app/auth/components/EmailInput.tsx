@@ -1,6 +1,12 @@
 import styles from "../AuthPage.module.css";
 
-export const EmailInput = ({ email, setEmail, loading }: any) => (
+interface EmailInputProps {
+  email: string;
+  setEmail: (value: string) => void;
+  loading: boolean;
+}
+
+export const EmailInput = ({ email, setEmail, loading }: EmailInputProps) => (
   <div className={styles.inputGroup}>
     <input
       type="email"

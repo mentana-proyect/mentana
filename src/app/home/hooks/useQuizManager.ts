@@ -1,6 +1,22 @@
 import { useState } from "react";
 import { Category } from "../../../components/useProgress";
 
+export interface QuizStoredResult {
+  score: number;
+  interpretation: string;
+}
+
+export type ResultsRecord = Record<string, QuizStoredResult>;
+
+export type BaseHandleQuizCompletion = (
+  index: number,
+  quiz: Category,
+  score: number,
+  interpretation: string,
+  onConfetti: () => void,
+  onOpenResult: () => void
+) => Promise<void>;
+
 export type HandleQuizCompletion = (
   index: number,
   quiz: Category,
@@ -19,9 +35,9 @@ export interface UseQuizManagerReturn {
 export const useQuizManager = (
   categories: Category[],
   setCategories: (cats: Category[]) => void,
-  results: Record<string, any>,
-  setResults: (res: Record<string, any>) => void,
-  baseHandleQuizCompletion: any,
+  results: ResultsRecord,
+  setResults: (res: ResultsRecord) => void,
+  baseHandleQuizCompletion: BaseHandleQuizCompletion,
   setActiveModal: (
     mode: "quiz" | "resultado" | "recomendacion" | null
   ) => void
