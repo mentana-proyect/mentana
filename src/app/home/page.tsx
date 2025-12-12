@@ -48,22 +48,23 @@ const Home: React.FC = () => {
   const { categories, setCategories, results, setResults, loading } =
     useFetchProgress(initialData);
 
-  const safeCategories = categories || [];
+  // Evita que cambie la referencia en cada render
+  const safeCategories = React.useMemo(() => categories || [], [categories]);
 
   const [activeView, setActiveView] = useState<"diario" | "perfil">("diario");
   const [userId, setUserId] = useState("");
 
-  // Estado de modales por quizId
   const [modalStates, setModalStates] = useState<Record<string, ModalState>>({});
   const initialized = useRef(false);
 
-  // Inicializar modalStates UNA sola vez
+  // Inicializar modales 1 vez
   useEffect(() => {
-    if (!safeCategories.length) return;
+    if (initialized.current) return;
 
-    if (!initialized.current) {
+    if (safeCategories.length > 0) {
+      initialized.current = true;
+
       const initial: Record<string, ModalState> = {};
-
       safeCategories.forEach((cat) => {
         initial[cat.quiz.id] = {
           quizOpen: false,
@@ -73,11 +74,9 @@ const Home: React.FC = () => {
       });
 
       setModalStates(initial);
-      initialized.current = true;
     }
-  }, [safeCategories]);
+  }, [safeCategories.length]);
 
-  // Abrir / cerrar modales por quizId
   const toggleQuizModal = (quizId: string, open: boolean) => {
     setModalStates((prev) => ({
       ...prev,
@@ -99,29 +98,38 @@ const Home: React.FC = () => {
     }));
   };
 
-  // Inicializar sesión
+  // Obtener sesión
   useEffect(() => {
     supabase.auth.getSession().then((session) => {
       setUserId(session.data.session?.user?.id ?? "");
     });
   }, []);
 
-  // Manejar finalización del quiz
+  // 🔥 Manejar finalización del quiz
   const handleQuizCompletion = (
     index: number,
     activeQuiz: Category,
     score: number,
     interpretation: string
   ) => {
+    const quizId = activeQuiz.quiz.id;
+
     // Guardar resultado
     setResults((prev) => ({
       ...prev,
-      [activeQuiz.quiz.id]: { score, interpretation },
+      [quizId]: { score, interpretation },
     }));
 
-    // Abrir modal de resultados para ese quiz
-    toggleQuizModal(activeQuiz.quiz.id, false);
-    toggleResultModal(activeQuiz.quiz.id, true);
+    // Cambiar estado de modales SOLO para el quiz respondido
+    setModalStates((prev) => ({
+      ...prev,
+      [quizId]: {
+        ...prev[quizId],
+        quizOpen: false,
+        resultOpen: true,
+        recommendOpen: false,
+      },
+    }));
   };
 
   if (loading) {
@@ -170,7 +178,9 @@ const Home: React.FC = () => {
             recommendModalOpen={state.recommendOpen}
             setQuizModalOpen={(open) => toggleQuizModal(cat.quiz.id, open)}
             setResultModalOpen={(open) => toggleResultModal(cat.quiz.id, open)}
-            setRecommendModalOpen={(open) => toggleRecommendModal(cat.quiz.id, open)}
+            setRecommendModalOpen={(open) =>
+              toggleRecommendModal(cat.quiz.id, open)
+            }
             QuizComponentToRender={quizComponents[cat.quiz.id as QuizKey]}
             handleQuizCompletion={handleQuizCompletion}
           />

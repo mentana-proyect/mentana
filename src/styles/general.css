@@ -255,13 +255,11 @@ background-color: #56dbc4;
 .calculate-row {
   background: var(--primary);
   color: var(--text);
-  /* Estilos agregados para asegurar que el botón principal se centre correctamente */
   width: 100%; /* El botón ocupa todo el ancho de su contenedor */
-  max-width: 200px; /* Limita el ancho máximo para que no se vea demasiado grande */
   display: block; /* Ahora es un elemento de bloque */
   margin: 0 auto; /* Centrado automático de bloque */
   padding: 12px 8px;
-  border-radius: 50px;border: 1px solid #56dbc4;
+  border-radius: 16px;border: 1px solid #56dbc4;
 }
 .calculate-row:hover {
   background-color: #56dbc4;

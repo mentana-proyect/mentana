@@ -443,4 +443,69 @@ body {
 
 .cls-2 {
   fill: #79e7d3;
+}/* ======================= */
+/* 🎛️ BOTONES AUTH */
+/* ======================= */
+
+.buttonsWrapper {
+  display: flex;
+  flex-direction: column; /* Desktop: vertical */
+  gap: 14px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 🔹 Botón principal (Ingresar / Registrarme) */
+.submitButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #ff8cd3;
+  color: white;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 🔸 Botón secundario (Cambiar modo) */
+.switchButton {
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #56dbc4;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.switchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 📱 Mobile: botones en una sola fila */
+@media (max-width: 600px) {
+  .buttonsWrapper {
+    flex-direction: row;        /* Horizontal */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .submitButton,
+  .switchButton {
+    width: auto;               /* Evita que se estiren */
+    flex: 1;                   /* Ambos ocupan el mismo espacio */
+    white-space: nowrap;       /* Evita saltos de línea */
+  }
 }
