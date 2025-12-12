@@ -1,7 +1,7 @@
 import React from "react";
 import QuizCard from "../../../components/QuizCard";
-import DockFooter from "../../../components/DockFooter";
 import { Category } from "../../../components/useProgress";
+import Footer from "../../../components/Footer";
 
 interface ResultsRecord {
   [quizId: string]: {
@@ -10,74 +10,69 @@ interface ResultsRecord {
   };
 }
 
-// Firmas exactas que parece que tu padre está pasando
-type SetActiveQuizFn = (q: Category | null) => void;
-type SetActiveIndexFn = (i: number | null) => void;
-type SetBoolFn = (v: boolean) => void;
-type SetResultsFn = (updater: ResultsRecord | ((prev: ResultsRecord) => ResultsRecord)) => void;
+type SetResultsFn = (
+  updater: ResultsRecord | ((prev: ResultsRecord) => ResultsRecord)
+) => void;
 
 interface Props {
   categories: Category[];
   refreshTrigger: number;
   logout: () => void;
 
-  // aquí usamos las firmas simples que el padre provee
-  setActiveQuiz: SetActiveQuizFn;
-  setActiveIndex: SetActiveIndexFn;
-
-  setResultModalOpen: SetBoolFn;
-  setRecommendModalOpen: SetBoolFn;
+  // Recibimos directamente funciones para abrir por quizId
+  openQuizModal: (quiz: Category, index: number) => void;
+  openResultModal: (quizId: string) => void;
+  openRecommendModal: (quizId: string) => void;
 
   setResults: SetResultsFn;
   results: ResultsRecord;
 }
 
-const PerfilSection = ({
+const PerfilSection: React.FC<Props> = ({
   categories,
   refreshTrigger,
   logout,
-  setActiveQuiz,
-  setActiveIndex,
-  setResultModalOpen,
-  setRecommendModalOpen,
+  openQuizModal,
+  openResultModal,
+  openRecommendModal,
   setResults,
   results,
-}: Props) => {
+}) => {
   return (
-    <main className="perfil-container">
-      {categories.map((cat, index) => (
-        <QuizCard
-          key={cat.name}
-          cat={cat}
-          index={index}
-          refreshTrigger={refreshTrigger}
-          openModal={() => {
-            if (!cat.quiz.completed) {
-              setActiveQuiz(cat);
-              setActiveIndex(index);
-            }
-          }}
-          openResult={(q, i, result) => {
-            setActiveQuiz(q);
-            setActiveIndex(i);
-            setResultModalOpen(true);
+    <>
+      <main className="perfil-container">
+        {categories.map((cat, index) => (
+          <QuizCard
+            key={cat.name}
+            cat={cat}
+            index={index}
+            refreshTrigger={refreshTrigger}
+            
+            /* ---- ABRIR QUIZ ---- */
+            openModal={() => {
+              openQuizModal(cat, index);
+            }}
 
-            // setResults acepta tanto un objeto como una función actualizadora
-            setResults((prev: ResultsRecord) => ({
-              ...prev,
-              [q.quiz.id]: result,
-            }));
-          }}
-          openRecomendacion={(q, i) => {
-            setActiveQuiz(q);
-            setActiveIndex(i);
-            setRecommendModalOpen(true);
-          }}
-        />
-      ))}
+            /* ---- ABRIR RESULTADOS ---- */
+            openResult={(q, i, result) => {
+              openResultModal(q.quiz.id);
 
-      <DockFooter logout={logout} />
-    </main>
+              setResults((prev: ResultsRecord) => ({
+                ...prev,
+                [q.quiz.id]: result,
+              }));
+            }}
+
+            /* ---- ABRIR RECOMENDACIÓN ---- */
+            openRecomendacion={(q) => {
+              openRecommendModal(q.quiz.id);
+            }}
+          />
+        ))}
+
+        <Footer />
+      </main>
+    </>
   );
 };
 

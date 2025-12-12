@@ -100,7 +100,6 @@ textarea:focus {
   margin: 10px auto;
   padding: 20px;
   background: var(--card-bg);
-  border: 1px solid var(--card-border);
   border-radius: var(--radius);
   backdrop-filter: blur(12px);
   box-shadow: 0 6px 25px rgba(0,0,0,0.25);
@@ -109,9 +108,9 @@ textarea:focus {
 
 .daily-notes-title {
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .daily-note-input {
@@ -127,7 +126,7 @@ textarea:focus {
   background: var(--primary);
   color: #112244;
   font-weight: 600;
-  border-radius: var(--radius);
+  border-radius: 16px;
   border: none;
   cursor: pointer;
   transition: var(--transition);
@@ -138,6 +137,7 @@ textarea:focus {
 
 .save-note-btn:hover {
   background: #3abfa7;
+  
 }
 
 .notes-history {

@@ -1,104 +1,64 @@
 import { useState } from "react";
 import { Category } from "../../../components/useProgress";
 
-interface ResultsMap {
-  [key: string]: {
-    score: number;
-    interpretation: string;
-  };
-}
-
-type SetCategories = React.Dispatch<React.SetStateAction<Category[] | null>>;
-type SetResults = React.Dispatch<React.SetStateAction<ResultsMap>>;
-
-type BaseHandleQuizCompletion = (
+export type HandleQuizCompletion = (
   index: number,
   quiz: Category,
   score: number,
-  interpretation: string,
-  setShowConfetti: (v: boolean) => void,
-  toggleModals: (mode: "quiz" | "result") => void
+  interpretation: string
 ) => void;
 
-interface UseQuizManagerReturn {
+export interface UseQuizManagerReturn {
   activeQuiz: Category | null;
   activeIndex: number | null;
-  setActiveQuiz: (quiz: Category | null) => void;
-  setActiveIndex: (index: number | null) => void;
+  handleQuizCompletion: HandleQuizCompletion;
   showConfetti: boolean;
-  handleQuizCompletion: (
-    index: number,
-    quiz: Category,
-    score: number,
-    interpretation: string
-  ) => void;
+  openQuizModal: (quiz: Category, index: number) => void;
 }
 
 export const useQuizManager = (
-  categories: Category[] | null,
-  setCategories: SetCategories,
-  results: ResultsMap,
-  setResults: SetResults,
-  baseHandleQuizCompletion: BaseHandleQuizCompletion,
-  setQuizModalOpen: (v: boolean) => void,
-  setResultModalOpen: (v: boolean) => void
+  categories: Category[],
+  setCategories: (cats: Category[]) => void,
+  results: Record<string, any>,
+  setResults: (res: Record<string, any>) => void,
+  baseHandleQuizCompletion: any,
+  setActiveModal: (
+    mode: "quiz" | "resultado" | "recomendacion" | null
+  ) => void
 ): UseQuizManagerReturn => {
   const [activeQuiz, setActiveQuiz] = useState<Category | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const handleQuizCompletion = (
-    index: number,
-    quiz: Category,
-    score: number,
-    interpretation: string
+  const handleQuizCompletion: HandleQuizCompletion = async (
+    index,
+    quiz,
+    score,
+    interpretation
   ) => {
-    if (index == null) return;
-
-    setCategories((prev) =>
-      prev
-        ? prev.map((cat, i) =>
-            i === index
-              ? {
-                  ...cat,
-                  quiz: {
-                    ...cat.quiz,
-                    completed: true,
-                    completedAt: new Date().toISOString(),
-                  },
-                }
-              : cat
-          )
-        : prev
-    );
-
-    setResults((prev) => ({
-      ...prev,
-      [quiz.quiz.id]: { score, interpretation },
-    }));
-
-    setShowConfetti(true);
-    setResultModalOpen(true);
-
-    baseHandleQuizCompletion(
+    await baseHandleQuizCompletion(
       index,
       quiz,
       score,
       interpretation,
-      setShowConfetti,
-      (mode) => {
-        setQuizModalOpen(mode === "quiz");
-        setResultModalOpen(mode === "result");
-      }
+      () => setShowConfetti(true),
+      () => setActiveModal("resultado")
     );
+
+    setTimeout(() => setShowConfetti(false), 3000);
+  };
+
+  const openQuizModal = (quiz: Category, index: number) => {
+    setActiveQuiz(quiz);
+    setActiveIndex(index);
+    setActiveModal("quiz");
   };
 
   return {
     activeQuiz,
     activeIndex,
-    setActiveQuiz,
-    setActiveIndex,
-    showConfetti,
     handleQuizCompletion,
+    showConfetti,
+    openQuizModal,
   };
 };

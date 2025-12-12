@@ -1,59 +1,102 @@
 "use client";
 import React from "react";
+import "./recommendation.css";
+import Footer from "../components/Footer";
 
 export const getRecommendation = (quizType: string, score: number): string => {
   switch (quizType) {
     case "ansiedad":
       if (score <= 4)
-        return "Ansiedad mínima. Mantén tus hábitos saludables: dormir bien, hacer pausas y cuidar tu respiración.";
+        return "Tu nivel de ansiedad es bajo 🤍 Sigue cultivando hábitos que cuidan tu bienestar emocional.";
       if (score <= 9)
-        return "Ansiedad leve. Practica ejercicios de respiración o mindfulness. Sal a caminar, mantén contacto con personas de confianza.";
+        return "Estás presentando ansiedad leve 🌿 Practicar respiración consciente o caminar te ayudará a relajarte.";
       if (score <= 14)
-        return "Ansiedad moderada. Reduce la cafeína y las pantallas antes de dormir. Dedica tiempo a actividades relajantes como leer o salir al aire libre.";
-      return "Ansiedad alta. Busca apoyo psicológico o consejería. Realiza actividades calmantes diarias y evita la sobreexposición a noticias o redes sociales.";
+        return "Ansiedad moderada 💛 Es buen momento para reducir estímulos y priorizar actividades calmantes.";
+      return "Ansiedad alta ❤️‍🩹 Considera apoyo profesional y reduce fuentes de estrés. No estás solo.";
+
     case "depresion":
       if (score <= 4)
-        return "Estado de ánimo estable. Continúa con rutinas que te ayuden a sentirte bien, como ejercicio ligero y contacto social.";
+        return "Tu estado de ánimo se encuentra estable 🌞 Mantén actividades que te generen bienestar.";
       if (score <= 9)
-        return "Síntomas leves. Trata de mantener una rutina con pequeñas metas diarias: caminar, escuchar música o cocinar algo que disfrutes.";
+        return "Síntomas leves 🌿 Apunta a pequeñas metas diarias: moverte un poco, salir, conectar con otros.";
       if (score <= 14)
-        return "Depresión moderada. Hablar con alguien de confianza puede ayudar. Intenta actividades que te conecten con otros y evita aislarte.";
+        return "Depresión moderada 💛 Conversar con alguien cercano o un profesional puede ayudarte mucho.";
       if (score <= 19)
-        return "Depresión moderadamente grave. Es recomendable buscar orientación profesional. Mantén hábitos de sueño regulares y sal a tomar aire fresco cada día.";
-      return "Depresión grave. Prioriza el apoyo profesional. No enfrentes esto solo; hablar con un terapeuta o médico puede marcar la diferencia.";
+        return "Depresión moderadamente grave ❤️‍🩹 Buscar orientación profesional es altamente recomendable.";
+      return "Depresión grave 🧡 Prioriza apoyo profesional. Mereces sentirte mejor y no enfrentar esto solo.";
+
     case "estres":
       if (score <= 13)
-        return "Estrés bajo. Mantén tus hábitos saludables y tiempo de descanso. Hacer pausas durante el día te ayudará a conservar el equilibrio.";
+        return "Estás manejando bien tu nivel de estrés 🌞 Sigue cuidando tus espacios de descanso.";
       if (score <= 19)
-        return "Estrés leve. Realiza actividades físicas suaves, estiramientos o caminatas cortas. Aprende a decir 'no' cuando lo necesites.";
+        return "Estrés leve 🌿 Intenta pausas activas, estiramientos y respiración profunda.";
       if (score <= 26)
-        return "Estrés moderado. Organiza tus tareas por prioridad, busca apoyo emocional y reserva tiempo para desconectarte del trabajo o estudios.";
-      return "Estrés alto. Intenta técnicas de relajación (respiración 4-7-8, meditación guiada). Si el estrés es persistente, consulta a un profesional.";
+        return "Estrés moderado 💛 Organiza tus tareas, desconéctate de pantallas y busca apoyo emocional.";
+      return "Estrés alto ❤️‍🩹 Prueba técnicas de relajación guiada y considera hablar con un profesional.";
+
     case "soledad":
       if (score <= 20)
-        return "Bajo nivel de soledad. Mantén tus vínculos y participa en actividades sociales que disfrutes.";
+        return "Tu nivel de soledad es bajo 🤍 Continúa fortaleciendo tus redes sociales.";
       if (score <= 40)
-        return "Soledad moderada. Busca momentos de conexión: conversar con amigos, asistir a un taller o grupo, o participar en actividades comunitarias.";
-      return "Soledad alta. Considera unirte a espacios grupales o de voluntariado. Si la sensación de aislamiento persiste, hablar con un profesional puede ser de gran ayuda.";
+        return "Soledad moderada 🌿 Busca espacios de conexión: talleres, actividades comunitarias o grupos.";
+      return "Soledad alta ❤️‍🩹 Conectarte con otros o con un profesional puede ayudarte a sentirte acompañado.";
+
     default:
       return "No hay recomendaciones disponibles para este test.";
   }
 };
 
-// Componente que renderiza la recomendación
+// Nivel visual según score (color + tono emocional)
+const getLevelInfo = (quizType: string, score: number) => {
+  if (quizType === "ansiedad") {
+    if (score <= 4) return { label: "Bajo", color: "level-low" };
+    if (score <= 9) return { label: "Leve", color: "level-mild" };
+    if (score <= 14) return { label: "Moderado", color: "level-mid" };
+    return { label: "Alto", color: "level-high" };
+  }
+
+  if (quizType === "depresion") {
+    if (score <= 4) return { label: "Estable", color: "level-low" };
+    if (score <= 9) return { label: "Leve", color: "level-mild" };
+    if (score <= 14) return { label: "Moderado", color: "level-mid" };
+    if (score <= 19) return { label: "Moderado-Alto", color: "level-midHigh" };
+    return { label: "Alto", color: "level-high" };
+  }
+
+  if (quizType === "estres") {
+    if (score <= 13) return { label: "Bajo", color: "level-low" };
+    if (score <= 19) return { label: "Leve", color: "level-mild" };
+    if (score <= 26) return { label: "Moderado", color: "level-mid" };
+    return { label: "Alto", color: "level-high" };
+  }
+
+  if (quizType === "soledad") {
+    if (score <= 20) return { label: "Bajo", color: "level-low" };
+    if (score <= 40) return { label: "Moderado", color: "level-mid" };
+    return { label: "Alto", color: "level-high" };
+  }
+
+  return { label: "—", color: "" };
+};
+
 interface RecommendationProps {
-  quizId: string; // puede ser 'ansiedad1', 'depresion1', etc.
+  quizId: string;
   score: number;
 }
 
 const Recommendation: React.FC<RecommendationProps> = ({ quizId, score }) => {
-  // Extrae el tipo real del quiz (elimina números)
   const quizType = quizId.replace(/[0-9]/g, "");
   const recommendation = getRecommendation(quizType, score);
+  const { label, color } = getLevelInfo(quizType, score);
 
   return (
-    <div style={{ textAlign: "center", padding: "1rem" }}>
-      <p style={{ fontWeight: "bold", margin: 0 }}>{recommendation}</p>
+    <div className={`recommendation-card ${color}`}>
+      <div className="rec-header">
+        <h2 className="recommendation-title">Tu recomendación</h2>
+        
+      </div>
+
+      <p className="recommendation-text">{recommendation}</p><Footer />
     </div>
   );
 };

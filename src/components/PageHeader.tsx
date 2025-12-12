@@ -24,6 +24,7 @@ export default function Header() {
         <circle fill="#ff8cd3" cx="454.93" cy="625.36" r="37.24" />
         <circle fill="#ff8cd3" cx="596.8" cy="625.41" r="37.24" />
       </svg>
+      
     </header>
   );
 }

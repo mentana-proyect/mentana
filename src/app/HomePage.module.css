@@ -25,6 +25,7 @@ html, body {
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .contenedorPrincipal {
+  margin: 10px;
   width: 95%;
   max-width: 450px;
   padding: 25px;
@@ -34,22 +35,31 @@ html, body {
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   align-items: center;
   text-align: center;
 }
 
 /* ===== HEADER ===== */
+/* ===== HEADER ===== */
 .header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: -85px;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: -80px; /* ajustado para que no baje tanto */
+  margin-top: -10px;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: row;       /* ⬅ Logo + texto en fila */
+  align-items: center;       /* ⬅ Centrados verticalmente */
+  gap: 12px;                 /* ⬅ Espacio entre logo y texto */
 }
 
 .logo {
-  margin-top: -10px;
-  width: 160px;
+  margin-top: 0;
+  width: 150px;
   height: auto;
   border-radius: 12px;
   object-fit: contain;
@@ -62,11 +72,12 @@ html, body {
 
 .tituloPrincipal {
   color: #e2e8f0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  text-align: center;
   margin: 0;
+  text-align: left;          /* ⬅ Para que el texto quede alineado */
 }
+
 
 /* ===== CARRUSEL ===== */
 .carruselSection {
@@ -123,13 +134,13 @@ html, body {
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  margin-top: -40px;
+  margin-top: -60px;
 }
 
 .btn {
   flex: 1;
   padding: 10px;
-  border-radius: 50px;
+  border-radius: 16px;
   border: none;
   font-size: 16px;
   cursor: pointer;
@@ -162,6 +173,7 @@ html, body {
 
 /* ===== FOOTER ===== */
 .footer {
+  margin-top: 10px;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -204,12 +216,8 @@ html, body {
   max-width: 200px; /* tamaño máximo */
   height: auto;
   transition: transform 0.3s ease;
-  margin-top: -60px;
-  margin-bottom: -60px;
+  margin-top: -80px;
+  margin-bottom: -80px;
 }
 
-/* Efecto opcional al pasar el mouse */
-.svgResponsive:hover {
-  transform: scale(1.05);
-}
 

@@ -1,0 +1,16 @@
+.imagenMotivacional {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.svgResponsive {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  transition: transform 0.3s ease;
+  margin-top: -60px;
+  margin-bottom: -60px;
+}

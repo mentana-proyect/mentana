@@ -16,16 +16,20 @@
 
 /* 🔹 Contenedor del modal */
 .modal-content {
- background:  #112244;
+  background: #112244;
   max-width: 450px;
   width: 95%;
   position: relative;
-  max-height: 100vh;
-  overflow-y: auto;
+
+  /* FIX: ahora funciona correctamente */
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 16px;
+  overflow: hidden; /* mantiene el borde redondeado */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   animation: fadeIn 0.3s ease-in-out;
-  border-radius: 16px; /* 🔹 borde más suave */
-  overflow: hidden;    /* 🔹 asegura que header/body respeten el border-radius */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); /* 🔹 sombra elegante */
 }
 /* Ocultar la barra de scroll */
 .modal-content::-webkit-scrollbar {

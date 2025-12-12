@@ -4,11 +4,10 @@ import "./globals.css";
 import styles from "./HomePage.module.css";
 import Header from "../components/PageHeader";
 import SvgTextInit from "../components/svgTextInit";
-import SvGImgPleople from "../components/svgImgPleople";
+import SvgImgPleople from "../components/svgImgPleople";
 import SvgTextPost from "../components/svgTextPost";
 import BotonesAccion from "../components/PageBotonesAccion";
 import Footer from "../components/Footer";
-
 
 export default function HomePage() {
   return (
@@ -16,26 +15,8 @@ export default function HomePage() {
       <main className={styles.contenedorPrincipal}>
         <Header />
         <SvgTextInit />
-        <SvGImgPleople />
+        <SvgImgPleople />
         <SvgTextPost />
-        <section className={styles.textoMotivacional}>
-
-          <p><svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="22"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="8 12 16 20 24 12" />
-          </svg>
-          </p>
-
-
-        </section>
         <BotonesAccion />
         <Footer />
       </main>

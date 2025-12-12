@@ -1,13 +1,4 @@
-/* Contenedor principal de la página */
-.page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #112244; /* Fondo oscuro */
-  color: #e5e7eb; /* Texto claro */
-  padding: 20px;
-}
+
 
 /* Contenedor del formulario */
 .container {

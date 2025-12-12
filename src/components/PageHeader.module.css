@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -85px;
+}
+
+.logo {
+  margin-top: -10px;
+  width: 160px;
+  height: auto;
+  border-radius: 12px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.tituloPrincipal {
+  color: #e2e8f0;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .tituloPrincipal {
+    font-size: 22px;
+  }
+}
