@@ -3,7 +3,7 @@ import React, { Suspense } from "react";
 import Modal from "../../../components/modal";
 import ResultView from "../../../components/ResultView";
 import Recommendation from "../../../components/Recommendation";
-import { Category } from "../../../components/useProgress"; // Importa Category correctamente
+import { Category } from "../../../components/useProgress";
 
 interface ResultsRecord {
   [quizId: string]: {
@@ -52,20 +52,30 @@ const QuizModals = ({
   QuizComponentToRender,
   handleQuizCompletion,
 }: Props) => {
+
+  // ---------------------------------------------------
+  // Render del quiz
+  // ---------------------------------------------------
   const renderQuizContent = () => {
     if (!QuizComponentToRender || !activeQuiz || activeIndex === null) return null;
 
     return (
       <Suspense fallback={<div style={{ padding: 20 }}>Cargando cuestionario…</div>}>
         <QuizComponentToRender
-          onResult={(score, interpretation) =>
-            handleQuizCompletion(activeIndex, activeQuiz, score, interpretation)
-          }
+          onResult={(score, interpretation) => {
+            handleQuizCompletion(activeIndex, activeQuiz, score, interpretation);
+
+            // Cerrar el modal del quiz inmediatamente
+            setQuizModalOpen(false);
+          }}
         />
       </Suspense>
     );
   };
 
+  // ---------------------------------------------------
+  // Render del resultado
+  // ---------------------------------------------------
   const renderResultContent = () => {
     if (!activeQuiz) return null;
 
@@ -80,6 +90,9 @@ const QuizModals = ({
     );
   };
 
+  // ---------------------------------------------------
+  // Render de las recomendaciones
+  // ---------------------------------------------------
   const renderRecommendationContent = () => {
     if (!activeQuiz) return null;
 
@@ -90,14 +103,17 @@ const QuizModals = ({
 
   return (
     <>
+      {/* QUIZ MODAL */}
       <Modal isOpen={quizModalOpen} onClose={() => setQuizModalOpen(false)}>
         {renderQuizContent()}
       </Modal>
 
+      {/* RESULT MODAL */}
       <Modal isOpen={resultModalOpen} onClose={() => setResultModalOpen(false)}>
         {renderResultContent()}
       </Modal>
 
+      {/* RECOMMENDATION MODAL */}
       <Modal isOpen={recommendModalOpen} onClose={() => setRecommendModalOpen(false)}>
         {renderRecommendationContent()}
       </Modal>

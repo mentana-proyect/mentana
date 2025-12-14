@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import Confetti from "react-confetti";
 import "../../styles/home.css";
@@ -45,19 +46,26 @@ const Home: React.FC = () => {
   const logout = useLogout();
   useInactivityTimer(logout);
 
-  const { categories, setCategories, results, setResults, loading } =
+  const { categories, results, setResults, loading } =
     useFetchProgress(initialData);
 
-  // Evita que cambie la referencia en cada render
   const safeCategories = React.useMemo(() => categories || [], [categories]);
 
-  const [activeView, setActiveView] = useState<"diario" | "perfil">("diario");
-  const [userId, setUserId] = useState("");
+  const [activeView, setActiveView] =
+    useState<"diario" | "perfil">("diario");
 
-  const [modalStates, setModalStates] = useState<Record<string, ModalState>>({});
+  const [viewLoading, setViewLoading] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const [modalStates, setModalStates] =
+    useState<Record<string, ModalState>>({});
+
   const initialized = useRef(false);
 
-  // Inicializar modales 1 vez
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  /* ---------------- Inicializar modales ---------------- */
   useEffect(() => {
     if (initialized.current) return;
 
@@ -77,6 +85,19 @@ const Home: React.FC = () => {
     }
   }, [safeCategories.length]);
 
+  /* ---------------- Cambio de vista con loader ---------------- */
+  const handleViewChange = (view: "diario" | "perfil") => {
+    if (view === activeView) return;
+
+    setViewLoading(true);
+
+    setTimeout(() => {
+      setActiveView(view);
+      setViewLoading(false);
+    }, 1000);
+  };
+
+  /* ---------------- Helpers modales ---------------- */
   const toggleQuizModal = (quizId: string, open: boolean) => {
     setModalStates((prev) => ({
       ...prev,
@@ -98,15 +119,15 @@ const Home: React.FC = () => {
     }));
   };
 
-  // Obtener sesión
+  /* ---------------- User ID ---------------- */
   useEffect(() => {
     supabase.auth.getSession().then((session) => {
       setUserId(session.data.session?.user?.id ?? "");
     });
   }, []);
 
-  // 🔥 Manejar finalización del quiz
-  const handleQuizCompletion = (
+  /* ---------------- Completar quiz ---------------- */
+  const handleQuizCompletion = async (
     index: number,
     activeQuiz: Category,
     score: number,
@@ -114,13 +135,11 @@ const Home: React.FC = () => {
   ) => {
     const quizId = activeQuiz.quiz.id;
 
-    // Guardar resultado
     setResults((prev) => ({
       ...prev,
       [quizId]: { score, interpretation },
     }));
 
-    // Cambiar estado de modales SOLO para el quiz respondido
     setModalStates((prev) => ({
       ...prev,
       [quizId]: {
@@ -130,8 +149,34 @@ const Home: React.FC = () => {
         recommendOpen: false,
       },
     }));
+
+    setRefreshTrigger((prev) => prev + 1);
+
+    setTimeout(() => {
+      setModalStates((prev) => ({
+        ...prev,
+        [quizId]: {
+          ...prev[quizId],
+          resultOpen: false,
+        },
+      }));
+    }, 3000);
+
+    localStorage.setItem("showConfetti", "true");
   };
 
+  /* ---------------- Confetti post refresh ---------------- */
+  useEffect(() => {
+    const flag = localStorage.getItem("showConfetti");
+
+    if (flag === "true") {
+      setShowConfetti(true);
+      localStorage.removeItem("showConfetti");
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }, []);
+
+  /* ---------------- Loader general ---------------- */
   if (loading) {
     return (
       <div className="loader-screen">
@@ -143,9 +188,20 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
+      {/* 🔄 Loader cambio de vista */}
+      {viewLoading && (
+        <div className="view-loading-overlay">
+          <div className="mini-spinner" />
+          <p>Cargando...</p>
+        </div>
+      )}
+
       <div className="daily-notes-container">
-        <ProgressHeaderNote refreshTrigger={0} />
-        <ViewToggle activeView={activeView} setActiveView={setActiveView} />
+        <ProgressHeaderNote refreshTrigger={refreshTrigger} />
+        <ViewToggle
+          activeView={activeView}
+          setActiveView={handleViewChange}
+        />
       </div>
 
       {activeView === "diario" && <NotesSection userId={userId} />}
@@ -155,7 +211,7 @@ const Home: React.FC = () => {
           categories={safeCategories}
           results={results}
           setResults={setResults}
-          refreshTrigger={0}
+          refreshTrigger={refreshTrigger}
           logout={logout}
           openQuizModal={(quiz) => toggleQuizModal(quiz.quiz.id, true)}
           openResultModal={(id) => toggleResultModal(id, true)}
@@ -176,18 +232,30 @@ const Home: React.FC = () => {
             quizModalOpen={state.quizOpen}
             resultModalOpen={state.resultOpen}
             recommendModalOpen={state.recommendOpen}
-            setQuizModalOpen={(open) => toggleQuizModal(cat.quiz.id, open)}
-            setResultModalOpen={(open) => toggleResultModal(cat.quiz.id, open)}
+            setQuizModalOpen={(open) =>
+              toggleQuizModal(cat.quiz.id, open)
+            }
+            setResultModalOpen={(open) =>
+              toggleResultModal(cat.quiz.id, open)
+            }
             setRecommendModalOpen={(open) =>
               toggleRecommendModal(cat.quiz.id, open)
             }
-            QuizComponentToRender={quizComponents[cat.quiz.id as QuizKey]}
+            QuizComponentToRender={
+              quizComponents[cat.quiz.id as QuizKey]
+            }
             handleQuizCompletion={handleQuizCompletion}
           />
         );
       })}
 
-      <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} />
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+        />
+      )}
 
       <DockFooter logout={logout} />
     </div>

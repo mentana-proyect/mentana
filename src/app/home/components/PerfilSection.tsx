@@ -16,63 +16,59 @@ type SetResultsFn = (
 
 interface Props {
   categories: Category[];
-  refreshTrigger: number;
   logout: () => void;
 
-  // Recibimos directamente funciones para abrir por quizId
-  openQuizModal: (quiz: Category, index: number) => void;
+  openQuizModal: (
+    quiz: Category,
+    index: number,
+    onCompleted: () => void
+  ) => void;
   openResultModal: (quizId: string) => void;
   openRecommendModal: (quizId: string) => void;
 
   setResults: SetResultsFn;
   results: ResultsRecord;
+
+  refreshTrigger: number; // ✅ viene desde Home
 }
 
 const PerfilSection: React.FC<Props> = ({
   categories,
-  refreshTrigger,
   logout,
   openQuizModal,
   openResultModal,
   openRecommendModal,
   setResults,
   results,
+  refreshTrigger, // ✅ usar el del padre
 }) => {
   return (
-    <>
-      <main className="perfil-container">
-        {categories.map((cat, index) => (
-          <QuizCard
-            key={cat.name}
-            cat={cat}
-            index={index}
-            refreshTrigger={refreshTrigger}
-            
-            /* ---- ABRIR QUIZ ---- */
-            openModal={() => {
-              openQuizModal(cat, index);
-            }}
+    <main className="perfil-container">
+      {categories.map((cat, index) => (
+        <QuizCard
+          key={cat.quiz.id}
+          cat={cat}
+          index={index}
+          refreshTrigger={refreshTrigger}
+          openModal={() =>
+            openQuizModal(cat, index, () => {
+              // 👇 Home ya incrementa refreshTrigger
+            })
+          }
+          openResult={(q, i, result) => {
+            openResultModal(q.quiz.id);
 
-            /* ---- ABRIR RESULTADOS ---- */
-            openResult={(q, i, result) => {
-              openResultModal(q.quiz.id);
+            setResults((prev: ResultsRecord) => ({
+              ...prev,
+              [q.quiz.id]: result,
+            }));
+          }}
+          openRecomendacion={(q) => openRecommendModal(q.quiz.id)}
+        />
+      ))}
 
-              setResults((prev: ResultsRecord) => ({
-                ...prev,
-                [q.quiz.id]: result,
-              }));
-            }}
-
-            /* ---- ABRIR RECOMENDACIÓN ---- */
-            openRecomendacion={(q) => {
-              openRecommendModal(q.quiz.id);
-            }}
-          />
-        ))}
-
-        <Footer />
-      </main>
-    </>
+      <Footer />
+    </main>
   );
 };
 

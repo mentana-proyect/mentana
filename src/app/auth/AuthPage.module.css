@@ -446,14 +446,23 @@ body {
 }/* ======================= */
 /* 🎛️ BOTONES AUTH */
 /* ======================= */
-
 .buttonsWrapper {
   display: flex;
-  flex-direction: column; /* Desktop: vertical */
+  flex-direction: row;   /* <-- Fila en todos los tamaños */
+  justify-content: center;
+  align-items: center;
   gap: 14px;
   width: 100%;
   margin-top: 10px;
 }
+
+.submitButton,
+.switchButton {
+  flex: 1;              /* ambos ocupan el mismo espacio */
+  width: auto;          /* evita estiramientos raros */
+  white-space: nowrap;  /* evita cortar texto */
+}
+
 
 /* 🔹 Botón principal (Ingresar / Registrarme) */
 .submitButton {

@@ -7,9 +7,13 @@ interface Props {
   cat: Category;
   index: number;
   openModal: (cat: Category, index: number) => void;
-  openResult: (cat: Category, index: number, result: { score: number; interpretation: string }) => void;
+  openResult: (
+    cat: Category,
+    index: number,
+    result: { score: number; interpretation: string }
+  ) => void;
   openRecomendacion: (cat: Category, index: number) => void;
-  refreshTrigger?: number;
+  refreshTrigger?: number; // 🌟 se incrementa cuando se completa un quiz
 }
 
 type ButtonState = {
@@ -27,45 +31,67 @@ const QuizCard: React.FC<Props> = ({
   refreshTrigger = 0,
 }) => {
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
-  const [hasResult, setHasResult] = useState<boolean>(false);
-  const [lastResult, setLastResult] = useState<{ score: number; interpretation: string } | null>(null);
+  const [hasResult, setHasResult] = useState(false);
+  const [lastResult, setLastResult] = useState<{
+    score: number;
+    interpretation: string;
+  } | null>(null);
+
+  // 🔁 Estado interno para forzar actualización al completar quiz
+  const [quizVersion, setQuizVersion] = useState(0);
+
   const [buttonState, setButtonState] = useState<ButtonState>({
     responder: { show: false, disabled: false },
     resultado: { show: false, disabled: false },
     recomendacion: { show: false, disabled: false },
   });
 
-  // Obtener último intento del usuario
+  /* ======================================================
+     1️⃣ Convertir refreshTrigger externo en estado interno
+     ====================================================== */
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      setQuizVersion((v) => v + 1);
+    }
+  }, [refreshTrigger]);
+
+  /* ======================================================
+     2️⃣ Obtener último intento (re-ejecuta al completar quiz)
+     ====================================================== */
   useEffect(() => {
     const fetchLastAttempt = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      const userId = user?.id;
-      if (!userId) return;
+      if (!user) return;
 
       const { data, error } = await supabase
         .from("quiz_progress")
         .select("score, interpretation, last_completed_at")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .eq("quiz_id", cat.quiz.id)
         .order("last_completed_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (error) {
-        console.error("Error al obtener último intento:", error.message || error);
+        console.error("Error al obtener último intento:", error);
         return;
       }
 
       if (data) {
         setHasResult(true);
-        setLastResult({ score: data.score, interpretation: data.interpretation });
+        setLastResult({
+          score: data.score,
+          interpretation: data.interpretation,
+        });
 
         const lastDate = new Date(data.last_completed_at);
-        const diffMs = new Date().getTime() - lastDate.getTime();
-        const remainingDays = 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const diffMs = Date.now() - lastDate.getTime();
+        const remainingDays =
+          30 - Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
         setDaysLeft(remainingDays > 0 ? remainingDays : 0);
       } else {
         setHasResult(false);
@@ -75,9 +101,11 @@ const QuizCard: React.FC<Props> = ({
     };
 
     fetchLastAttempt();
-  }, [cat.quiz.id, refreshTrigger]);
+  }, [cat.quiz.id, quizVersion]);
 
-  // Actualizar estados de botones
+  /* ======================================================
+     3️⃣ Calcular estados de botones
+     ====================================================== */
   useEffect(() => {
     const state: ButtonState = {
       responder: { show: false, disabled: false },
@@ -108,6 +136,9 @@ const QuizCard: React.FC<Props> = ({
     ? `⏳ Disponible en ${daysLeft} día${daysLeft > 1 ? "s" : ""}`
     : "✅ Disponible";
 
+  /* ======================================================
+     4️⃣ Render
+     ====================================================== */
   return (
     <section className="grid">
       <article className="card-content">
@@ -129,7 +160,9 @@ const QuizCard: React.FC<Props> = ({
           {buttonState.resultado.show && (
             <button
               className="action view"
-              onClick={() => lastResult && openResult(cat, index, lastResult)}
+              onClick={() =>
+                lastResult && openResult(cat, index, lastResult)
+              }
               disabled={buttonState.resultado.disabled}
             >
               <b>Resultado</b>
