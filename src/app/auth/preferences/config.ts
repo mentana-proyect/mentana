@@ -201,8 +201,8 @@ export const ButtonStyle = {
   },
   disabled: {
     ...baseButtonStyles,
-    background: "#ccc",
-    color: "#666",
+    background: "#79e7d3",
+    color: "white",
     cursor: "not-allowed",
   },
 };

@@ -6,7 +6,22 @@ import ProgressHeaderPreferences from "../../../components/ProgressHeaderPrefere
 import { questionConfig, styles, ButtonStyle } from "./config";
 
 /* =========================================
-   TIPOS DEL COMPONENTE QUESTION CARD
+   MARCO HEADER + PROGRESO
+========================================= */
+const frameStyle: React.CSSProperties = {
+  gridColumn: "span 12",
+  background: "rgba(255, 255, 255, 0.1)",
+  borderRadius: "16px",
+  padding: "16px",
+  position: "relative",
+  overflow: "hidden",
+  flex: "0 0 100%",
+  scrollSnapAlign: "start",
+  boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
+};
+
+/* =========================================
+   TIPOS QUESTION CARD
 ========================================= */
 interface QuestionCardProps {
   question: string;
@@ -16,7 +31,7 @@ interface QuestionCardProps {
 }
 
 /* =========================================
-   COMPONENTE QUESTION CARD
+   QUESTION CARD
 ========================================= */
 function QuestionCard({
   question,
@@ -34,8 +49,9 @@ function QuestionCard({
 
   return (
     <div style={{ ...styles.card, textAlign: "center" }}>
-      <h2 style={{ ...styles.questcardion, textAlign: "center" }}>{question}</h2>
-      
+      <h2 style={{ ...styles.questcardion, textAlign: "center" }}>
+        {question}
+      </h2>
 
       <div style={{ ...styles.tagContainer, justifyContent: "center" }}>
         {options.map((opt) => {
@@ -65,7 +81,6 @@ function QuestionCard({
 export default function PreferenciasPsicologicas() {
   const router = useRouter();
 
-  // Inicializar respuestas
   const initialAnswers = useMemo(() => {
     return questionConfig.reduce(
       (acc, q) => ({ ...acc, [q.field]: [] as string[] }),
@@ -79,22 +94,17 @@ export default function PreferenciasPsicologicas() {
   const [step, setStep] = useState(1);
   const stepsTotal = questionConfig.length;
 
-  // Actualizar respuestas
   const handleChange = useCallback((field: string, value: string[]) => {
     setAnswers((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // Navegación
   const next = () => setStep((prev) => prev + 1);
   const back = () => setStep((prev) => prev - 1);
 
-  // Validación
   const currentQuestionField = questionConfig[step - 1].field;
   const isCurrentAnswerSelected =
-    answers[currentQuestionField] &&
-    answers[currentQuestionField].length > 0;
+    answers[currentQuestionField]?.length > 0;
 
-  // Guardar en Supabase
   const handleSubmit = async () => {
     const {
       data: { user },
@@ -112,8 +122,7 @@ export default function PreferenciasPsicologicas() {
     });
 
     if (error) {
-      console.error("Error guardando preferencias:", error);
-      alert("Error al guardar las preferencias. Por favor, inténtalo nuevamente.");
+      alert("Error al guardar las preferencias");
       return;
     }
 
@@ -125,31 +134,34 @@ export default function PreferenciasPsicologicas() {
 
   return (
     <div style={{ ...styles.container, textAlign: "center" }}>
-      <ProgressHeaderPreferences />
+      {/* MARCO */}
+      <div style={{ ...frameStyle, marginBottom: "15px" }}>
+        <ProgressHeaderPreferences />
 
-      {/* Barra de progreso */}
-      <div
-        style={{
-          width: "100%",
-          background: "#ddd",
-          height: "10px",
-          borderRadius: "5px",
-          margin: "20px 0",
-          overflow: "hidden",
-        }}
-      >
+        {/* Barra de progreso */}
         <div
           style={{
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, #ff8cd3, #56dbc4)",
-            height: "100%",
+            width: "100%",
+            background: "#ddd",
+            height: "10px",
             borderRadius: "5px",
-            transition: "width 0.3s ease",
+            marginTop: "20px",
+            overflow: "hidden",
           }}
-        />
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              background: "linear-gradient(90deg, #ff8cd3, #56dbc4)",
+              height: "100%",
+              borderRadius: "5px",
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Tarjeta */}
+      {/* TARJETA PREGUNTA (FUERA DEL MARCO) */}
       <QuestionCard
         question={currentQuestion.question}
         options={currentQuestion.options}
@@ -157,16 +169,16 @@ export default function PreferenciasPsicologicas() {
         onChange={(value) => handleChange(currentQuestion.field, value)}
       />
 
-      {/* Botones alineados */}
+      {/* BOTONES */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
           marginTop: "30px",
+          gridColumn: "span 12",
         }}
       >
-        {/* Izquierda */}
         <div>
           {step > 1 && (
             <button onClick={back} style={ButtonStyle.back}>
@@ -175,7 +187,6 @@ export default function PreferenciasPsicologicas() {
           )}
         </div>
 
-        {/* Derecha */}
         <div>
           {step < stepsTotal && (
             <button
