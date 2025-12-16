@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 interface QuizProgress {
@@ -11,11 +11,7 @@ interface Props {
   refreshTrigger?: number;
 }
 
-const TOTAL_QUIZZES = 4;
-
 const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
-  const [completedCount, setCompletedCount] = useState<number>(0);
-
   /* -------------------------------------------
      OBTENER PROGRESO DE QUIZZES
   ------------------------------------------- */
@@ -26,30 +22,19 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
     if (!user?.id) return;
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("quiz_progress")
       .select("quiz_id, completed")
       .eq("user_id", user.id);
 
     if (error) {
       console.error("Error al obtener progreso:", error.message || error);
-      return;
     }
-
-    if (!data) return;
-
-    const completed = data.filter(
-      (q: QuizProgress) => q.completed
-    ).length;
-
-    setCompletedCount(Math.min(completed, TOTAL_QUIZZES));
   }, []);
 
   useEffect(() => {
     fetchProgress();
   }, [fetchProgress, refreshTrigger]);
-
-
 
   return (
     <header>
@@ -77,8 +62,6 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
           </svg>
 
           <h3>Mi Perfil Emocional</h3>
-
-
         </div>
 
         <p style={{ textAlign: "center" }}>

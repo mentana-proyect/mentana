@@ -115,7 +115,7 @@ const Home: React.FC = () => {
     viewTimeoutRef.current = setTimeout(() => {
       setViewLoading(false);
       viewTimeoutRef.current = null;
-    }, 2000);
+    }, 2500);
   };
 
   /* ---------------- User ID ---------------- */
