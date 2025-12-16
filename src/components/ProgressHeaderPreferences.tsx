@@ -8,7 +8,7 @@ interface QuizProgress {
 }
 
 interface Props {
-  refreshTrigger?: number; // Dependencia para refrescar
+  refreshTrigger?: number;
 }
 
 const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
@@ -18,13 +18,17 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
   useEffect(() => {
     const fetchProgress = async () => {
-      setLoading(true); // Cargando
+      setLoading(true);
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       const userId = user?.id;
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase
         .from("quiz_progress")
@@ -42,16 +46,20 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
           (q: QuizProgress) => q.completed
         ).length;
 
-        setCompleted(completedQuizzes > totalQuizzes ? totalQuizzes : completedQuizzes);
+        setCompleted(
+          completedQuizzes > totalQuizzes
+            ? totalQuizzes
+            : completedQuizzes
+        );
       }
 
-      setLoading(false); // Carga terminada
+      setLoading(false);
     };
 
     fetchProgress();
   }, [refreshTrigger]);
 
-  const progress = (completed / totalQuizzes) * 100;
+  const progress = Math.round((completed / totalQuizzes) * 100);
 
   return (
     <header>
@@ -76,10 +84,11 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
               <circle fill="#ff8cd3" cx="454.93" cy="625.36" r="37.24" />
               <circle fill="#ff8cd3" cx="596.8" cy="625.41" r="37.24" />
             </svg>
-          <h3>Preferencias Psicológicas</h3>
-        </div>
 
-        
+          <h3>Preferencias Psicológicas</h3>
+
+      
+        </div>
 
         <p style={{ textAlign: "center" }}>
           <strong>👉 Es tu espacio seguro, pensado para ti 🌱</strong>

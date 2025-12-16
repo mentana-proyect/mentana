@@ -1,74 +1,66 @@
+"use client";
 import React from "react";
-import QuizCard from "../../../components/QuizCard";
 import { Category } from "../../../components/useProgress";
-import Footer from "../../../components/Footer";
 
-interface ResultsRecord {
-  [quizId: string]: {
-    score: number;
-    interpretation: string;
-  };
+interface QuizResult {
+  score: number;
+  interpretation: string;
 }
-
-type SetResultsFn = (
-  updater: ResultsRecord | ((prev: ResultsRecord) => ResultsRecord)
-) => void;
 
 interface Props {
   categories: Category[];
+  results: Record<string, QuizResult>;
+  setResults: React.Dispatch<
+    React.SetStateAction<Record<string, QuizResult>>
+  >;
+  refreshTrigger: number;
   logout: () => void;
 
-  openQuizModal: (
-    quiz: Category,
-    index: number,
-    onCompleted: () => void
-  ) => void;
-  openResultModal: (quizId: string) => void;
-  openRecommendModal: (quizId: string) => void;
-
-  setResults: SetResultsFn;
-  results: ResultsRecord;
-
-  refreshTrigger: number; // ✅ viene desde Home
+  openQuizModal: (cat: Category) => void;
+  openResultModal: (id: string) => void;
+  openRecommendModal: (id: string) => void;
 }
 
 const PerfilSection: React.FC<Props> = ({
   categories,
+  results,
   logout,
   openQuizModal,
   openResultModal,
   openRecommendModal,
-  setResults,
-  results,
-  refreshTrigger, // ✅ usar el del padre
 }) => {
   return (
-    <main className="perfil-container">
-      {categories.map((cat, index) => (
-        <QuizCard
-          key={cat.quiz.id}
-          cat={cat}
-          index={index}
-          refreshTrigger={refreshTrigger}
-          openModal={() =>
-            openQuizModal(cat, index, () => {
-              // 👇 Home ya incrementa refreshTrigger
-            })
-          }
-          openResult={(q, i, result) => {
-            openResultModal(q.quiz.id);
+    <section>
+      {categories.map((cat) => {
+        const quizId = cat.quiz.id;
+        const hasResult = Boolean(results[quizId]);
 
-            setResults((prev: ResultsRecord) => ({
-              ...prev,
-              [q.quiz.id]: result,
-            }));
-          }}
-          openRecomendacion={(q) => openRecommendModal(q.quiz.id)}
-        />
-      ))}
+        return (
+          <div key={quizId}>
+            {/* ✅ ACCESO CORRECTO */}
+            <h3>{cat.quiz.title}</h3>
 
-      <Footer />
-    </main>
+            <button onClick={() => openQuizModal(cat)}>
+              Iniciar Quiz
+            </button>
+
+            {hasResult && (
+              <>
+                <button onClick={() => openResultModal(quizId)}>
+                  Ver Resultado
+                </button>
+
+                <button onClick={() => openRecommendModal(quizId)}>
+                  Recomendaciones
+                </button>
+              </>
+            )}
+          </div>
+        );
+      })}
+
+      <button onClick={logout}>Cerrar sesión</button>
+    </section>
   );
 };
 

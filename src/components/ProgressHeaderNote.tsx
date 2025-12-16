@@ -80,7 +80,7 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
           <h3>Mi Perfil Emocional</h3>
 
-          
+
         </div>
 
         <p style={{ textAlign: "center" }}>
