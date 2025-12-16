@@ -115,11 +115,11 @@ const Home: React.FC = () => {
     setActiveView(view);     // monta la vista
     setViewLoading(true);   // muestra spinner
 
-    // ⏱️ spinner máximo 3s
+    // ⏱️ spinner máximo 2s
     viewTimeoutRef.current = setTimeout(() => {
       setViewLoading(false);
       viewTimeoutRef.current = null;
-    }, 3000);
+    }, 2000);
   };
 
   /* ---------------- User ID ---------------- */
