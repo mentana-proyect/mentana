@@ -14,27 +14,27 @@ type ResultsRecord = Record<string, QuizResult>;
 
 interface Props {
   categories: Category[];
-  results: ResultsRecord;
+  results: ResultsRecord; // se mantiene
   setResults: React.Dispatch<React.SetStateAction<ResultsRecord>>;
   refreshTrigger: number;
 
-  logout: () => void;
+  logout: () => void; // se mantiene
 
   openQuizModal: (quiz: Category, index: number) => void;
   openResultModal: (quizId: string) => void;
   openRecommendModal: (quizId: string) => void;
 }
 
-const PerfilSection: React.FC<Props> = ({
-  categories,
-  results,
-  setResults,
-  refreshTrigger,
-  logout,
-  openQuizModal,
-  openResultModal,
-  openRecommendModal,
-}) => {
+const PerfilSection: React.FC<Props> = (props) => {
+  const {
+    categories,
+    setResults,
+    refreshTrigger,
+    openQuizModal,
+    openResultModal,
+    openRecommendModal,
+  } = props;
+
   return (
     <main className="perfil-container">
       {categories.map((cat, index) => (

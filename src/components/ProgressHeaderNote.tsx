@@ -49,9 +49,7 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
     fetchProgress();
   }, [fetchProgress, refreshTrigger]);
 
-  const progressPercent = Math.round(
-    (completedCount / TOTAL_QUIZZES) * 100
-  );
+
 
   return (
     <header>
