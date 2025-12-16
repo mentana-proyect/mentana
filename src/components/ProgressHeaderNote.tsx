@@ -2,10 +2,7 @@
 import React, { useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-interface QuizProgress {
-  quiz_id: string;
-  completed: boolean;
-}
+
 
 interface Props {
   refreshTrigger?: number;
