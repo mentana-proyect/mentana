@@ -16,7 +16,6 @@ type SetResultsFn = (
 
 interface Props {
   categories: Category[];
-  logout: () => void;
 
   openQuizModal: (
     quiz: Category,
@@ -27,20 +26,16 @@ interface Props {
   openRecommendModal: (quizId: string) => void;
 
   setResults: SetResultsFn;
-  results: ResultsRecord;
-
-  refreshTrigger: number; // ✅ viene desde Home
+  refreshTrigger: number;
 }
 
 const PerfilSection: React.FC<Props> = ({
   categories,
-  logout,
   openQuizModal,
   openResultModal,
   openRecommendModal,
   setResults,
-  results,
-  refreshTrigger, // ✅ usar el del padre
+  refreshTrigger,
 }) => {
   return (
     <main className="perfil-container">
@@ -52,13 +47,13 @@ const PerfilSection: React.FC<Props> = ({
           refreshTrigger={refreshTrigger}
           openModal={() =>
             openQuizModal(cat, index, () => {
-              // 👇 Home ya incrementa refreshTrigger
+              // Home ya maneja el refreshTrigger
             })
           }
           openResult={(q, i, result) => {
             openResultModal(q.quiz.id);
 
-            setResults((prev: ResultsRecord) => ({
+            setResults((prev) => ({
               ...prev,
               [q.quiz.id]: result,
             }));

@@ -175,7 +175,7 @@ export default function PreferenciasPsicologicas() {
           display: "flex",
           justifyContent: "space-between",
           width: "100%",
-          marginTop: "30px",
+          marginTop: "16px",
           gridColumn: "span 12",
         }}
       >

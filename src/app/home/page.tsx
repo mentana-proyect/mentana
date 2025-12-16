@@ -67,23 +67,25 @@ const Home: React.FC = () => {
 
   /* ---------------- Inicializar modales ---------------- */
   useEffect(() => {
-    if (initialized.current) return;
+  if (initialized.current) return;
 
-    if (safeCategories.length > 0) {
-      initialized.current = true;
+  if (safeCategories.length > 0) {
+    initialized.current = true;
 
-      const initial: Record<string, ModalState> = {};
-      safeCategories.forEach((cat) => {
-        initial[cat.quiz.id] = {
-          quizOpen: false,
-          resultOpen: false,
-          recommendOpen: false,
-        };
-      });
+    const initial: Record<string, ModalState> = {};
 
-      setModalStates(initial);
-    }
-  }, [safeCategories.length]);
+    safeCategories.forEach((cat) => {
+      initial[cat.quiz.id] = {
+        quizOpen: false,
+        resultOpen: false,
+        recommendOpen: false,
+      };
+    });
+
+    setModalStates(initial);
+  }
+}, [safeCategories]); // ✅ dependencia correcta
+
 
   /* ---------------- Cambio de vista con loader ---------------- */
   const handleViewChange = (view: "diario" | "perfil") => {
@@ -209,10 +211,8 @@ const Home: React.FC = () => {
       {activeView === "perfil" && (
         <PerfilSection
           categories={safeCategories}
-          results={results}
           setResults={setResults}
           refreshTrigger={refreshTrigger}
-          logout={logout}
           openQuizModal={(quiz) => toggleQuizModal(quiz.quiz.id, true)}
           openResultModal={(id) => toggleResultModal(id, true)}
           openRecommendModal={(id) => toggleRecommendModal(id, true)}

@@ -1,5 +1,4 @@
 import DailyNotes from "../../../components/DailyNotes";
-import { NoteItem } from "../hooks/useNotes";
 import Footer from "../../../components/Footer";
 
 interface Props {

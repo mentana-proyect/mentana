@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 interface NoteItem {
@@ -22,7 +22,9 @@ const DailyNotes: React.FC<Props> = ({ userId }) => {
   /* -------------------------------------------
      CARGAR NOTAS DESDE SUPABASE
   ------------------------------------------- */
-  const loadNotes = async () => {
+  const loadNotes = useCallback(async () => {
+    if (!userId) return;
+
     setLoading(true);
 
     const { data, error } = await supabase
@@ -32,7 +34,7 @@ const DailyNotes: React.FC<Props> = ({ userId }) => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      const formatted = data.map((n) => ({
+      const formatted: NoteItem[] = data.map((n) => ({
         id: n.id,
         text: n.note_text,
         date: new Date(n.created_at).toLocaleString("es-CL", {
@@ -40,15 +42,16 @@ const DailyNotes: React.FC<Props> = ({ userId }) => {
           timeStyle: "short",
         }),
       }));
+
       setNotes(formatted);
     }
 
     setLoading(false);
-  };
+  }, [userId]);
 
   useEffect(() => {
-    if (userId) loadNotes();
-  }, [userId]);
+    loadNotes();
+  }, [loadNotes]);
 
   /* -------------------------------------------
      GUARDAR NOTA EN SUPABASE
@@ -139,7 +142,10 @@ const DailyNotes: React.FC<Props> = ({ userId }) => {
                 <div className="note-text">{n.text}</div>
               </div>
 
-              <div className="delete-icon" onClick={() => deleteNote(i, n.id)}>
+              <div
+                className="delete-icon"
+                onClick={() => deleteNote(i, n.id)}
+              >
                 <svg
                   width="20"
                   height="20"
