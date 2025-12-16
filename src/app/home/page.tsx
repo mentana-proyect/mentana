@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Confetti from "react-confetti";
 import "../../styles/home.css";
 import { supabase } from "../../lib/supabaseClient";
@@ -49,12 +49,14 @@ const Home: React.FC = () => {
   const { categories, results, setResults, loading } =
     useFetchProgress(initialData);
 
-  const safeCategories = React.useMemo(() => categories || [], [categories]);
+  const safeCategories = useMemo(() => categories || [], [categories]);
 
   const [activeView, setActiveView] =
     useState<"diario" | "perfil">("diario");
 
   const [viewLoading, setViewLoading] = useState(false);
+  const viewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [userId, setUserId] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -62,63 +64,45 @@ const Home: React.FC = () => {
     useState<Record<string, ModalState>>({});
 
   const initialized = useRef(false);
-
   const [showConfetti, setShowConfetti] = useState(false);
 
   /* ---------------- Inicializar modales ---------------- */
   useEffect(() => {
-  if (initialized.current) return;
+    if (initialized.current) return;
 
-  if (safeCategories.length > 0) {
-    initialized.current = true;
+    if (safeCategories.length > 0) {
+      initialized.current = true;
 
-    const initial: Record<string, ModalState> = {};
+      const initial: Record<string, ModalState> = {};
+      safeCategories.forEach((cat) => {
+        initial[cat.quiz.id] = {
+          quizOpen: false,
+          resultOpen: false,
+          recommendOpen: false,
+        };
+      });
 
-    safeCategories.forEach((cat) => {
-      initial[cat.quiz.id] = {
-        quizOpen: false,
-        resultOpen: false,
-        recommendOpen: false,
-      };
-    });
+      setModalStates(initial);
+    }
+  }, [safeCategories]);
 
-    setModalStates(initial);
-  }
-}, [safeCategories]); // ✅ dependencia correcta
-
-
-  /* ---------------- Cambio de vista con loader ---------------- */
+  /* ---------------- Cambio de vista (spinner único) ---------------- */
   const handleViewChange = (view: "diario" | "perfil") => {
     if (view === activeView) return;
 
-    setViewLoading(true);
+    // limpiar timeout previo
+    if (viewTimeoutRef.current) {
+      clearTimeout(viewTimeoutRef.current);
+    }
 
-    setTimeout(() => {
-      setActiveView(view);
+    setActiveView(view);     // monta la vista
+    setViewLoading(true);   // muestra spinner
+
+    // ⏱️ spinner máximo 3s
+    viewTimeoutRef.current = setTimeout(() => {
       setViewLoading(false);
-    }, 1000);
-  };
-
-  /* ---------------- Helpers modales ---------------- */
-  const toggleQuizModal = (quizId: string, open: boolean) => {
-    setModalStates((prev) => ({
-      ...prev,
-      [quizId]: { ...prev[quizId], quizOpen: open },
-    }));
-  };
-
-  const toggleResultModal = (quizId: string, open: boolean) => {
-    setModalStates((prev) => ({
-      ...prev,
-      [quizId]: { ...prev[quizId], resultOpen: open },
-    }));
-  };
-
-  const toggleRecommendModal = (quizId: string, open: boolean) => {
-    setModalStates((prev) => ({
-      ...prev,
-      [quizId]: { ...prev[quizId], recommendOpen: open },
-    }));
+      viewTimeoutRef.current = null;
+    }, 3000);
   };
 
   /* ---------------- User ID ---------------- */
@@ -167,10 +151,9 @@ const Home: React.FC = () => {
     localStorage.setItem("showConfetti", "true");
   };
 
-  /* ---------------- Confetti post refresh ---------------- */
+  /* ---------------- Confetti ---------------- */
   useEffect(() => {
     const flag = localStorage.getItem("showConfetti");
-
     if (flag === "true") {
       setShowConfetti(true);
       localStorage.removeItem("showConfetti");
@@ -178,7 +161,7 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  /* ---------------- Loader general ---------------- */
+  /* ---------------- Loader global ---------------- */
   if (loading) {
     return (
       <div className="loader-screen">
@@ -190,7 +173,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
-      {/* 🔄 Loader cambio de vista */}
+      {/* 🔄 Overlay loader */}
       {viewLoading && (
         <div className="view-loading-overlay">
           <div className="mini-spinner" />
@@ -211,11 +194,28 @@ const Home: React.FC = () => {
       {activeView === "perfil" && (
         <PerfilSection
           categories={safeCategories}
+          results={results}
           setResults={setResults}
           refreshTrigger={refreshTrigger}
-          openQuizModal={(quiz) => toggleQuizModal(quiz.quiz.id, true)}
-          openResultModal={(id) => toggleResultModal(id, true)}
-          openRecommendModal={(id) => toggleRecommendModal(id, true)}
+          logout={logout}
+          openQuizModal={(quiz) =>
+            setModalStates((prev) => ({
+              ...prev,
+              [quiz.quiz.id]: { ...prev[quiz.quiz.id], quizOpen: true },
+            }))
+          }
+          openResultModal={(id) =>
+            setModalStates((prev) => ({
+              ...prev,
+              [id]: { ...prev[id], resultOpen: true },
+            }))
+          }
+          openRecommendModal={(id) =>
+            setModalStates((prev) => ({
+              ...prev,
+              [id]: { ...prev[id], recommendOpen: true },
+            }))
+          }
         />
       )}
 
@@ -233,13 +233,22 @@ const Home: React.FC = () => {
             resultModalOpen={state.resultOpen}
             recommendModalOpen={state.recommendOpen}
             setQuizModalOpen={(open) =>
-              toggleQuizModal(cat.quiz.id, open)
+              setModalStates((prev) => ({
+                ...prev,
+                [cat.quiz.id]: { ...prev[cat.quiz.id], quizOpen: open },
+              }))
             }
             setResultModalOpen={(open) =>
-              toggleResultModal(cat.quiz.id, open)
+              setModalStates((prev) => ({
+                ...prev,
+                [cat.quiz.id]: { ...prev[cat.quiz.id], resultOpen: open },
+              }))
             }
             setRecommendModalOpen={(open) =>
-              toggleRecommendModal(cat.quiz.id, open)
+              setModalStates((prev) => ({
+                ...prev,
+                [cat.quiz.id]: { ...prev[cat.quiz.id], recommendOpen: open },
+              }))
             }
             QuizComponentToRender={
               quizComponents[cat.quiz.id as QuizKey]
