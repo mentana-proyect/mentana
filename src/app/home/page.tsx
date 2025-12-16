@@ -57,6 +57,9 @@ const Home: React.FC = () => {
   const [viewLoading, setViewLoading] = useState(false);
   const viewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [initialLoading, setInitialLoading] = useState(true); // Estado para el spinner inicial
+  const initialTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref para el timeout inicial
+
   const [userId, setUserId] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -86,7 +89,21 @@ const Home: React.FC = () => {
     }
   }, [safeCategories]);
 
-  /* ---------------- Cambio de vista (spinner único) ---------------- */
+  /* ---------------- Spinner inicial (1 segundo) ---------------- */
+  useEffect(() => {
+    initialTimeoutRef.current = setTimeout(() => {
+      setInitialLoading(false); // Ocultar spinner después de 1 segundo
+      initialTimeoutRef.current = null;
+    }, 1000); // 1 segundo
+
+    return () => {
+      if (initialTimeoutRef.current) {
+        clearTimeout(initialTimeoutRef.current); // Limpiar timeout si se desmonta el componente
+      }
+    };
+  }, []);
+
+  /* ---------------- Cambio de vista (spinner de vista) ---------------- */
   const handleViewChange = (view: "diario" | "perfil") => {
     if (view === activeView) return;
 
@@ -161,18 +178,16 @@ const Home: React.FC = () => {
     }
   }, []);
 
-  /* ---------------- Loader global ---------------- */
-  if (loading) {
-    return (
-      <div className="loader-screen">
-        <div className="spinner" />
-        <p className="loader-text">Cargando...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="home-container">
+      {/* 🔄 Spinner inicial */}
+      {initialLoading && (
+        <div className="loader-screen">
+          <div className="spinner" />
+          <p className="loader-text">Cargando...</p>
+        </div>
+      )}
+
       {/* 🔄 Overlay loader */}
       {viewLoading && (
         <div className="view-loading-overlay">
