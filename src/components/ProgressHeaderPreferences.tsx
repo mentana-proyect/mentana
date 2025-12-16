@@ -8,7 +8,7 @@ interface QuizProgress {
 }
 
 interface Props {
-  refreshTrigger?: number; // 🔹 Dependencia para refrescar
+  refreshTrigger?: number; // Dependencia para refrescar
 }
 
 const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
@@ -18,7 +18,7 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
   useEffect(() => {
     const fetchProgress = async () => {
-      setLoading(true);
+      setLoading(true); // Cargando
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -45,7 +45,7 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
         setCompleted(completedQuizzes > totalQuizzes ? totalQuizzes : completedQuizzes);
       }
 
-      setLoading(false);
+      setLoading(false); // Carga terminada
     };
 
     fetchProgress();
@@ -79,12 +79,11 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
           <h3>Preferencias Psicológicas</h3>
         </div>
 
+        
+
         <p style={{ textAlign: "center" }}>
-          
           <strong>👉 Es tu espacio seguro, pensado para ti 🌱</strong>
         </p>
-
-      
       </article>
     </header>
   );

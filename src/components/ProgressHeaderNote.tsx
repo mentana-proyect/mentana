@@ -16,9 +16,9 @@ const TOTAL_QUIZZES = 4;
 const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
   const [completedCount, setCompletedCount] = useState<number>(0);
 
-  // -------------------------------
-  // 🔹 Función optimizada con useCallback
-  // -------------------------------
+  /* -------------------------------------------
+     OBTENER PROGRESO DE QUIZZES
+  ------------------------------------------- */
   const fetchProgress = useCallback(async () => {
     const {
       data: { user },
@@ -38,26 +38,26 @@ const ProgressHeader: React.FC<Props> = ({ refreshTrigger = 0 }) => {
 
     if (!data) return;
 
-    const completed = data.filter((q: QuizProgress) => q.completed).length;
+    const completed = data.filter(
+      (q: QuizProgress) => q.completed
+    ).length;
 
     setCompletedCount(Math.min(completed, TOTAL_QUIZZES));
   }, []);
 
-  // -------------------------------
-  // 🔹 Ejecutar fetch en montaje o cuando refreshTrigger cambie
-  // -------------------------------
   useEffect(() => {
     fetchProgress();
   }, [fetchProgress, refreshTrigger]);
 
-  // -------------------------------
-  // 🔹 Render
-  // -------------------------------
+  const progressPercent = Math.round(
+    (completedCount / TOTAL_QUIZZES) * 100
+  );
+
   return (
     <header>
       <article>
         <div style={{ textAlign: "center" }}>
-          {/* SVG AQUÍ */}
+          {/* LOGO / SVG */}
           <svg
             id="Capa_4"
             data-name="Capa 4"

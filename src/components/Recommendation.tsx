@@ -46,37 +46,37 @@ export const getRecommendation = (quizType: string, score: number): string => {
   }
 };
 
-// Nivel visual según score (color + tono emocional)
+// Nivel visual según score (color)
 const getLevelInfo = (quizType: string, score: number) => {
   if (quizType === "ansiedad") {
-    if (score <= 4) return { label: "Bajo", color: "level-low" };
-    if (score <= 9) return { label: "Leve", color: "level-mild" };
-    if (score <= 14) return { label: "Moderado", color: "level-mid" };
-    return { label: "Alto", color: "level-high" };
+    if (score <= 4) return { color: "level-low" };
+    if (score <= 9) return { color: "level-mild" };
+    if (score <= 14) return { color: "level-mid" };
+    return { color: "level-high" };
   }
 
   if (quizType === "depresion") {
-    if (score <= 4) return { label: "Estable", color: "level-low" };
-    if (score <= 9) return { label: "Leve", color: "level-mild" };
-    if (score <= 14) return { label: "Moderado", color: "level-mid" };
-    if (score <= 19) return { label: "Moderado-Alto", color: "level-midHigh" };
-    return { label: "Alto", color: "level-high" };
+    if (score <= 4) return { color: "level-low" };
+    if (score <= 9) return { color: "level-mild" };
+    if (score <= 14) return { color: "level-mid" };
+    if (score <= 19) return { color: "level-midHigh" };
+    return { color: "level-high" };
   }
 
   if (quizType === "estres") {
-    if (score <= 13) return { label: "Bajo", color: "level-low" };
-    if (score <= 19) return { label: "Leve", color: "level-mild" };
-    if (score <= 26) return { label: "Moderado", color: "level-mid" };
-    return { label: "Alto", color: "level-high" };
+    if (score <= 13) return { color: "level-low" };
+    if (score <= 19) return { color: "level-mild" };
+    if (score <= 26) return { color: "level-mid" };
+    return { color: "level-high" };
   }
 
   if (quizType === "soledad") {
-    if (score <= 20) return { label: "Bajo", color: "level-low" };
-    if (score <= 40) return { label: "Moderado", color: "level-mid" };
-    return { label: "Alto", color: "level-high" };
+    if (score <= 20) return { color: "level-low" };
+    if (score <= 40) return { color: "level-mid" };
+    return { color: "level-high" };
   }
 
-  return { label: "—", color: "" };
+  return { color: "" };
 };
 
 interface RecommendationProps {
@@ -87,16 +87,16 @@ interface RecommendationProps {
 const Recommendation: React.FC<RecommendationProps> = ({ quizId, score }) => {
   const quizType = quizId.replace(/[0-9]/g, "");
   const recommendation = getRecommendation(quizType, score);
-  const { label, color } = getLevelInfo(quizType, score);
+  const { color } = getLevelInfo(quizType, score);
 
   return (
     <div className={`recommendation-card ${color}`}>
       <div className="rec-header">
         <h2 className="recommendation-title">Tu recomendación</h2>
-        
       </div>
 
-      <p className="recommendation-text">{recommendation}</p><Footer />
+      <p className="recommendation-text">{recommendation}</p>
+      <Footer />
     </div>
   );
 };
