@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import Confetti from "react-confetti";
 import "../../styles/home.css";
 import { supabase } from "../../lib/supabaseClient";
 
@@ -46,7 +45,7 @@ const Home: React.FC = () => {
   const logout = useLogout();
   useInactivityTimer(logout);
 
-  const { categories, results, setResults, loading } =
+  const { categories, results, setResults } =
     useFetchProgress(initialData);
 
   const safeCategories = useMemo(() => categories || [], [categories]);
@@ -57,8 +56,8 @@ const Home: React.FC = () => {
   const [viewLoading, setViewLoading] = useState(false);
   const viewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [initialLoading, setInitialLoading] = useState(true); // Estado para el spinner inicial
-  const initialTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref para el timeout inicial
+  const [initialLoading, setInitialLoading] = useState(true);
+  const initialTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [userId, setUserId] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -67,7 +66,6 @@ const Home: React.FC = () => {
     useState<Record<string, ModalState>>({});
 
   const initialized = useRef(false);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   /* ---------------- Inicializar modales ---------------- */
   useEffect(() => {
@@ -92,30 +90,28 @@ const Home: React.FC = () => {
   /* ---------------- Spinner inicial (1 segundo) ---------------- */
   useEffect(() => {
     initialTimeoutRef.current = setTimeout(() => {
-      setInitialLoading(false); // Ocultar spinner después de 1 segundo
+      setInitialLoading(false);
       initialTimeoutRef.current = null;
-    }, 1000); // 1 segundo
+    }, 1000);
 
     return () => {
       if (initialTimeoutRef.current) {
-        clearTimeout(initialTimeoutRef.current); // Limpiar timeout si se desmonta el componente
+        clearTimeout(initialTimeoutRef.current);
       }
     };
   }, []);
 
-  /* ---------------- Cambio de vista (spinner de vista) ---------------- */
+  /* ---------------- Cambio de vista ---------------- */
   const handleViewChange = (view: "diario" | "perfil") => {
     if (view === activeView) return;
 
-    // limpiar timeout previo
     if (viewTimeoutRef.current) {
       clearTimeout(viewTimeoutRef.current);
     }
 
-    setActiveView(view);     // monta la vista
-    setViewLoading(true);   // muestra spinner
+    setActiveView(view);
+    setViewLoading(true);
 
-    // ⏱️ spinner máximo 2s
     viewTimeoutRef.current = setTimeout(() => {
       setViewLoading(false);
       viewTimeoutRef.current = null;
@@ -164,19 +160,7 @@ const Home: React.FC = () => {
         },
       }));
     }, 3000);
-
-    localStorage.setItem("showConfetti", "true");
   };
-
-  /* ---------------- Confetti ---------------- */
-  useEffect(() => {
-    const flag = localStorage.getItem("showConfetti");
-    if (flag === "true") {
-      setShowConfetti(true);
-      localStorage.removeItem("showConfetti");
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-  }, []);
 
   return (
     <div className="home-container">
@@ -272,14 +256,6 @@ const Home: React.FC = () => {
           />
         );
       })}
-
-      {showConfetti && (
-        <Confetti
-          width={window.innerWidth}
-          height={window.innerHeight}
-          recycle={false}
-        />
-      )}
 
       <DockFooter logout={logout} />
     </div>
