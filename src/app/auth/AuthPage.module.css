@@ -502,3 +502,14 @@ body {
     white-space: nowrap;       /* Evita saltos de línea */
   }
 }
+.modalScroll {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.modalScroll p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
