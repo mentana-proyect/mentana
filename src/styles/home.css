@@ -663,3 +663,16 @@ header .logo {
     transform: rotate(360deg);
   }
 }
+.view-description {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.view-description p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #999;
+  max-width: 520px;
+  margin: 0 auto;
+}

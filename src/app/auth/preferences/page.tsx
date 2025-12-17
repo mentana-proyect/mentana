@@ -49,8 +49,8 @@ function QuestionCard({
 
   return (
     <div style={{ ...styles.card, textAlign: "center" }}>
-      <h2 style={{ ...styles.questcardion, textAlign: "center" }}>
-        {question}
+      <h2 style={{ ...styles.questcardion, textAlign: "center", fontSize: "16px" }}>
+        <strong>{question}</strong>
       </h2>
 
       <div style={{ ...styles.tagContainer, justifyContent: "center" }}>
@@ -154,7 +154,7 @@ export default function PreferenciasPsicologicas() {
               width: `${progress}%`,
               background: "linear-gradient(90deg, #ff8cd3, #56dbc4)",
               height: "100%",
-              borderRadius: "5px",
+              borderRadius: "16px",
               transition: "width 0.3s ease",
             }}
           />

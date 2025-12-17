@@ -12,9 +12,11 @@ import { useInactivityTimer } from "./utils/useInactivityTimer";
 import { useLogout } from "./utils/useLogout";
 import { useFetchProgress } from "./utils/useFetchProgress";
 
+
 import ViewToggle from "./components/ViewToggle";
 import NotesSection from "./components/NotesSection";
 import PerfilSection from "./components/PerfilSection";
+import ViewDescription from "./components/ViewDescription";
 import QuizModals from "./components/QuizModals";
 import ProgressHeaderNote from "../../components/ProgressHeaderNote";
 
@@ -182,10 +184,13 @@ const Home: React.FC = () => {
 
       <div className="daily-notes-container">
         <ProgressHeaderNote refreshTrigger={refreshTrigger} />
+
         <ViewToggle
           activeView={activeView}
           setActiveView={handleViewChange}
         />
+
+        <ViewDescription activeView={activeView} />
       </div>
 
       {activeView === "diario" && <NotesSection userId={userId} />}
@@ -257,7 +262,9 @@ const Home: React.FC = () => {
         );
       })}
 
-      <DockFooter logout={logout} />
+      {!initialLoading && !viewLoading && (
+        <DockFooter logout={logout} />
+      )}
     </div>
   );
 };

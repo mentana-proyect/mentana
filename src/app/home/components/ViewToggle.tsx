@@ -25,7 +25,7 @@ const ViewToggle = ({ activeView, setActiveView }: Props) => {
               <path d="M8 3V5" />
               <path d="M4 9h16" />
             </svg>{" "}
-            <strong>Diario</strong>
+            <strong>DED</strong>
           </button>
 
       <button
@@ -46,8 +46,9 @@ const ViewToggle = ({ activeView, setActiveView }: Props) => {
               <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <strong>Perfil</strong>
+            <strong>PEP</strong>
           </button>
+          
     </div>
   );
 };

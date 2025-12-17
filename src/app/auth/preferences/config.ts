@@ -110,23 +110,23 @@ export const questionConfig = [
 
 export const styles: Record<string, React.CSSProperties> = {
   container: {
-    
     maxWidth: "700px",
     margin: "0 auto",
-    padding: "20px",
+    padding: "10px",
     fontFamily: "sans-serif",
+    fontSize: "14px",
   },
   title: {
     
     textAlign: "center",
-    fontSize: "28px",
+    fontSize: "20px",
     fontWeight: "bold",
     color: "#56dbc4",
   },
   subtitle: {
     
     textAlign: "center",
-    marginBottom: "20px",
+    marginBottom: "16px",
     color: "#fff",
   },
   card: {
@@ -135,10 +135,11 @@ export const styles: Record<string, React.CSSProperties> = {
   borderRadius: "16px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
   marginBottom: "20px",
+  
 },
 
   question: {
-    fontSize: "20px",
+    fontSize: "16px",
     marginBottom: "14px",
     
   },
@@ -147,10 +148,11 @@ export const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexWrap: "wrap",
     gap: "10px",
+    
   },
   tag: {
-    padding: "6px 14px",
-    borderRadius: "30px",
+    padding: "4px 4px",
+    borderRadius: "16px",
     background: "#ccc",
     cursor: "pointer",
     transition: "0.2s",

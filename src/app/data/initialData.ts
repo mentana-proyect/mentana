@@ -6,7 +6,7 @@ export const initialData: Category[] = [
     quiz: {
       id: "ansiedad1",
       title: "Ansiedad GAD-7",
-      description: "El GAD-7 (Generalized Anxiety Disorder-7) es un cuestionario breve de 7 ítems diseñado para evaluar la presencia y gravedad de la ansiedad generalizada en adultos.",
+      description: "El GAD-7 (Generalized Anxiety Disorder-7) es un cuestionario validado, que consta de 7 preguntas que nos ayuda a identificar la presencia e intensidad de síntomas de ansiedad en personas adultas.",
       unlocked: true,
       completed: false,
     },
@@ -26,7 +26,7 @@ export const initialData: Category[] = [
     quiz: {
       id: "estres1",
       title: "Estrés PSS-10",
-      description: "El PSS-10 (Perceived Stress Scale-10) es un cuestionario de 10 ítems diseñado para medir el nivel de estrés percibido en adultos.",
+      description: "El PSS-10 (Perceived Stress Scale-10) es un instrumento validado que mide el nivel de estrés percibido en personas adultas.",
       unlocked: true,
       completed: false,
     },

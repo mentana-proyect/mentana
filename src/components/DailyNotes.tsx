@@ -105,15 +105,16 @@ const DailyNotes: React.FC<Props> = ({ userId }) => {
 
   return (
     <div className="daily-notes-container">
-      <h2 style={{ textAlign: "left" }}>Mentana Chile</h2>
+      <h2 style={{ textAlign: "center", color:"#56dbc4" }}>Diario Emocional Digital</h2>
 
-      <p style={{ textAlign: "left" }}>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+      <p style={{ textAlign: "center", fontSize:"16px"}}>
+        Cuando anotas tu día a día, empiezas a ver con más claridad lo que sientes.<br /> Aquí te acompañamos a descubrirlo.
+
       </p>
 
       <textarea
         className="daily-note-input"
-        placeholder="Escribe una nota sobre tu día..."
+        placeholder="¿Cómo te sientes hoy?..."
         value={note}
         onChange={(e) => setNote(e.target.value)}
       />

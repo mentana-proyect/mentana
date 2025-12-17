@@ -28,7 +28,7 @@ html, body {
   margin: 10px;
   width: 95%;
   max-width: 450px;
-  padding: 25px;
+  padding: 20px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
@@ -216,8 +216,8 @@ html, body {
   max-width: 200px; /* tamaño máximo */
   height: auto;
   transition: transform 0.3s ease;
-  margin-top: -80px;
-  margin-bottom: -80px;
+  margin-top: -60px;
+  margin-bottom: -60px;
 }
 
 
